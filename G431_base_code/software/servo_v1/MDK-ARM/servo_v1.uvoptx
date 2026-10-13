@@ -125,7 +125,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>DLGTARM</Key>
-          <Name>(1010=-1,-1,-1,-1,0)(1007=-1,-1,-1,-1,0)(1008=-1,-1,-1,-1,0)(1009=-1,-1,-1,-1,0)(1012=-1,-1,-1,-1,0)</Name>
+          <Name>(1010=-1,-1,-1,-1,0)(1007=-1,-1,-1,-1,0)(1008=1002,442,1378,678,0)(1009=-1,-1,-1,-1,0)(1012=-1,-1,-1,-1,0)</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -164,6 +164,11 @@
           <count>2</count>
           <WinNumber>1</WinNumber>
           <ItemText>s_mon,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>3</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>g_measurement_manager,0x0A</ItemText>
         </Ww>
       </WatchWindow1>
       <Tracepoint>
@@ -208,6 +213,16 @@
       <pszMrulep></pszMrulep>
       <pSingCmdsp></pSingCmdsp>
       <pMultCmdsp></pMultCmdsp>
+      <SystemViewers>
+        <Entry>
+          <Name>System Viewer\RCC</Name>
+          <WinId>35904</WinId>
+        </Entry>
+        <Entry>
+          <Name>System Viewer\TIM1</Name>
+          <WinId>35905</WinId>
+        </Entry>
+      </SystemViewers>
       <DebugDescription>
         <Enable>1</Enable>
         <EnableFlashSeq>0</EnableFlashSeq>
@@ -219,7 +234,7 @@
   </Target>
 
   <Group>
-    <GroupName>Application/MDK-ARM</GroupName>
+    <GroupName>Application/Startup</GroupName>
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
@@ -239,8 +254,8 @@
   </Group>
 
   <Group>
-    <GroupName>Application/User/Core</GroupName>
-    <tvExp>1</tvExp>
+    <GroupName>Application/Core</GroupName>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -259,6 +274,18 @@
     <File>
       <GroupNumber>2</GroupNumber>
       <FileNumber>3</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>../Core/Inc/main.h</PathWithFileName>
+      <FilenameWithoutPath>main.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>2</GroupNumber>
+      <FileNumber>4</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -270,79 +297,19 @@
     </File>
     <File>
       <GroupNumber>2</GroupNumber>
-      <FileNumber>4</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>../Core/Src/i2c.c</PathWithFileName>
-      <FilenameWithoutPath>i2c.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>2</GroupNumber>
       <FileNumber>5</FileNumber>
-      <FileType>1</FileType>
+      <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>../Core/Src/stspin32g4.c</PathWithFileName>
-      <FilenameWithoutPath>stspin32g4.c</FilenameWithoutPath>
+      <PathWithFileName>../Core/Inc/gpio.h</PathWithFileName>
+      <FilenameWithoutPath>gpio.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>2</GroupNumber>
       <FileNumber>6</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>../Core/Src/tim.c</PathWithFileName>
-      <FilenameWithoutPath>tim.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>2</GroupNumber>
-      <FileNumber>7</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>../Core/Src/tim1_pwm.c</PathWithFileName>
-      <FilenameWithoutPath>tim1_pwm.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>2</GroupNumber>
-      <FileNumber>8</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>../Core/Src/tim1_pwm_verify.c</PathWithFileName>
-      <FilenameWithoutPath>tim1_pwm_verify.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>2</GroupNumber>
-      <FileNumber>9</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>../Core/Src/drv_monitor.c</PathWithFileName>
-      <FilenameWithoutPath>drv_monitor.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>2</GroupNumber>
-      <FileNumber>10</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -354,7 +321,19 @@
     </File>
     <File>
       <GroupNumber>2</GroupNumber>
-      <FileNumber>11</FileNumber>
+      <FileNumber>7</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>../Core/Inc/stm32g4xx_it.h</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_it.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>2</GroupNumber>
+      <FileNumber>8</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -366,7 +345,19 @@
     </File>
     <File>
       <GroupNumber>2</GroupNumber>
-      <FileNumber>12</FileNumber>
+      <FileNumber>9</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>../Core/Inc/stm32g4xx_hal_conf.h</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_conf.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>2</GroupNumber>
+      <FileNumber>10</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -379,11 +370,35 @@
   </Group>
 
   <Group>
-    <GroupName>Drivers/STM32G4xx_HAL_Driver</GroupName>
+    <GroupName>Modules/Three-Phase Communication</GroupName>
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
+    <File>
+      <GroupNumber>3</GroupNumber>
+      <FileNumber>11</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>../Core/Src/i2c.c</PathWithFileName>
+      <FilenameWithoutPath>i2c.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>3</GroupNumber>
+      <FileNumber>12</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>../Core/Inc/i2c.h</PathWithFileName>
+      <FilenameWithoutPath>i2c.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
     <File>
       <GroupNumber>3</GroupNumber>
       <FileNumber>13</FileNumber>
@@ -391,20 +406,20 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_pwr_ex.c</PathWithFileName>
-      <FilenameWithoutPath>stm32g4xx_hal_pwr_ex.c</FilenameWithoutPath>
+      <PathWithFileName>../Core/Src/tim.c</PathWithFileName>
+      <FilenameWithoutPath>tim.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>3</GroupNumber>
       <FileNumber>14</FileNumber>
-      <FileType>1</FileType>
+      <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal.c</PathWithFileName>
-      <FilenameWithoutPath>stm32g4xx_hal.c</FilenameWithoutPath>
+      <PathWithFileName>../Core/Inc/tim.h</PathWithFileName>
+      <FilenameWithoutPath>tim.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -415,20 +430,20 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_rcc.c</PathWithFileName>
-      <FilenameWithoutPath>stm32g4xx_hal_rcc.c</FilenameWithoutPath>
+      <PathWithFileName>../Core/Src/stspin32g4.c</PathWithFileName>
+      <FilenameWithoutPath>stspin32g4.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>3</GroupNumber>
       <FileNumber>16</FileNumber>
-      <FileType>1</FileType>
+      <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_rcc_ex.c</PathWithFileName>
-      <FilenameWithoutPath>stm32g4xx_hal_rcc_ex.c</FilenameWithoutPath>
+      <PathWithFileName>../Core/Inc/stspin32g4.h</PathWithFileName>
+      <FilenameWithoutPath>stspin32g4.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -439,14 +454,178 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_flash.c</PathWithFileName>
-      <FilenameWithoutPath>stm32g4xx_hal_flash.c</FilenameWithoutPath>
+      <PathWithFileName>../Core/Src/drv_monitor.c</PathWithFileName>
+      <FilenameWithoutPath>drv_monitor.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>3</GroupNumber>
       <FileNumber>18</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>../Core/Inc/drv_monitor.h</PathWithFileName>
+      <FilenameWithoutPath>drv_monitor.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+  </Group>
+
+  <Group>
+    <GroupName>Modules/Three-Phase Driver</GroupName>
+    <tvExp>0</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
+    <File>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>19</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>../Core/Src/tim1_pwm.c</PathWithFileName>
+      <FilenameWithoutPath>tim1_pwm.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>20</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>../Core/Inc/tim1_pwm.h</PathWithFileName>
+      <FilenameWithoutPath>tim1_pwm.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>21</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>../Core/Src/tim1_pwm_verify.c</PathWithFileName>
+      <FilenameWithoutPath>tim1_pwm_verify.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>22</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>../Core/Inc/tim1_pwm_verify.h</PathWithFileName>
+      <FilenameWithoutPath>tim1_pwm_verify.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>23</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>../Core/Inc/measurement_manager.h</PathWithFileName>
+      <FilenameWithoutPath>measurement_manager.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+  </Group>
+
+  <Group>
+    <GroupName>Modules/Current Sampling</GroupName>
+    <tvExp>0</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
+  </Group>
+
+  <Group>
+    <GroupName>Modules/Encoder</GroupName>
+    <tvExp>0</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
+  </Group>
+
+  <Group>
+    <GroupName>Drivers/STM32G4xx_HAL_Driver</GroupName>
+    <tvExp>0</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
+    <File>
+      <GroupNumber>7</GroupNumber>
+      <FileNumber>24</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_pwr_ex.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_pwr_ex.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>7</GroupNumber>
+      <FileNumber>25</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>7</GroupNumber>
+      <FileNumber>26</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_rcc.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_rcc.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>7</GroupNumber>
+      <FileNumber>27</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_rcc_ex.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_rcc_ex.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>7</GroupNumber>
+      <FileNumber>28</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_flash.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_flash.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>7</GroupNumber>
+      <FileNumber>29</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -457,8 +636,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>19</FileNumber>
+      <GroupNumber>7</GroupNumber>
+      <FileNumber>30</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -469,8 +648,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>20</FileNumber>
+      <GroupNumber>7</GroupNumber>
+      <FileNumber>31</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -481,8 +660,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>21</FileNumber>
+      <GroupNumber>7</GroupNumber>
+      <FileNumber>32</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -493,8 +672,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>22</FileNumber>
+      <GroupNumber>7</GroupNumber>
+      <FileNumber>33</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -505,8 +684,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>23</FileNumber>
+      <GroupNumber>7</GroupNumber>
+      <FileNumber>34</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -517,8 +696,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>24</FileNumber>
+      <GroupNumber>7</GroupNumber>
+      <FileNumber>35</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -529,8 +708,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>25</FileNumber>
+      <GroupNumber>7</GroupNumber>
+      <FileNumber>36</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -541,8 +720,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>26</FileNumber>
+      <GroupNumber>7</GroupNumber>
+      <FileNumber>37</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -553,8 +732,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>27</FileNumber>
+      <GroupNumber>7</GroupNumber>
+      <FileNumber>38</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -565,8 +744,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>28</FileNumber>
+      <GroupNumber>7</GroupNumber>
+      <FileNumber>39</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -577,8 +756,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>29</FileNumber>
+      <GroupNumber>7</GroupNumber>
+      <FileNumber>40</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -597,8 +776,8 @@
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
     <File>
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>30</FileNumber>
+      <GroupNumber>8</GroupNumber>
+      <FileNumber>41</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>

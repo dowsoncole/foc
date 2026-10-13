@@ -144,34 +144,58 @@ build:
   linker:
     script: ../../../servo_v1_servo_v1.sct
   groups:
-    - group: Application/MDK-ARM
+    - group: Application/Startup
       files:
         - file: ../../../startup_stm32g431xx.s
           category: sourceAsm
-    - group: Application/User/Core
+    - group: Application/Core
       files:
         - file: ../../../../Core/Src/main.c
           category: sourceC
+        - file: ../../../../Core/Inc/main.h
+          category: header
         - file: ../../../../Core/Src/gpio.c
           category: sourceC
-        - file: ../../../../Core/Src/i2c.c
-          category: sourceC
-        - file: ../../../../Core/Src/stspin32g4.c
-          category: sourceC
-        - file: ../../../../Core/Src/tim.c
-          category: sourceC
-        - file: ../../../../Core/Src/tim1_pwm.c
-          category: sourceC
-        - file: ../../../../Core/Src/tim1_pwm_verify.c
-          category: sourceC
-        - file: ../../../../Core/Src/drv_monitor.c
-          category: sourceC
+        - file: ../../../../Core/Inc/gpio.h
+          category: header
         - file: ../../../../Core/Src/stm32g4xx_it.c
           category: sourceC
+        - file: ../../../../Core/Inc/stm32g4xx_it.h
+          category: header
         - file: ../../../../Core/Src/stm32g4xx_hal_msp.c
           category: sourceC
+        - file: ../../../../Core/Inc/stm32g4xx_hal_conf.h
+          category: header
         - file: ../../../../Core/Src/readme.md
           category: doc
+    - group: Modules/MOS Driver
+      files:
+        - file: ../../../../Core/Src/i2c.c
+          category: sourceC
+        - file: ../../../../Core/Inc/i2c.h
+          category: header
+        - file: ../../../../Core/Src/tim.c
+          category: sourceC
+        - file: ../../../../Core/Inc/tim.h
+          category: header
+        - file: ../../../../Core/Src/stspin32g4.c
+          category: sourceC
+        - file: ../../../../Core/Inc/stspin32g4.h
+          category: header
+        - file: ../../../../Core/Src/drv_monitor.c
+          category: sourceC
+        - file: ../../../../Core/Inc/drv_monitor.h
+          category: header
+    - group: Modules/Three-Phase Driver
+      files:
+        - file: ../../../../Core/Src/tim1_pwm.c
+          category: sourceC
+        - file: ../../../../Core/Inc/tim1_pwm.h
+          category: header
+        - file: ../../../../Core/Src/tim1_pwm_verify.c
+          category: sourceC
+        - file: ../../../../Core/Inc/tim1_pwm_verify.h
+          category: header
     - group: Drivers/STM32G4xx_HAL_Driver
       files:
         - file: ../../../../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_pwr_ex.c

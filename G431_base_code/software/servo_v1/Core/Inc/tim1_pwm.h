@@ -28,7 +28,7 @@ extern "C" {
 /* --------------------------------------------------------------------------*/
 /* Timing                                                                    */
 /* --------------------------------------------------------------------------*/
-/* SystemClock_Config() sets SYSCLK = HSE 12 MHz / 1 * 28 / 2 = 168 MHz with
+/* SystemClock_Config() sets SYSCLK = HSE 8 MHz / 2 * 84 / 2 = 168 MHz with
    APB2 prescaler 1, so TIM1 is clocked at 168 MHz. */
 #define TIM1_PWM_TIMER_CLOCK_HZ     168000000UL
 

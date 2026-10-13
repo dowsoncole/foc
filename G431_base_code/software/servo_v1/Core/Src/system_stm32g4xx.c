@@ -78,8 +78,8 @@
 #include "stm32g4xx.h"
 
 #if !defined  (HSE_VALUE)
-  /* The board fitted crystal X1 (TXC AV12000007) is 12 MHz. */
-  #define HSE_VALUE     12000000U /*!< Value of the External oscillator in Hz */
+  /* The board fitted crystal X1 is 8 MHz. */
+  #define HSE_VALUE     8000000U /*!< Value of the External oscillator in Hz */
 #endif /* HSE_VALUE */
 
 #if !defined  (HSI_VALUE)
@@ -218,7 +218,7 @@ void SystemInit(void)
   *              in voltage and temperature.
   *
   *         (***) HSE_VALUE is a constant defined in stm32g4xx_hal.h file (default value
-  *              12 MHz for this board), user has to ensure that HSE_VALUE is same as the real
+  *              8 MHz for this board), user has to ensure that HSE_VALUE is same as the real
   *              frequency of the crystal used. Otherwise, this function may
   *              have wrong result.
   *

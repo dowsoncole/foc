@@ -1,24 +1,24 @@
 # groups.cmake
 
-# group Application/MDK-ARM
-add_library(Group_Application_MDK-ARM OBJECT
+# group Application/Startup
+add_library(Group_Application_Startup OBJECT
   "${SOLUTION_ROOT}/startup_stm32g431xx.s"
 )
-target_include_directories(Group_Application_MDK-ARM PUBLIC
+target_include_directories(Group_Application_Startup PUBLIC
   $<TARGET_PROPERTY:${CONTEXT},INTERFACE_INCLUDE_DIRECTORIES>
 )
-target_compile_definitions(Group_Application_MDK-ARM PUBLIC
+target_compile_definitions(Group_Application_Startup PUBLIC
   $<TARGET_PROPERTY:${CONTEXT},INTERFACE_COMPILE_DEFINITIONS>
 )
-add_library(Group_Application_MDK-ARM_ABSTRACTIONS INTERFACE)
-target_link_libraries(Group_Application_MDK-ARM_ABSTRACTIONS INTERFACE
+add_library(Group_Application_Startup_ABSTRACTIONS INTERFACE)
+target_link_libraries(Group_Application_Startup_ABSTRACTIONS INTERFACE
   ${CONTEXT}_ABSTRACTIONS
 )
-target_compile_options(Group_Application_MDK-ARM PUBLIC
+target_compile_options(Group_Application_Startup PUBLIC
   $<TARGET_PROPERTY:${CONTEXT},INTERFACE_COMPILE_OPTIONS>
 )
-target_link_libraries(Group_Application_MDK-ARM PUBLIC
-  Group_Application_MDK-ARM_ABSTRACTIONS
+target_link_libraries(Group_Application_Startup PUBLIC
+  Group_Application_Startup_ABSTRACTIONS
 )
 set(COMPILE_DEFINITIONS
   STM32G431xx
@@ -29,34 +29,77 @@ set_source_files_properties("${SOLUTION_ROOT}/startup_stm32g431xx.s" PROPERTIES
   COMPILE_FLAGS "${COMPILE_DEFINITIONS}"
 )
 
-# group Application/User/Core
-add_library(Group_Application_User_Core OBJECT
+# group Application/Core
+add_library(Group_Application_Core OBJECT
   "${SOLUTION_ROOT}/../Core/Src/main.c"
   "${SOLUTION_ROOT}/../Core/Src/gpio.c"
-  "${SOLUTION_ROOT}/../Core/Src/i2c.c"
-  "${SOLUTION_ROOT}/../Core/Src/stspin32g4.c"
-  "${SOLUTION_ROOT}/../Core/Src/tim.c"
-  "${SOLUTION_ROOT}/../Core/Src/tim1_pwm.c"
-  "${SOLUTION_ROOT}/../Core/Src/tim1_pwm_verify.c"
-  "${SOLUTION_ROOT}/../Core/Src/drv_monitor.c"
   "${SOLUTION_ROOT}/../Core/Src/stm32g4xx_it.c"
   "${SOLUTION_ROOT}/../Core/Src/stm32g4xx_hal_msp.c"
 )
-target_include_directories(Group_Application_User_Core PUBLIC
+target_include_directories(Group_Application_Core PUBLIC
   $<TARGET_PROPERTY:${CONTEXT},INTERFACE_INCLUDE_DIRECTORIES>
+  "${SOLUTION_ROOT}/../Core/Inc"
 )
-target_compile_definitions(Group_Application_User_Core PUBLIC
+target_compile_definitions(Group_Application_Core PUBLIC
   $<TARGET_PROPERTY:${CONTEXT},INTERFACE_COMPILE_DEFINITIONS>
 )
-add_library(Group_Application_User_Core_ABSTRACTIONS INTERFACE)
-target_link_libraries(Group_Application_User_Core_ABSTRACTIONS INTERFACE
+add_library(Group_Application_Core_ABSTRACTIONS INTERFACE)
+target_link_libraries(Group_Application_Core_ABSTRACTIONS INTERFACE
   ${CONTEXT}_ABSTRACTIONS
 )
-target_compile_options(Group_Application_User_Core PUBLIC
+target_compile_options(Group_Application_Core PUBLIC
   $<TARGET_PROPERTY:${CONTEXT},INTERFACE_COMPILE_OPTIONS>
 )
-target_link_libraries(Group_Application_User_Core PUBLIC
-  Group_Application_User_Core_ABSTRACTIONS
+target_link_libraries(Group_Application_Core PUBLIC
+  Group_Application_Core_ABSTRACTIONS
+)
+
+# group Modules/MOS Driver
+add_library(Group_Modules_MOS_Driver OBJECT
+  "${SOLUTION_ROOT}/../Core/Src/i2c.c"
+  "${SOLUTION_ROOT}/../Core/Src/tim.c"
+  "${SOLUTION_ROOT}/../Core/Src/stspin32g4.c"
+  "${SOLUTION_ROOT}/../Core/Src/drv_monitor.c"
+)
+target_include_directories(Group_Modules_MOS_Driver PUBLIC
+  $<TARGET_PROPERTY:${CONTEXT},INTERFACE_INCLUDE_DIRECTORIES>
+  "${SOLUTION_ROOT}/../Core/Inc"
+)
+target_compile_definitions(Group_Modules_MOS_Driver PUBLIC
+  $<TARGET_PROPERTY:${CONTEXT},INTERFACE_COMPILE_DEFINITIONS>
+)
+add_library(Group_Modules_MOS_Driver_ABSTRACTIONS INTERFACE)
+target_link_libraries(Group_Modules_MOS_Driver_ABSTRACTIONS INTERFACE
+  ${CONTEXT}_ABSTRACTIONS
+)
+target_compile_options(Group_Modules_MOS_Driver PUBLIC
+  $<TARGET_PROPERTY:${CONTEXT},INTERFACE_COMPILE_OPTIONS>
+)
+target_link_libraries(Group_Modules_MOS_Driver PUBLIC
+  Group_Modules_MOS_Driver_ABSTRACTIONS
+)
+
+# group Modules/Three-Phase Driver
+add_library(Group_Modules_Three-Phase_Driver OBJECT
+  "${SOLUTION_ROOT}/../Core/Src/tim1_pwm.c"
+  "${SOLUTION_ROOT}/../Core/Src/tim1_pwm_verify.c"
+)
+target_include_directories(Group_Modules_Three-Phase_Driver PUBLIC
+  $<TARGET_PROPERTY:${CONTEXT},INTERFACE_INCLUDE_DIRECTORIES>
+  "${SOLUTION_ROOT}/../Core/Inc"
+)
+target_compile_definitions(Group_Modules_Three-Phase_Driver PUBLIC
+  $<TARGET_PROPERTY:${CONTEXT},INTERFACE_COMPILE_DEFINITIONS>
+)
+add_library(Group_Modules_Three-Phase_Driver_ABSTRACTIONS INTERFACE)
+target_link_libraries(Group_Modules_Three-Phase_Driver_ABSTRACTIONS INTERFACE
+  ${CONTEXT}_ABSTRACTIONS
+)
+target_compile_options(Group_Modules_Three-Phase_Driver PUBLIC
+  $<TARGET_PROPERTY:${CONTEXT},INTERFACE_COMPILE_OPTIONS>
+)
+target_link_libraries(Group_Modules_Three-Phase_Driver PUBLIC
+  Group_Modules_Three-Phase_Driver_ABSTRACTIONS
 )
 
 # group Drivers/STM32G4xx_HAL_Driver

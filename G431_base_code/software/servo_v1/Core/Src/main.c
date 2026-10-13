@@ -26,6 +26,7 @@
 #include "tim.h"
 #include "tim1_pwm.h"
 #include "tim1_pwm_verify.h"
+#include "measurement_manager.h"
 #include "stspin32g4.h"
 #include "drv_monitor.h"
 
@@ -61,8 +62,23 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-volatile uint8_t a = 100U;
-volatile uint8_t b = 10U;
+/* Change only this object to select and configure the active board test. */
+measurement_manager_t g_measurement_manager =
+{
+  .module = MEASUREMENT_MODULE_MOS_DRIVER,
+  .state = MEASUREMENT_STATE_IDLE,
+  .config.mos_driver =
+  {
+    .phase = MOS_DRIVER_PHASE_U,
+    .duty = 50U,         /* 10 % high-side PWM on the selected phase (0..1000 scale). */
+    .moe_enable = 0U,      /* Start gated off; set to 1 to enable waveform output. */
+    .duration_ms = 0U,     /* 0 = no automatic waveform shutdown. */
+    .deadline_ms = 0U,
+    .moe_applied = 1U,
+    .phase_applied = MOS_DRIVER_PHASE_U,
+    .duty_applied = 0U
+  }
+};
 /* USER CODE END 0 */
 
 /**
@@ -108,30 +124,28 @@ int main(void)
   DrvMonitor_Init();
 
   /* ------------------------------------------------------------------------
-   * Layer 1 - TIM1 gate-signal verification
+   * Layer 1 - measurement module selected in g_measurement_manager
    * ------------------------------------------------------------------------
    * MX_TIM1_Init() has already produced the 20 kHz carrier, but MOE is still
    * cleared, so no gate signal can reach the power stage. The sequence below
-   * checks the last untested link in the chain (MCU pin -> gate driver -> power
-   * stage) with a pattern that is easy to judge on a scope and gentle enough for
-   * a motor that is already bolted to the phases.
+   * checks the MCU -> gate driver -> external MOSFET path with a fixed pattern
+   * that is easy to judge on a scope. Keep the motor disconnected for this
+   * measurement and use a current-limited DC link.
    *
    * Read the runbook in tim1_pwm_verify.h before enabling it, and keep the DC
-   * link current limited (or the supply below the motor's rated voltage) for the
-   * first run: the static pattern holds no torque, but a stalled winding still
-   * draws winding_resistance-limited current while it does.
+   * link current limited for every run. The selected-phase pattern applies a
+   * non-zero line-to-line voltage, so it is not a no-torque motor test.
    *
    * Set TIM1_PWM_VERIFY_ENABLE to 0 to skip it. While it is enabled, the driver
    * has to be reported healthy first: a faulted driver must never be driven.
-   * The timeout only bounds the pattern; it does not replace a current limit.
+   * The duration only bounds the pattern; it does not replace a current limit.
    */
 #define TIM1_PWM_VERIFY_ENABLE       1U
-#define TIM1_PWM_VERIFY_TIMEOUT_MS   10000U
 
   if ((TIM1_PWM_VERIFY_ENABLE != 0U) &&
       (DrvMonitor_GetState() == DRV_STATE_READY))
   {
-    if (Tim1PwmVerify_Start(TIM1_PWM_VERIFY_TIMEOUT_MS) != HAL_OK)
+    if (Tim1PwmVerify_Start(&g_measurement_manager) != HAL_OK)
     {
       /* The outputs never left the neutral pattern; the driver monitor keeps
          running so the reason can be read from the snapshot. */
@@ -162,13 +176,13 @@ int main(void)
     DrvMonitor_Task();
 
     /* --------------------------------------------------------------------
-     * Layer 2 - TIM1 verification sequence
+     * Layer 2 - active measurement module
      * --------------------------------------------------------------------
-     * Non-blocking: it returns between steps, so this layer never holds the
-     * loop. Remove both calls once the current loop owns the PWM channels.
+     * Non-blocking: it returns immediately while the selected waveform is held.
+     * Remove this call once the current loop owns the PWM channels.
      */
 #if (TIM1_PWM_VERIFY_ENABLE != 0U)
-    (void)Tim1PwmVerify_Task(TIM1_PWM_VERIFY_TIMEOUT_MS);
+    (void)Tim1PwmVerify_Task(&g_measurement_manager);
 #endif
 
     /* TODO: protocol stack (CAN/UART), parameter storage, temperature
@@ -197,9 +211,13 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-  /* X1 is 12 MHz: 12 MHz / 1 * 28 = 336 MHz VCO, /2 = 168 MHz SYSCLK. */
-  RCC_OscInitStruct.PLL.PLLM = RCC_PLLM_DIV1;
-  RCC_OscInitStruct.PLL.PLLN = 28;
+  /* X1 is 8 MHz: 8 MHz / 2 = 4 MHz VCO input, * 84 = 336 MHz VCO, /2 = 168 MHz
+     SYSCLK. A 4 MHz VCO input is what ST recommends for the lowest PLL jitter,
+     and SYSCLK deliberately stays at 168 MHz so every derived timing constant
+     keeps holding: the 20 kHz TIM1 carrier, the 500 ns dead time, the 10 kHz
+     TIM6 tick (prescaler 16800) and the I2C timing word. */
+  RCC_OscInitStruct.PLL.PLLM = RCC_PLLM_DIV2;
+  RCC_OscInitStruct.PLL.PLLN = 84;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV2;
   RCC_OscInitStruct.PLL.PLLR = RCC_PLLR_DIV2;

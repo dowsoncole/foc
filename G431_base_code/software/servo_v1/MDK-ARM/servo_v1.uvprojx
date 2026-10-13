@@ -383,7 +383,7 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>Application/MDK-ARM</GroupName>
+          <GroupName>Application/Startup</GroupName>
           <Files>
             <File>
               <FileName>startup_stm32g431xx.s</FileName>
@@ -393,7 +393,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>Application/User/Core</GroupName>
+          <GroupName>Application/Core</GroupName>
           <Files>
             <File>
               <FileName>main.c</FileName>
@@ -401,39 +401,19 @@
               <FilePath>../Core/Src/main.c</FilePath>
             </File>
             <File>
+              <FileName>main.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>../Core/Inc/main.h</FilePath>
+            </File>
+            <File>
               <FileName>gpio.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Core/Src/gpio.c</FilePath>
             </File>
             <File>
-              <FileName>i2c.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Core/Src/i2c.c</FilePath>
-            </File>
-            <File>
-              <FileName>stspin32g4.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Core/Src/stspin32g4.c</FilePath>
-            </File>
-            <File>
-              <FileName>tim.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Core/Src/tim.c</FilePath>
-            </File>
-            <File>
-              <FileName>tim1_pwm.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Core/Src/tim1_pwm.c</FilePath>
-            </File>
-            <File>
-              <FileName>tim1_pwm_verify.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Core/Src/tim1_pwm_verify.c</FilePath>
-            </File>
-            <File>
-              <FileName>drv_monitor.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Core/Src/drv_monitor.c</FilePath>
+              <FileName>gpio.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>../Core/Inc/gpio.h</FilePath>
             </File>
             <File>
               <FileName>stm32g4xx_it.c</FileName>
@@ -441,9 +421,19 @@
               <FilePath>../Core/Src/stm32g4xx_it.c</FilePath>
             </File>
             <File>
+              <FileName>stm32g4xx_it.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>../Core/Inc/stm32g4xx_it.h</FilePath>
+            </File>
+            <File>
               <FileName>stm32g4xx_hal_msp.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Core/Src/stm32g4xx_hal_msp.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32g4xx_hal_conf.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>../Core/Inc/stm32g4xx_hal_conf.h</FilePath>
             </File>
             <File>
               <FileName>readme.md</FileName>
@@ -451,6 +441,87 @@
               <FilePath>../Core/Src/readme.md</FilePath>
             </File>
           </Files>
+        </Group>
+        <Group>
+          <GroupName>Modules/Three-Phase Communication</GroupName>
+          <Files>
+            <File>
+              <FileName>i2c.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Core/Src/i2c.c</FilePath>
+            </File>
+            <File>
+              <FileName>i2c.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>../Core/Inc/i2c.h</FilePath>
+            </File>
+            <File>
+              <FileName>tim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Core/Src/tim.c</FilePath>
+            </File>
+            <File>
+              <FileName>tim.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>../Core/Inc/tim.h</FilePath>
+            </File>
+            <File>
+              <FileName>stspin32g4.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Core/Src/stspin32g4.c</FilePath>
+            </File>
+            <File>
+              <FileName>stspin32g4.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>../Core/Inc/stspin32g4.h</FilePath>
+            </File>
+            <File>
+              <FileName>drv_monitor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Core/Src/drv_monitor.c</FilePath>
+            </File>
+            <File>
+              <FileName>drv_monitor.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>../Core/Inc/drv_monitor.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Modules/Three-Phase Driver</GroupName>
+          <Files>
+            <File>
+              <FileName>tim1_pwm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Core/Src/tim1_pwm.c</FilePath>
+            </File>
+            <File>
+              <FileName>tim1_pwm.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>../Core/Inc/tim1_pwm.h</FilePath>
+            </File>
+            <File>
+              <FileName>tim1_pwm_verify.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Core/Src/tim1_pwm_verify.c</FilePath>
+            </File>
+            <File>
+              <FileName>tim1_pwm_verify.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>../Core/Inc/tim1_pwm_verify.h</FilePath>
+            </File>
+            <File>
+              <FileName>measurement_manager.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>../Core/Inc/measurement_manager.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Modules/Current Sampling</GroupName>
+        </Group>
+        <Group>
+          <GroupName>Modules/Encoder</GroupName>
         </Group>
         <Group>
           <GroupName>Drivers/STM32G4xx_HAL_Driver</GroupName>
@@ -571,5 +642,14 @@
     </components>
     <files/>
   </RTE>
+
+  <LayerInfo>
+    <Layers>
+      <Layer>
+        <LayName>servo_v1</LayName>
+        <LayPrjMark>1</LayPrjMark>
+      </Layer>
+    </Layers>
+  </LayerInfo>
 
 </Project>

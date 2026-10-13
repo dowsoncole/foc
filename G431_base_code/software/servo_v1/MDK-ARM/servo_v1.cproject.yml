@@ -61,22 +61,40 @@ project:
   linker:
     - script: servo_v1_servo_v1.sct
   groups:
-    - group: Application/MDK-ARM
+    - group: Application/Startup
       files:
         - file: startup_stm32g431xx.s
-    - group: Application/User/Core
+    - group: Application/Core
       files:
         - file: ../Core/Src/main.c
+        - file: ../Core/Inc/main.h
         - file: ../Core/Src/gpio.c
-        - file: ../Core/Src/i2c.c
-        - file: ../Core/Src/stspin32g4.c
-        - file: ../Core/Src/tim.c
-        - file: ../Core/Src/tim1_pwm.c
-        - file: ../Core/Src/tim1_pwm_verify.c
-        - file: ../Core/Src/drv_monitor.c
+        - file: ../Core/Inc/gpio.h
         - file: ../Core/Src/stm32g4xx_it.c
+        - file: ../Core/Inc/stm32g4xx_it.h
         - file: ../Core/Src/stm32g4xx_hal_msp.c
+        - file: ../Core/Inc/stm32g4xx_hal_conf.h
         - file: ../Core/Src/readme.md
+    - group: Modules/MOS Driver
+      files:
+        - file: ../Core/Src/i2c.c
+        - file: ../Core/Inc/i2c.h
+        - file: ../Core/Src/tim.c
+        - file: ../Core/Inc/tim.h
+        - file: ../Core/Src/stspin32g4.c
+        - file: ../Core/Inc/stspin32g4.h
+        - file: ../Core/Src/drv_monitor.c
+        - file: ../Core/Inc/drv_monitor.h
+    - group: Modules/Three-Phase Driver
+      files:
+        - file: ../Core/Inc/measurement_manager.h
+        - file: ../Core/Src/tim1_pwm.c
+        - file: ../Core/Inc/tim1_pwm.h
+        - file: ../Core/Src/tim1_pwm_verify.c
+        - file: ../Core/Inc/tim1_pwm_verify.h
+    # Reserved functional groups for upcoming peripherals.
+    - group: Modules/Current Sampling
+    - group: Modules/Encoder
     - group: Drivers/STM32G4xx_HAL_Driver
       files:
         - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_pwr_ex.c

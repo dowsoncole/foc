@@ -1,5 +1,5 @@
 # ninja log v7
-22	127	8135005558060122	C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/out/servo_v1/servo_v1/compile_commands.json	16f9b0b96231595a
+49	145	8135612330312706	C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/out/servo_v1/servo_v1/compile_commands.json	16f9b0b96231595a
 22	150	8133272025192013	C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/out/servo_v1/servo_v1/compile_macros_c.h	649c9490c28df033
 16	401	8135533019671834	CMakeFiles/Group_Application_User_Core.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/Core/Src/gpio.o	27a4e1fed7aee60b
 139	498	8135533020903869	CMakeFiles/Group_Application_User_Core.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/Core/Src/stm32g4xx_hal_msp.o	96216e5c83e652c3
@@ -21,7 +21,7 @@
 346	833	8135533022969803	CMakeFiles/Group_Drivers_STM32G4xx_HAL_Driver.dir/d3f08af0c45a666a68b1011a7412dfff/servo_v1/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_cortex.o	5a276443165477d1
 271	857	8135533022218224	CMakeFiles/Group_Drivers_STM32G4xx_HAL_Driver.dir/d3f08af0c45a666a68b1011a7412dfff/servo_v1/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_dma.o	79ba585b3ed0a116
 1687	2156	8135533036373372	C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/out/servo_v1/servo_v1/servo_v1.axf	e5af9e77ced146be
-16	2709	8135612328348301	build.ninja	35eb14ded0220ceb
+4	3410	8135619547974699	build.ninja	35eb14ded0220ceb
 26	422	8135533019765227	CMakeFiles/Group_Application_User_Core.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/Core/Src/i2c.o	8e882e8e5d34658e
 403	838	8135533023535200	CMakeFiles/Group_Drivers_STM32G4xx_HAL_Driver.dir/d3f08af0c45a666a68b1011a7412dfff/servo_v1/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_i2c_ex.o	e75898857b9be4ed
 36	532	8135533019866073	CMakeFiles/Group_Application_User_Core.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/Core/Src/stspin32g4.o	fef7f4920cac5b95
@@ -30,5 +30,5 @@
 118	576	8135533020686123	CMakeFiles/Group_Application_User_Core.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/Core/Src/drv_monitor.o	96e16ebc472c8333
 445	1222	8135533023951885	CMakeFiles/Group_Drivers_STM32G4xx_HAL_Driver.dir/d3f08af0c45a666a68b1011a7412dfff/servo_v1/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_tim_ex.o	b9ac338308088926
 422	1594	8135533023724542	CMakeFiles/Group_Drivers_STM32G4xx_HAL_Driver.dir/d3f08af0c45a666a68b1011a7412dfff/servo_v1/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_tim.o	75b9751ddf6ab367
-4	3410	8135612328348301	build.ninja	35eb14ded0220ceb
-49	145	8135612330312706	C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/out/servo_v1/servo_v1/compile_commands.json	16f9b0b96231595a
+16	5966	8135619547974699	build.ninja	35eb14ded0220ceb
+45	157	8135619550336136	C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/out/servo_v1/servo_v1/compile_commands.json	16f9b0b96231595a

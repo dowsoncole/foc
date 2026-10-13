@@ -214,7 +214,7 @@ void TIM6_DAC_IRQHandler(void)
 
   /* Deadline enforcement for a running TIM1 verification. Does nothing while no
      verification is armed. */
-  Tim1PwmVerify_TickIsr();
+  Tim1PwmVerify_TickIsr(&g_measurement_manager);
 }
 
 /**

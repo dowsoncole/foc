@@ -36,6 +36,7 @@ Section Cross References
     main.o(.text.main) refers to tim1_pwm.o(.text.MX_TIM1_Init) for MX_TIM1_Init
     main.o(.text.main) refers to drv_monitor.o(.text.DrvMonitor_Init) for DrvMonitor_Init
     main.o(.text.main) refers to drv_monitor.o(.text.DrvMonitor_GetState) for DrvMonitor_GetState
+    main.o(.text.main) refers to main.o(.data.g_measurement_manager) for g_measurement_manager
     main.o(.text.main) refers to tim1_pwm_verify.o(.text.Tim1PwmVerify_Start) for Tim1PwmVerify_Start
     main.o(.text.main) refers to drv_monitor.o(.text.DrvMonitor_Task) for DrvMonitor_Task
     main.o(.text.main) refers to tim1_pwm_verify.o(.text.Tim1PwmVerify_Task) for Tim1PwmVerify_Task
@@ -48,12 +49,55 @@ Section Cross References
     gpio.o(.text.MX_GPIO_Init) refers to stm32g4xx_hal_gpio.o(.text.HAL_GPIO_WritePin) for HAL_GPIO_WritePin
     gpio.o(.text.MX_GPIO_Init) refers to stm32g4xx_hal_gpio.o(.text.HAL_GPIO_Init) for HAL_GPIO_Init
     gpio.o(.ARM.exidx.text.MX_GPIO_Init) refers to gpio.o(.text.MX_GPIO_Init) for [Anonymous Symbol]
+    stm32g4xx_it.o(.ARM.exidx.text.NMI_Handler) refers to stm32g4xx_it.o(.text.NMI_Handler) for [Anonymous Symbol]
+    stm32g4xx_it.o(.ARM.exidx.text.HardFault_Handler) refers to stm32g4xx_it.o(.text.HardFault_Handler) for [Anonymous Symbol]
+    stm32g4xx_it.o(.ARM.exidx.text.MemManage_Handler) refers to stm32g4xx_it.o(.text.MemManage_Handler) for [Anonymous Symbol]
+    stm32g4xx_it.o(.ARM.exidx.text.BusFault_Handler) refers to stm32g4xx_it.o(.text.BusFault_Handler) for [Anonymous Symbol]
+    stm32g4xx_it.o(.ARM.exidx.text.UsageFault_Handler) refers to stm32g4xx_it.o(.text.UsageFault_Handler) for [Anonymous Symbol]
+    stm32g4xx_it.o(.ARM.exidx.text.SVC_Handler) refers to stm32g4xx_it.o(.text.SVC_Handler) for [Anonymous Symbol]
+    stm32g4xx_it.o(.ARM.exidx.text.DebugMon_Handler) refers to stm32g4xx_it.o(.text.DebugMon_Handler) for [Anonymous Symbol]
+    stm32g4xx_it.o(.ARM.exidx.text.PendSV_Handler) refers to stm32g4xx_it.o(.text.PendSV_Handler) for [Anonymous Symbol]
+    stm32g4xx_it.o(.text.SysTick_Handler) refers to stm32g4xx_hal.o(.text.HAL_IncTick) for HAL_IncTick
+    stm32g4xx_it.o(.ARM.exidx.text.SysTick_Handler) refers to stm32g4xx_it.o(.text.SysTick_Handler) for [Anonymous Symbol]
+    stm32g4xx_it.o(.text.TIM6_DAC_IRQHandler) refers to tim.o(.bss.htim6) for htim6
+    stm32g4xx_it.o(.text.TIM6_DAC_IRQHandler) refers to stm32g4xx_hal_tim.o(.text.HAL_TIM_IRQHandler) for HAL_TIM_IRQHandler
+    stm32g4xx_it.o(.text.TIM6_DAC_IRQHandler) refers to main.o(.data.g_measurement_manager) for g_measurement_manager
+    stm32g4xx_it.o(.text.TIM6_DAC_IRQHandler) refers to tim1_pwm_verify.o(.text.Tim1PwmVerify_TickIsr) for Tim1PwmVerify_TickIsr
+    stm32g4xx_it.o(.ARM.exidx.text.TIM6_DAC_IRQHandler) refers to stm32g4xx_it.o(.text.TIM6_DAC_IRQHandler) for [Anonymous Symbol]
+    stm32g4xx_it.o(.text.TIM1_CC_IRQHandler) refers to tim1_pwm.o(.bss.htim1) for htim1
+    stm32g4xx_it.o(.text.TIM1_CC_IRQHandler) refers to stm32g4xx_hal_tim.o(.text.HAL_TIM_IRQHandler) for HAL_TIM_IRQHandler
+    stm32g4xx_it.o(.ARM.exidx.text.TIM1_CC_IRQHandler) refers to stm32g4xx_it.o(.text.TIM1_CC_IRQHandler) for [Anonymous Symbol]
+    stm32g4xx_it.o(.text.TIM1_UP_TIM16_IRQHandler) refers to tim1_pwm.o(.bss.htim1) for htim1
+    stm32g4xx_it.o(.text.TIM1_UP_TIM16_IRQHandler) refers to stm32g4xx_hal_tim.o(.text.HAL_TIM_IRQHandler) for HAL_TIM_IRQHandler
+    stm32g4xx_it.o(.ARM.exidx.text.TIM1_UP_TIM16_IRQHandler) refers to stm32g4xx_it.o(.text.TIM1_UP_TIM16_IRQHandler) for [Anonymous Symbol]
+    stm32g4xx_hal_msp.o(.text.HAL_MspInit) refers to stm32g4xx_hal_pwr_ex.o(.text.HAL_PWREx_DisableUCPDDeadBattery) for HAL_PWREx_DisableUCPDDeadBattery
+    stm32g4xx_hal_msp.o(.ARM.exidx.text.HAL_MspInit) refers to stm32g4xx_hal_msp.o(.text.HAL_MspInit) for [Anonymous Symbol]
+    stm32g4xx_hal_msp.o(.text.HAL_I2C_MspInit) refers to stm32g4xx_hal_gpio.o(.text.HAL_GPIO_Init) for HAL_GPIO_Init
+    stm32g4xx_hal_msp.o(.ARM.exidx.text.HAL_I2C_MspInit) refers to stm32g4xx_hal_msp.o(.text.HAL_I2C_MspInit) for [Anonymous Symbol]
+    stm32g4xx_hal_msp.o(.text.HAL_I2C_MspDeInit) refers to stm32g4xx_hal_gpio.o(.text.HAL_GPIO_DeInit) for HAL_GPIO_DeInit
+    stm32g4xx_hal_msp.o(.ARM.exidx.text.HAL_I2C_MspDeInit) refers to stm32g4xx_hal_msp.o(.text.HAL_I2C_MspDeInit) for [Anonymous Symbol]
+    stm32g4xx_hal_msp.o(.text.HAL_TIM_Base_MspInit) refers to stm32g4xx_hal_cortex.o(.text.HAL_NVIC_SetPriority) for HAL_NVIC_SetPriority
+    stm32g4xx_hal_msp.o(.text.HAL_TIM_Base_MspInit) refers to stm32g4xx_hal_cortex.o(.text.HAL_NVIC_EnableIRQ) for HAL_NVIC_EnableIRQ
+    stm32g4xx_hal_msp.o(.ARM.exidx.text.HAL_TIM_Base_MspInit) refers to stm32g4xx_hal_msp.o(.text.HAL_TIM_Base_MspInit) for [Anonymous Symbol]
+    stm32g4xx_hal_msp.o(.text.HAL_TIM_Base_MspDeInit) refers to stm32g4xx_hal_cortex.o(.text.HAL_NVIC_DisableIRQ) for HAL_NVIC_DisableIRQ
+    stm32g4xx_hal_msp.o(.ARM.exidx.text.HAL_TIM_Base_MspDeInit) refers to stm32g4xx_hal_msp.o(.text.HAL_TIM_Base_MspDeInit) for [Anonymous Symbol]
+    stm32g4xx_hal_msp.o(.text.HAL_TIM_PWM_MspInit) refers to stm32g4xx_hal_cortex.o(.text.HAL_NVIC_SetPriority) for HAL_NVIC_SetPriority
+    stm32g4xx_hal_msp.o(.text.HAL_TIM_PWM_MspInit) refers to stm32g4xx_hal_cortex.o(.text.HAL_NVIC_EnableIRQ) for HAL_NVIC_EnableIRQ
+    stm32g4xx_hal_msp.o(.ARM.exidx.text.HAL_TIM_PWM_MspInit) refers to stm32g4xx_hal_msp.o(.text.HAL_TIM_PWM_MspInit) for [Anonymous Symbol]
+    stm32g4xx_hal_msp.o(.text.HAL_TIM_PWM_MspDeInit) refers to stm32g4xx_hal_cortex.o(.text.HAL_NVIC_DisableIRQ) for HAL_NVIC_DisableIRQ
+    stm32g4xx_hal_msp.o(.ARM.exidx.text.HAL_TIM_PWM_MspDeInit) refers to stm32g4xx_hal_msp.o(.text.HAL_TIM_PWM_MspDeInit) for [Anonymous Symbol]
+    stm32g4xx_hal_msp.o(.text.HAL_TIM_MspPostInit) refers to stm32g4xx_hal_gpio.o(.text.HAL_GPIO_Init) for HAL_GPIO_Init
+    stm32g4xx_hal_msp.o(.ARM.exidx.text.HAL_TIM_MspPostInit) refers to stm32g4xx_hal_msp.o(.text.HAL_TIM_MspPostInit) for [Anonymous Symbol]
     i2c.o(.text.MX_I2C3_Init) refers to i2c.o(.bss.hi2c3) for hi2c3
     i2c.o(.text.MX_I2C3_Init) refers to stm32g4xx_hal_i2c.o(.text.HAL_I2C_Init) for HAL_I2C_Init
     i2c.o(.text.MX_I2C3_Init) refers to main.o(.text.Error_Handler) for Error_Handler
     i2c.o(.text.MX_I2C3_Init) refers to stm32g4xx_hal_i2c_ex.o(.text.HAL_I2CEx_ConfigAnalogFilter) for HAL_I2CEx_ConfigAnalogFilter
     i2c.o(.text.MX_I2C3_Init) refers to stm32g4xx_hal_i2c_ex.o(.text.HAL_I2CEx_ConfigDigitalFilter) for HAL_I2CEx_ConfigDigitalFilter
     i2c.o(.ARM.exidx.text.MX_I2C3_Init) refers to i2c.o(.text.MX_I2C3_Init) for [Anonymous Symbol]
+    tim.o(.text.MX_TIM6_Init) refers to tim.o(.bss.htim6) for htim6
+    tim.o(.text.MX_TIM6_Init) refers to stm32g4xx_hal_tim.o(.text.HAL_TIM_Base_Init) for HAL_TIM_Base_Init
+    tim.o(.text.MX_TIM6_Init) refers to main.o(.text.Error_Handler) for Error_Handler
+    tim.o(.ARM.exidx.text.MX_TIM6_Init) refers to tim.o(.text.MX_TIM6_Init) for [Anonymous Symbol]
     stspin32g4.o(.text.STSPIN32G4_ReadRegister) refers to i2c.o(.bss.hi2c3) for hi2c3
     stspin32g4.o(.text.STSPIN32G4_ReadRegister) refers to stm32g4xx_hal_i2c.o(.text.HAL_I2C_Mem_Read) for HAL_I2C_Mem_Read
     stspin32g4.o(.ARM.exidx.text.STSPIN32G4_ReadRegister) refers to stspin32g4.o(.text.STSPIN32G4_ReadRegister) for [Anonymous Symbol]
@@ -90,60 +134,6 @@ Section Cross References
     stspin32g4.o(.text.STSPIN32G4_EnterStandby) refers to stm32g4xx_hal_i2c.o(.text.HAL_I2C_Mem_Write) for HAL_I2C_Mem_Write
     stspin32g4.o(.text.STSPIN32G4_EnterStandby) refers to stm32g4xx_hal_i2c.o(.text.HAL_I2C_Mem_Read) for HAL_I2C_Mem_Read
     stspin32g4.o(.ARM.exidx.text.STSPIN32G4_EnterStandby) refers to stspin32g4.o(.text.STSPIN32G4_EnterStandby) for [Anonymous Symbol]
-    tim.o(.text.MX_TIM6_Init) refers to tim.o(.bss.htim6) for htim6
-    tim.o(.text.MX_TIM6_Init) refers to stm32g4xx_hal_tim.o(.text.HAL_TIM_Base_Init) for HAL_TIM_Base_Init
-    tim.o(.text.MX_TIM6_Init) refers to main.o(.text.Error_Handler) for Error_Handler
-    tim.o(.ARM.exidx.text.MX_TIM6_Init) refers to tim.o(.text.MX_TIM6_Init) for [Anonymous Symbol]
-    tim1_pwm.o(.text.MX_TIM1_Init) refers to rt_memclr_w.o(.text) for __aeabi_memclr4
-    tim1_pwm.o(.text.MX_TIM1_Init) refers to stm32g4xx_hal_rcc.o(.text.HAL_RCC_GetPCLK2Freq) for HAL_RCC_GetPCLK2Freq
-    tim1_pwm.o(.text.MX_TIM1_Init) refers to main.o(.text.Error_Handler) for Error_Handler
-    tim1_pwm.o(.text.MX_TIM1_Init) refers to tim1_pwm.o(.bss.htim1) for htim1
-    tim1_pwm.o(.text.MX_TIM1_Init) refers to stm32g4xx_hal_tim.o(.text.HAL_TIM_PWM_Init) for HAL_TIM_PWM_Init
-    tim1_pwm.o(.text.MX_TIM1_Init) refers to stm32g4xx_hal_tim_ex.o(.text.HAL_TIMEx_MasterConfigSynchronization) for HAL_TIMEx_MasterConfigSynchronization
-    tim1_pwm.o(.text.MX_TIM1_Init) refers to stm32g4xx_hal_tim_ex.o(.text.HAL_TIMEx_ConfigBreakDeadTime) for HAL_TIMEx_ConfigBreakDeadTime
-    tim1_pwm.o(.text.MX_TIM1_Init) refers to stm32g4xx_hal_tim.o(.text.HAL_TIM_PWM_ConfigChannel) for HAL_TIM_PWM_ConfigChannel
-    tim1_pwm.o(.text.MX_TIM1_Init) refers to stm32g4xx_hal_msp.o(.text.HAL_TIM_MspPostInit) for HAL_TIM_MspPostInit
-    tim1_pwm.o(.text.MX_TIM1_Init) refers to stm32g4xx_hal_tim.o(.text.HAL_TIM_Base_Start_IT) for HAL_TIM_Base_Start_IT
-    tim1_pwm.o(.text.MX_TIM1_Init) refers to tim1_pwm.o(.data.s_phase_duty) for s_phase_duty
-    tim1_pwm.o(.ARM.exidx.text.MX_TIM1_Init) refers to tim1_pwm.o(.text.MX_TIM1_Init) for [Anonymous Symbol]
-    tim1_pwm.o(.text.Tim1Pwm_SetPhaseDuty) refers to tim1_pwm.o(.bss.htim1) for htim1
-    tim1_pwm.o(.text.Tim1Pwm_SetPhaseDuty) refers to tim1_pwm.o(.data.s_phase_duty) for s_phase_duty
-    tim1_pwm.o(.ARM.exidx.text.Tim1Pwm_SetPhaseDuty) refers to tim1_pwm.o(.text.Tim1Pwm_SetPhaseDuty) for [Anonymous Symbol]
-    tim1_pwm.o(.text.Tim1Pwm_GetPhaseDuty) refers to tim1_pwm.o(.data.s_phase_duty) for s_phase_duty
-    tim1_pwm.o(.ARM.exidx.text.Tim1Pwm_GetPhaseDuty) refers to tim1_pwm.o(.text.Tim1Pwm_GetPhaseDuty) for [Anonymous Symbol]
-    tim1_pwm.o(.text.Tim1Pwm_SetNeutral) refers to tim1_pwm.o(.data.s_phase_duty) for s_phase_duty
-    tim1_pwm.o(.text.Tim1Pwm_SetNeutral) refers to tim1_pwm.o(.bss.htim1) for htim1
-    tim1_pwm.o(.ARM.exidx.text.Tim1Pwm_SetNeutral) refers to tim1_pwm.o(.text.Tim1Pwm_SetNeutral) for [Anonymous Symbol]
-    tim1_pwm.o(.text.Tim1Pwm_EnableOutputs) refers to tim1_pwm.o(.bss.htim1) for htim1
-    tim1_pwm.o(.ARM.exidx.text.Tim1Pwm_EnableOutputs) refers to tim1_pwm.o(.text.Tim1Pwm_EnableOutputs) for [Anonymous Symbol]
-    tim1_pwm.o(.text.Tim1Pwm_EmergencyStop) refers to tim1_pwm.o(.bss.htim1) for htim1
-    tim1_pwm.o(.ARM.exidx.text.Tim1Pwm_EmergencyStop) refers to tim1_pwm.o(.text.Tim1Pwm_EmergencyStop) for [Anonymous Symbol]
-    tim1_pwm.o(.ARM.exidx.text.Tim1Pwm_IsOutputEnabled) refers to tim1_pwm.o(.text.Tim1Pwm_IsOutputEnabled) for [Anonymous Symbol]
-    tim1_pwm_verify.o(.text.Tim1PwmVerify_Start) refers to tim1_pwm_verify.o(.bss..L_MergedGlobals) for .L_MergedGlobals
-    tim1_pwm_verify.o(.text.Tim1PwmVerify_Start) refers to stm32g4xx_hal.o(.text.HAL_GetTick) for HAL_GetTick
-    tim1_pwm_verify.o(.text.Tim1PwmVerify_Start) refers to tim1_pwm.o(.text.Tim1Pwm_SetPhaseDuty) for Tim1Pwm_SetPhaseDuty
-    tim1_pwm_verify.o(.text.Tim1PwmVerify_Start) refers to tim1_pwm.o(.text.Tim1Pwm_EnableOutputs) for Tim1Pwm_EnableOutputs
-    tim1_pwm_verify.o(.text.Tim1PwmVerify_Start) refers to tim1_pwm.o(.text.Tim1Pwm_IsOutputEnabled) for Tim1Pwm_IsOutputEnabled
-    tim1_pwm_verify.o(.text.Tim1PwmVerify_Start) refers to tim1_pwm.o(.text.Tim1Pwm_SetNeutral) for Tim1Pwm_SetNeutral
-    tim1_pwm_verify.o(.ARM.exidx.text.Tim1PwmVerify_Start) refers to tim1_pwm_verify.o(.text.Tim1PwmVerify_Start) for [Anonymous Symbol]
-    tim1_pwm_verify.o(.text.Tim1PwmVerify_Task) refers to tim1_pwm_verify.o(.bss..L_MergedGlobals) for .L_MergedGlobals
-    tim1_pwm_verify.o(.text.Tim1PwmVerify_Task) refers to tim1_pwm.o(.text.Tim1Pwm_SetNeutral) for Tim1Pwm_SetNeutral
-    tim1_pwm_verify.o(.text.Tim1PwmVerify_Task) refers to tim1_pwm.o(.text.Tim1Pwm_IsOutputEnabled) for Tim1Pwm_IsOutputEnabled
-    tim1_pwm_verify.o(.text.Tim1PwmVerify_Task) refers to stm32g4xx_hal.o(.text.HAL_GetTick) for HAL_GetTick
-    tim1_pwm_verify.o(.text.Tim1PwmVerify_Task) refers to tim1_pwm_verify.o(.rodata.s_sector_table) for s_sector_table
-    tim1_pwm_verify.o(.text.Tim1PwmVerify_Task) refers to tim1_pwm_verify.o(.text.Tim1PwmVerify_ApplySector) for Tim1PwmVerify_ApplySector
-    tim1_pwm_verify.o(.ARM.exidx.text.Tim1PwmVerify_Task) refers to tim1_pwm_verify.o(.text.Tim1PwmVerify_Task) for [Anonymous Symbol]
-    tim1_pwm_verify.o(.text.Tim1PwmVerify_ApplySector) refers to tim1_pwm.o(.text.Tim1Pwm_SetPhaseDuty) for Tim1Pwm_SetPhaseDuty
-    tim1_pwm_verify.o(.ARM.exidx.text.Tim1PwmVerify_ApplySector) refers to tim1_pwm_verify.o(.text.Tim1PwmVerify_ApplySector) for [Anonymous Symbol]
-    tim1_pwm_verify.o(.text.Tim1PwmVerify_Stop) refers to tim1_pwm_verify.o(.bss..L_MergedGlobals) for .L_MergedGlobals
-    tim1_pwm_verify.o(.text.Tim1PwmVerify_Stop) refers to tim1_pwm.o(.text.Tim1Pwm_SetNeutral) for Tim1Pwm_SetNeutral
-    tim1_pwm_verify.o(.ARM.exidx.text.Tim1PwmVerify_Stop) refers to tim1_pwm_verify.o(.text.Tim1PwmVerify_Stop) for [Anonymous Symbol]
-    tim1_pwm_verify.o(.text.Tim1PwmVerify_IsRunning) refers to tim1_pwm_verify.o(.bss..L_MergedGlobals) for .L_MergedGlobals
-    tim1_pwm_verify.o(.ARM.exidx.text.Tim1PwmVerify_IsRunning) refers to tim1_pwm_verify.o(.text.Tim1PwmVerify_IsRunning) for [Anonymous Symbol]
-    tim1_pwm_verify.o(.text.Tim1PwmVerify_TickIsr) refers to tim1_pwm_verify.o(.bss..L_MergedGlobals) for .L_MergedGlobals
-    tim1_pwm_verify.o(.text.Tim1PwmVerify_TickIsr) refers to stm32g4xx_hal.o(.text.HAL_GetTick) for HAL_GetTick
-    tim1_pwm_verify.o(.text.Tim1PwmVerify_TickIsr) refers to tim1_pwm.o(.text.Tim1Pwm_EmergencyStop) for Tim1Pwm_EmergencyStop
-    tim1_pwm_verify.o(.ARM.exidx.text.Tim1PwmVerify_TickIsr) refers to tim1_pwm_verify.o(.text.Tim1PwmVerify_TickIsr) for [Anonymous Symbol]
     drv_monitor.o(.text.HAL_TIM_PeriodElapsedCallback) refers to drv_monitor.o(.bss..L_MergedGlobals) for .L_MergedGlobals
     drv_monitor.o(.ARM.exidx.text.HAL_TIM_PeriodElapsedCallback) refers to drv_monitor.o(.text.HAL_TIM_PeriodElapsedCallback) for [Anonymous Symbol]
     drv_monitor.o(.text.DrvMonitor_Init) refers to drv_monitor.o(.bss..L_MergedGlobals) for .L_MergedGlobals
@@ -169,44 +159,47 @@ Section Cross References
     drv_monitor.o(.ARM.exidx.text.DrvMonitor_Get) refers to drv_monitor.o(.text.DrvMonitor_Get) for [Anonymous Symbol]
     drv_monitor.o(.text.DrvMonitor_GetState) refers to drv_monitor.o(.bss..L_MergedGlobals) for .L_MergedGlobals
     drv_monitor.o(.ARM.exidx.text.DrvMonitor_GetState) refers to drv_monitor.o(.text.DrvMonitor_GetState) for [Anonymous Symbol]
-    stm32g4xx_it.o(.ARM.exidx.text.NMI_Handler) refers to stm32g4xx_it.o(.text.NMI_Handler) for [Anonymous Symbol]
-    stm32g4xx_it.o(.ARM.exidx.text.HardFault_Handler) refers to stm32g4xx_it.o(.text.HardFault_Handler) for [Anonymous Symbol]
-    stm32g4xx_it.o(.ARM.exidx.text.MemManage_Handler) refers to stm32g4xx_it.o(.text.MemManage_Handler) for [Anonymous Symbol]
-    stm32g4xx_it.o(.ARM.exidx.text.BusFault_Handler) refers to stm32g4xx_it.o(.text.BusFault_Handler) for [Anonymous Symbol]
-    stm32g4xx_it.o(.ARM.exidx.text.UsageFault_Handler) refers to stm32g4xx_it.o(.text.UsageFault_Handler) for [Anonymous Symbol]
-    stm32g4xx_it.o(.ARM.exidx.text.SVC_Handler) refers to stm32g4xx_it.o(.text.SVC_Handler) for [Anonymous Symbol]
-    stm32g4xx_it.o(.ARM.exidx.text.DebugMon_Handler) refers to stm32g4xx_it.o(.text.DebugMon_Handler) for [Anonymous Symbol]
-    stm32g4xx_it.o(.ARM.exidx.text.PendSV_Handler) refers to stm32g4xx_it.o(.text.PendSV_Handler) for [Anonymous Symbol]
-    stm32g4xx_it.o(.text.SysTick_Handler) refers to stm32g4xx_hal.o(.text.HAL_IncTick) for HAL_IncTick
-    stm32g4xx_it.o(.ARM.exidx.text.SysTick_Handler) refers to stm32g4xx_it.o(.text.SysTick_Handler) for [Anonymous Symbol]
-    stm32g4xx_it.o(.text.TIM6_DAC_IRQHandler) refers to tim.o(.bss.htim6) for htim6
-    stm32g4xx_it.o(.text.TIM6_DAC_IRQHandler) refers to stm32g4xx_hal_tim.o(.text.HAL_TIM_IRQHandler) for HAL_TIM_IRQHandler
-    stm32g4xx_it.o(.text.TIM6_DAC_IRQHandler) refers to tim1_pwm_verify.o(.text.Tim1PwmVerify_TickIsr) for Tim1PwmVerify_TickIsr
-    stm32g4xx_it.o(.ARM.exidx.text.TIM6_DAC_IRQHandler) refers to stm32g4xx_it.o(.text.TIM6_DAC_IRQHandler) for [Anonymous Symbol]
-    stm32g4xx_it.o(.text.TIM1_CC_IRQHandler) refers to tim1_pwm.o(.bss.htim1) for htim1
-    stm32g4xx_it.o(.text.TIM1_CC_IRQHandler) refers to stm32g4xx_hal_tim.o(.text.HAL_TIM_IRQHandler) for HAL_TIM_IRQHandler
-    stm32g4xx_it.o(.ARM.exidx.text.TIM1_CC_IRQHandler) refers to stm32g4xx_it.o(.text.TIM1_CC_IRQHandler) for [Anonymous Symbol]
-    stm32g4xx_it.o(.text.TIM1_UP_TIM16_IRQHandler) refers to tim1_pwm.o(.bss.htim1) for htim1
-    stm32g4xx_it.o(.text.TIM1_UP_TIM16_IRQHandler) refers to stm32g4xx_hal_tim.o(.text.HAL_TIM_IRQHandler) for HAL_TIM_IRQHandler
-    stm32g4xx_it.o(.ARM.exidx.text.TIM1_UP_TIM16_IRQHandler) refers to stm32g4xx_it.o(.text.TIM1_UP_TIM16_IRQHandler) for [Anonymous Symbol]
-    stm32g4xx_hal_msp.o(.text.HAL_MspInit) refers to stm32g4xx_hal_pwr_ex.o(.text.HAL_PWREx_DisableUCPDDeadBattery) for HAL_PWREx_DisableUCPDDeadBattery
-    stm32g4xx_hal_msp.o(.ARM.exidx.text.HAL_MspInit) refers to stm32g4xx_hal_msp.o(.text.HAL_MspInit) for [Anonymous Symbol]
-    stm32g4xx_hal_msp.o(.text.HAL_I2C_MspInit) refers to stm32g4xx_hal_gpio.o(.text.HAL_GPIO_Init) for HAL_GPIO_Init
-    stm32g4xx_hal_msp.o(.ARM.exidx.text.HAL_I2C_MspInit) refers to stm32g4xx_hal_msp.o(.text.HAL_I2C_MspInit) for [Anonymous Symbol]
-    stm32g4xx_hal_msp.o(.text.HAL_I2C_MspDeInit) refers to stm32g4xx_hal_gpio.o(.text.HAL_GPIO_DeInit) for HAL_GPIO_DeInit
-    stm32g4xx_hal_msp.o(.ARM.exidx.text.HAL_I2C_MspDeInit) refers to stm32g4xx_hal_msp.o(.text.HAL_I2C_MspDeInit) for [Anonymous Symbol]
-    stm32g4xx_hal_msp.o(.text.HAL_TIM_Base_MspInit) refers to stm32g4xx_hal_cortex.o(.text.HAL_NVIC_SetPriority) for HAL_NVIC_SetPriority
-    stm32g4xx_hal_msp.o(.text.HAL_TIM_Base_MspInit) refers to stm32g4xx_hal_cortex.o(.text.HAL_NVIC_EnableIRQ) for HAL_NVIC_EnableIRQ
-    stm32g4xx_hal_msp.o(.ARM.exidx.text.HAL_TIM_Base_MspInit) refers to stm32g4xx_hal_msp.o(.text.HAL_TIM_Base_MspInit) for [Anonymous Symbol]
-    stm32g4xx_hal_msp.o(.text.HAL_TIM_Base_MspDeInit) refers to stm32g4xx_hal_cortex.o(.text.HAL_NVIC_DisableIRQ) for HAL_NVIC_DisableIRQ
-    stm32g4xx_hal_msp.o(.ARM.exidx.text.HAL_TIM_Base_MspDeInit) refers to stm32g4xx_hal_msp.o(.text.HAL_TIM_Base_MspDeInit) for [Anonymous Symbol]
-    stm32g4xx_hal_msp.o(.text.HAL_TIM_PWM_MspInit) refers to stm32g4xx_hal_cortex.o(.text.HAL_NVIC_SetPriority) for HAL_NVIC_SetPriority
-    stm32g4xx_hal_msp.o(.text.HAL_TIM_PWM_MspInit) refers to stm32g4xx_hal_cortex.o(.text.HAL_NVIC_EnableIRQ) for HAL_NVIC_EnableIRQ
-    stm32g4xx_hal_msp.o(.ARM.exidx.text.HAL_TIM_PWM_MspInit) refers to stm32g4xx_hal_msp.o(.text.HAL_TIM_PWM_MspInit) for [Anonymous Symbol]
-    stm32g4xx_hal_msp.o(.text.HAL_TIM_PWM_MspDeInit) refers to stm32g4xx_hal_cortex.o(.text.HAL_NVIC_DisableIRQ) for HAL_NVIC_DisableIRQ
-    stm32g4xx_hal_msp.o(.ARM.exidx.text.HAL_TIM_PWM_MspDeInit) refers to stm32g4xx_hal_msp.o(.text.HAL_TIM_PWM_MspDeInit) for [Anonymous Symbol]
-    stm32g4xx_hal_msp.o(.text.HAL_TIM_MspPostInit) refers to stm32g4xx_hal_gpio.o(.text.HAL_GPIO_Init) for HAL_GPIO_Init
-    stm32g4xx_hal_msp.o(.ARM.exidx.text.HAL_TIM_MspPostInit) refers to stm32g4xx_hal_msp.o(.text.HAL_TIM_MspPostInit) for [Anonymous Symbol]
+    tim1_pwm.o(.text.MX_TIM1_Init) refers to rt_memclr_w.o(.text) for __aeabi_memclr4
+    tim1_pwm.o(.text.MX_TIM1_Init) refers to stm32g4xx_hal_rcc.o(.text.HAL_RCC_GetPCLK2Freq) for HAL_RCC_GetPCLK2Freq
+    tim1_pwm.o(.text.MX_TIM1_Init) refers to main.o(.text.Error_Handler) for Error_Handler
+    tim1_pwm.o(.text.MX_TIM1_Init) refers to tim1_pwm.o(.bss.htim1) for htim1
+    tim1_pwm.o(.text.MX_TIM1_Init) refers to stm32g4xx_hal_tim.o(.text.HAL_TIM_PWM_Init) for HAL_TIM_PWM_Init
+    tim1_pwm.o(.text.MX_TIM1_Init) refers to stm32g4xx_hal_tim_ex.o(.text.HAL_TIMEx_MasterConfigSynchronization) for HAL_TIMEx_MasterConfigSynchronization
+    tim1_pwm.o(.text.MX_TIM1_Init) refers to stm32g4xx_hal_tim_ex.o(.text.HAL_TIMEx_ConfigBreakDeadTime) for HAL_TIMEx_ConfigBreakDeadTime
+    tim1_pwm.o(.text.MX_TIM1_Init) refers to stm32g4xx_hal_tim.o(.text.HAL_TIM_PWM_ConfigChannel) for HAL_TIM_PWM_ConfigChannel
+    tim1_pwm.o(.text.MX_TIM1_Init) refers to stm32g4xx_hal_msp.o(.text.HAL_TIM_MspPostInit) for HAL_TIM_MspPostInit
+    tim1_pwm.o(.text.MX_TIM1_Init) refers to stm32g4xx_hal_tim.o(.text.HAL_TIM_Base_Start_IT) for HAL_TIM_Base_Start_IT
+    tim1_pwm.o(.text.MX_TIM1_Init) refers to tim1_pwm.o(.data.s_phase_duty) for s_phase_duty
+    tim1_pwm.o(.ARM.exidx.text.MX_TIM1_Init) refers to tim1_pwm.o(.text.MX_TIM1_Init) for [Anonymous Symbol]
+    tim1_pwm.o(.text.Tim1Pwm_SetPhaseDuty) refers to tim1_pwm.o(.bss.htim1) for htim1
+    tim1_pwm.o(.text.Tim1Pwm_SetPhaseDuty) refers to tim1_pwm.o(.data.s_phase_duty) for s_phase_duty
+    tim1_pwm.o(.ARM.exidx.text.Tim1Pwm_SetPhaseDuty) refers to tim1_pwm.o(.text.Tim1Pwm_SetPhaseDuty) for [Anonymous Symbol]
+    tim1_pwm.o(.text.Tim1Pwm_GetPhaseDuty) refers to tim1_pwm.o(.data.s_phase_duty) for s_phase_duty
+    tim1_pwm.o(.ARM.exidx.text.Tim1Pwm_GetPhaseDuty) refers to tim1_pwm.o(.text.Tim1Pwm_GetPhaseDuty) for [Anonymous Symbol]
+    tim1_pwm.o(.text.Tim1Pwm_SetNeutral) refers to tim1_pwm.o(.data.s_phase_duty) for s_phase_duty
+    tim1_pwm.o(.text.Tim1Pwm_SetNeutral) refers to tim1_pwm.o(.bss.htim1) for htim1
+    tim1_pwm.o(.ARM.exidx.text.Tim1Pwm_SetNeutral) refers to tim1_pwm.o(.text.Tim1Pwm_SetNeutral) for [Anonymous Symbol]
+    tim1_pwm.o(.text.Tim1Pwm_EnableOutputs) refers to tim1_pwm.o(.bss.htim1) for htim1
+    tim1_pwm.o(.ARM.exidx.text.Tim1Pwm_EnableOutputs) refers to tim1_pwm.o(.text.Tim1Pwm_EnableOutputs) for [Anonymous Symbol]
+    tim1_pwm.o(.text.Tim1Pwm_EmergencyStop) refers to tim1_pwm.o(.bss.htim1) for htim1
+    tim1_pwm.o(.ARM.exidx.text.Tim1Pwm_EmergencyStop) refers to tim1_pwm.o(.text.Tim1Pwm_EmergencyStop) for [Anonymous Symbol]
+    tim1_pwm.o(.ARM.exidx.text.Tim1Pwm_IsOutputEnabled) refers to tim1_pwm.o(.text.Tim1Pwm_IsOutputEnabled) for [Anonymous Symbol]
+    tim1_pwm_verify.o(.text.Tim1PwmVerify_Start) refers to tim1_pwm.o(.text.Tim1Pwm_SetPhaseDuty) for Tim1Pwm_SetPhaseDuty
+    tim1_pwm_verify.o(.text.Tim1PwmVerify_Start) refers to tim1_pwm.o(.text.Tim1Pwm_EnableOutputs) for Tim1Pwm_EnableOutputs
+    tim1_pwm_verify.o(.text.Tim1PwmVerify_Start) refers to tim1_pwm.o(.text.Tim1Pwm_EmergencyStop) for Tim1Pwm_EmergencyStop
+    tim1_pwm_verify.o(.text.Tim1PwmVerify_Start) refers to tim1_pwm.o(.text.Tim1Pwm_IsOutputEnabled) for Tim1Pwm_IsOutputEnabled
+    tim1_pwm_verify.o(.text.Tim1PwmVerify_Start) refers to tim1_pwm.o(.text.Tim1Pwm_SetNeutral) for Tim1Pwm_SetNeutral
+    tim1_pwm_verify.o(.ARM.exidx.text.Tim1PwmVerify_Start) refers to tim1_pwm_verify.o(.text.Tim1PwmVerify_Start) for [Anonymous Symbol]
+    tim1_pwm_verify.o(.text.Tim1PwmVerify_Task) refers to tim1_pwm.o(.text.Tim1Pwm_IsOutputEnabled) for Tim1Pwm_IsOutputEnabled
+    tim1_pwm_verify.o(.text.Tim1PwmVerify_Task) refers to tim1_pwm.o(.text.Tim1Pwm_SetPhaseDuty) for Tim1Pwm_SetPhaseDuty
+    tim1_pwm_verify.o(.text.Tim1PwmVerify_Task) refers to tim1_pwm.o(.text.Tim1Pwm_EnableOutputs) for Tim1Pwm_EnableOutputs
+    tim1_pwm_verify.o(.text.Tim1PwmVerify_Task) refers to tim1_pwm.o(.text.Tim1Pwm_EmergencyStop) for Tim1Pwm_EmergencyStop
+    tim1_pwm_verify.o(.ARM.exidx.text.Tim1PwmVerify_Task) refers to tim1_pwm_verify.o(.text.Tim1PwmVerify_Task) for [Anonymous Symbol]
+    tim1_pwm_verify.o(.text.Tim1PwmVerify_Stop) refers to tim1_pwm.o(.text.Tim1Pwm_EmergencyStop) for Tim1Pwm_EmergencyStop
+    tim1_pwm_verify.o(.text.Tim1PwmVerify_Stop) refers to tim1_pwm.o(.text.Tim1Pwm_SetNeutral) for Tim1Pwm_SetNeutral
+    tim1_pwm_verify.o(.ARM.exidx.text.Tim1PwmVerify_Stop) refers to tim1_pwm_verify.o(.text.Tim1PwmVerify_Stop) for [Anonymous Symbol]
+    tim1_pwm_verify.o(.ARM.exidx.text.Tim1PwmVerify_IsRunning) refers to tim1_pwm_verify.o(.text.Tim1PwmVerify_IsRunning) for [Anonymous Symbol]
+    tim1_pwm_verify.o(.ARM.exidx.text.Tim1PwmVerify_TickIsr) refers to tim1_pwm_verify.o(.text.Tim1PwmVerify_TickIsr) for [Anonymous Symbol]
     stm32g4xx_hal_pwr_ex.o(.ARM.exidx.text.HAL_PWREx_GetVoltageRange) refers to stm32g4xx_hal_pwr_ex.o(.text.HAL_PWREx_GetVoltageRange) for [Anonymous Symbol]
     stm32g4xx_hal_pwr_ex.o(.text.HAL_PWREx_ControlVoltageScaling) refers to system_stm32g4xx.o(.data.SystemCoreClock) for SystemCoreClock
     stm32g4xx_hal_pwr_ex.o(.ARM.exidx.text.HAL_PWREx_ControlVoltageScaling) refers to stm32g4xx_hal_pwr_ex.o(.text.HAL_PWREx_ControlVoltageScaling) for [Anonymous Symbol]
@@ -1194,56 +1187,9 @@ Removing Unused input sections from the image.
     Removing main.o(.text.SystemClock_Config), (108 bytes).
     Removing main.o(.ARM.exidx.text.SystemClock_Config), (8 bytes).
     Removing main.o(.ARM.exidx.text.Error_Handler), (8 bytes).
-    Removing main.o(.data.a), (1 bytes).
-    Removing main.o(.data.b), (1 bytes).
     Removing main.o(.ARM.use_no_argv), (4 bytes).
     Removing gpio.o(.text), (0 bytes).
     Removing gpio.o(.ARM.exidx.text.MX_GPIO_Init), (8 bytes).
-    Removing i2c.o(.text), (0 bytes).
-    Removing i2c.o(.ARM.exidx.text.MX_I2C3_Init), (8 bytes).
-    Removing stspin32g4.o(.text), (0 bytes).
-    Removing stspin32g4.o(.ARM.exidx.text.STSPIN32G4_ReadRegister), (8 bytes).
-    Removing stspin32g4.o(.text.STSPIN32G4_ReadRegisters), (50 bytes).
-    Removing stspin32g4.o(.ARM.exidx.text.STSPIN32G4_ReadRegisters), (8 bytes).
-    Removing stspin32g4.o(.text.STSPIN32G4_WriteRegister), (46 bytes).
-    Removing stspin32g4.o(.ARM.exidx.text.STSPIN32G4_WriteRegister), (8 bytes).
-    Removing stspin32g4.o(.text.STSPIN32G4_WriteRegisters), (50 bytes).
-    Removing stspin32g4.o(.ARM.exidx.text.STSPIN32G4_WriteRegisters), (8 bytes).
-    Removing stspin32g4.o(.ARM.exidx.text.STSPIN32G4_Init), (8 bytes).
-    Removing stspin32g4.o(.ARM.exidx.text.STSPIN32G4_IsReady), (8 bytes).
-    Removing stspin32g4.o(.ARM.exidx.text.STSPIN32G4_IsFault), (8 bytes).
-    Removing stspin32g4.o(.ARM.exidx.text.STSPIN32G4_ClearFaults), (8 bytes).
-    Removing stspin32g4.o(.ARM.exidx.text.STSPIN32G4_Wake), (8 bytes).
-    Removing stspin32g4.o(.ARM.exidx.text.STSPIN32G4_EnterStandby), (8 bytes).
-    Removing tim.o(.text), (0 bytes).
-    Removing tim.o(.ARM.exidx.text.MX_TIM6_Init), (8 bytes).
-    Removing tim1_pwm.o(.text), (0 bytes).
-    Removing tim1_pwm.o(.ARM.exidx.text.MX_TIM1_Init), (8 bytes).
-    Removing tim1_pwm.o(.ARM.exidx.text.Tim1Pwm_SetPhaseDuty), (8 bytes).
-    Removing tim1_pwm.o(.text.Tim1Pwm_GetPhaseDuty), (48 bytes).
-    Removing tim1_pwm.o(.ARM.exidx.text.Tim1Pwm_GetPhaseDuty), (8 bytes).
-    Removing tim1_pwm.o(.ARM.exidx.text.Tim1Pwm_SetNeutral), (8 bytes).
-    Removing tim1_pwm.o(.ARM.exidx.text.Tim1Pwm_EnableOutputs), (8 bytes).
-    Removing tim1_pwm.o(.ARM.exidx.text.Tim1Pwm_EmergencyStop), (8 bytes).
-    Removing tim1_pwm.o(.ARM.exidx.text.Tim1Pwm_IsOutputEnabled), (8 bytes).
-    Removing tim1_pwm_verify.o(.text), (0 bytes).
-    Removing tim1_pwm_verify.o(.ARM.exidx.text.Tim1PwmVerify_Start), (8 bytes).
-    Removing tim1_pwm_verify.o(.ARM.exidx.text.Tim1PwmVerify_Task), (8 bytes).
-    Removing tim1_pwm_verify.o(.ARM.exidx.text.Tim1PwmVerify_ApplySector), (8 bytes).
-    Removing tim1_pwm_verify.o(.text.Tim1PwmVerify_Stop), (20 bytes).
-    Removing tim1_pwm_verify.o(.ARM.exidx.text.Tim1PwmVerify_Stop), (8 bytes).
-    Removing tim1_pwm_verify.o(.text.Tim1PwmVerify_IsRunning), (12 bytes).
-    Removing tim1_pwm_verify.o(.ARM.exidx.text.Tim1PwmVerify_IsRunning), (8 bytes).
-    Removing tim1_pwm_verify.o(.ARM.exidx.text.Tim1PwmVerify_TickIsr), (8 bytes).
-    Removing drv_monitor.o(.text), (0 bytes).
-    Removing drv_monitor.o(.ARM.exidx.text.HAL_TIM_PeriodElapsedCallback), (8 bytes).
-    Removing drv_monitor.o(.ARM.exidx.text.DrvMonitor_Init), (8 bytes).
-    Removing drv_monitor.o(.ARM.exidx.text.DrvMonitor_Task), (8 bytes).
-    Removing drv_monitor.o(.text.DrvMonitor_PostRequest), (12 bytes).
-    Removing drv_monitor.o(.ARM.exidx.text.DrvMonitor_PostRequest), (8 bytes).
-    Removing drv_monitor.o(.text.DrvMonitor_Get), (12 bytes).
-    Removing drv_monitor.o(.ARM.exidx.text.DrvMonitor_Get), (8 bytes).
-    Removing drv_monitor.o(.ARM.exidx.text.DrvMonitor_GetState), (8 bytes).
     Removing stm32g4xx_it.o(.text), (0 bytes).
     Removing stm32g4xx_it.o(.ARM.exidx.text.NMI_Handler), (8 bytes).
     Removing stm32g4xx_it.o(.ARM.exidx.text.HardFault_Handler), (8 bytes).
@@ -1269,6 +1215,50 @@ Removing Unused input sections from the image.
     Removing stm32g4xx_hal_msp.o(.text.HAL_TIM_PWM_MspDeInit), (50 bytes).
     Removing stm32g4xx_hal_msp.o(.ARM.exidx.text.HAL_TIM_PWM_MspDeInit), (8 bytes).
     Removing stm32g4xx_hal_msp.o(.ARM.exidx.text.HAL_TIM_MspPostInit), (8 bytes).
+    Removing i2c.o(.text), (0 bytes).
+    Removing i2c.o(.ARM.exidx.text.MX_I2C3_Init), (8 bytes).
+    Removing tim.o(.text), (0 bytes).
+    Removing tim.o(.ARM.exidx.text.MX_TIM6_Init), (8 bytes).
+    Removing stspin32g4.o(.text), (0 bytes).
+    Removing stspin32g4.o(.ARM.exidx.text.STSPIN32G4_ReadRegister), (8 bytes).
+    Removing stspin32g4.o(.text.STSPIN32G4_ReadRegisters), (50 bytes).
+    Removing stspin32g4.o(.ARM.exidx.text.STSPIN32G4_ReadRegisters), (8 bytes).
+    Removing stspin32g4.o(.text.STSPIN32G4_WriteRegister), (46 bytes).
+    Removing stspin32g4.o(.ARM.exidx.text.STSPIN32G4_WriteRegister), (8 bytes).
+    Removing stspin32g4.o(.text.STSPIN32G4_WriteRegisters), (50 bytes).
+    Removing stspin32g4.o(.ARM.exidx.text.STSPIN32G4_WriteRegisters), (8 bytes).
+    Removing stspin32g4.o(.ARM.exidx.text.STSPIN32G4_Init), (8 bytes).
+    Removing stspin32g4.o(.ARM.exidx.text.STSPIN32G4_IsReady), (8 bytes).
+    Removing stspin32g4.o(.ARM.exidx.text.STSPIN32G4_IsFault), (8 bytes).
+    Removing stspin32g4.o(.ARM.exidx.text.STSPIN32G4_ClearFaults), (8 bytes).
+    Removing stspin32g4.o(.ARM.exidx.text.STSPIN32G4_Wake), (8 bytes).
+    Removing stspin32g4.o(.ARM.exidx.text.STSPIN32G4_EnterStandby), (8 bytes).
+    Removing drv_monitor.o(.text), (0 bytes).
+    Removing drv_monitor.o(.ARM.exidx.text.HAL_TIM_PeriodElapsedCallback), (8 bytes).
+    Removing drv_monitor.o(.ARM.exidx.text.DrvMonitor_Init), (8 bytes).
+    Removing drv_monitor.o(.ARM.exidx.text.DrvMonitor_Task), (8 bytes).
+    Removing drv_monitor.o(.text.DrvMonitor_PostRequest), (12 bytes).
+    Removing drv_monitor.o(.ARM.exidx.text.DrvMonitor_PostRequest), (8 bytes).
+    Removing drv_monitor.o(.text.DrvMonitor_Get), (12 bytes).
+    Removing drv_monitor.o(.ARM.exidx.text.DrvMonitor_Get), (8 bytes).
+    Removing drv_monitor.o(.ARM.exidx.text.DrvMonitor_GetState), (8 bytes).
+    Removing tim1_pwm.o(.text), (0 bytes).
+    Removing tim1_pwm.o(.ARM.exidx.text.MX_TIM1_Init), (8 bytes).
+    Removing tim1_pwm.o(.ARM.exidx.text.Tim1Pwm_SetPhaseDuty), (8 bytes).
+    Removing tim1_pwm.o(.text.Tim1Pwm_GetPhaseDuty), (48 bytes).
+    Removing tim1_pwm.o(.ARM.exidx.text.Tim1Pwm_GetPhaseDuty), (8 bytes).
+    Removing tim1_pwm.o(.ARM.exidx.text.Tim1Pwm_SetNeutral), (8 bytes).
+    Removing tim1_pwm.o(.ARM.exidx.text.Tim1Pwm_EnableOutputs), (8 bytes).
+    Removing tim1_pwm.o(.ARM.exidx.text.Tim1Pwm_EmergencyStop), (8 bytes).
+    Removing tim1_pwm.o(.ARM.exidx.text.Tim1Pwm_IsOutputEnabled), (8 bytes).
+    Removing tim1_pwm_verify.o(.text), (0 bytes).
+    Removing tim1_pwm_verify.o(.ARM.exidx.text.Tim1PwmVerify_Start), (8 bytes).
+    Removing tim1_pwm_verify.o(.ARM.exidx.text.Tim1PwmVerify_Task), (8 bytes).
+    Removing tim1_pwm_verify.o(.text.Tim1PwmVerify_Stop), (32 bytes).
+    Removing tim1_pwm_verify.o(.ARM.exidx.text.Tim1PwmVerify_Stop), (8 bytes).
+    Removing tim1_pwm_verify.o(.text.Tim1PwmVerify_IsRunning), (20 bytes).
+    Removing tim1_pwm_verify.o(.ARM.exidx.text.Tim1PwmVerify_IsRunning), (8 bytes).
+    Removing tim1_pwm_verify.o(.ARM.exidx.text.Tim1PwmVerify_TickIsr), (8 bytes).
     Removing stm32g4xx_hal_pwr_ex.o(.text), (0 bytes).
     Removing stm32g4xx_hal_pwr_ex.o(.text.HAL_PWREx_GetVoltageRange), (38 bytes).
     Removing stm32g4xx_hal_pwr_ex.o(.ARM.exidx.text.HAL_PWREx_GetVoltageRange), (8 bytes).
@@ -2170,7 +2160,7 @@ Removing Unused input sections from the image.
     Removing system_stm32g4xx.o(.text.SystemCoreClockUpdate), (152 bytes).
     Removing system_stm32g4xx.o(.ARM.exidx.text.SystemCoreClockUpdate), (8 bytes).
 
-980 unused section(s) (total 57022 bytes) removed from the image.
+977 unused section(s) (total 57032 bytes) removed from the image.
 
 ==============================================================================
 
@@ -2400,39 +2390,24 @@ Image Symbol Table
     [Anonymous Symbol]                       0x08002b20   Section        0  stm32g4xx_it.o(.text.TIM1_CC_IRQHandler)
     [Anonymous Symbol]                       0x08002b2c   Section        0  stm32g4xx_it.o(.text.TIM1_UP_TIM16_IRQHandler)
     [Anonymous Symbol]                       0x08002b38   Section        0  stm32g4xx_it.o(.text.TIM6_DAC_IRQHandler)
-    [Anonymous Symbol]                       0x08002b50   Section        0  stm32g4xx_hal_tim.o(.text.TIM_Base_SetConfig)
-    Tim1PwmVerify_ApplySector                0x08002c81   Thumb Code   122  tim1_pwm_verify.o(.text.Tim1PwmVerify_ApplySector)
-    [Anonymous Symbol]                       0x08002c80   Section        0  tim1_pwm_verify.o(.text.Tim1PwmVerify_ApplySector)
-    [Anonymous Symbol]                       0x08002cfc   Section        0  tim1_pwm_verify.o(.text.Tim1PwmVerify_Start)
-    [Anonymous Symbol]                       0x08002d60   Section        0  tim1_pwm_verify.o(.text.Tim1PwmVerify_Task)
-    [Anonymous Symbol]                       0x08002e04   Section        0  tim1_pwm_verify.o(.text.Tim1PwmVerify_TickIsr)
-    [Anonymous Symbol]                       0x08002e34   Section        0  tim1_pwm.o(.text.Tim1Pwm_EmergencyStop)
-    [Anonymous Symbol]                       0x08002e48   Section        0  tim1_pwm.o(.text.Tim1Pwm_EnableOutputs)
-    [Anonymous Symbol]                       0x08002e5c   Section        0  tim1_pwm.o(.text.Tim1Pwm_IsOutputEnabled)
-    [Anonymous Symbol]                       0x08002e6c   Section        0  tim1_pwm.o(.text.Tim1Pwm_SetNeutral)
-    [Anonymous Symbol]                       0x08002e94   Section        0  tim1_pwm.o(.text.Tim1Pwm_SetPhaseDuty)
-    [Anonymous Symbol]                       0x08002f20   Section        0  stm32g4xx_it.o(.text.UsageFault_Handler)
-    [Anonymous Symbol]                       0x08002f24   Section        0  main.o(.text.main)
-    $v0                                      0x08002fca   Number         0  fpinit.o(x$fpl$fpinit)
-    x$fpl$fpinit                             0x08002fca   Section       26  fpinit.o(x$fpl$fpinit)
-    s_sector_table                           0x08002ffc   Data          36  tim1_pwm_verify.o(.rodata.s_sector_table)
-    [Anonymous Symbol]                       0x08002ffc   Section        0  tim1_pwm_verify.o(.rodata.s_sector_table)
+    [Anonymous Symbol]                       0x08002b58   Section        0  stm32g4xx_hal_tim.o(.text.TIM_Base_SetConfig)
+    [Anonymous Symbol]                       0x08002c88   Section        0  tim1_pwm_verify.o(.text.Tim1PwmVerify_Start)
+    [Anonymous Symbol]                       0x08002d48   Section        0  tim1_pwm_verify.o(.text.Tim1PwmVerify_Task)
+    [Anonymous Symbol]                       0x08002e28   Section        0  tim1_pwm_verify.o(.text.Tim1PwmVerify_TickIsr)
+    [Anonymous Symbol]                       0x08002e38   Section        0  tim1_pwm.o(.text.Tim1Pwm_EmergencyStop)
+    [Anonymous Symbol]                       0x08002e4c   Section        0  tim1_pwm.o(.text.Tim1Pwm_EnableOutputs)
+    [Anonymous Symbol]                       0x08002e60   Section        0  tim1_pwm.o(.text.Tim1Pwm_IsOutputEnabled)
+    [Anonymous Symbol]                       0x08002e70   Section        0  tim1_pwm.o(.text.Tim1Pwm_SetNeutral)
+    [Anonymous Symbol]                       0x08002e98   Section        0  tim1_pwm.o(.text.Tim1Pwm_SetPhaseDuty)
+    [Anonymous Symbol]                       0x08002f24   Section        0  stm32g4xx_it.o(.text.UsageFault_Handler)
+    [Anonymous Symbol]                       0x08002f28   Section        0  main.o(.text.main)
+    $v0                                      0x08002fd6   Number         0  fpinit.o(x$fpl$fpinit)
+    x$fpl$fpinit                             0x08002fd6   Section       26  fpinit.o(x$fpl$fpinit)
     .L_MergedGlobals                         0x20000000   Data           8  stm32g4xx_hal.o(.data..L_MergedGlobals)
     [Anonymous Symbol]                       0x20000000   Section        0  stm32g4xx_hal.o(.data..L_MergedGlobals)
-    s_phase_duty                             0x2000000c   Data           6  tim1_pwm.o(.data.s_phase_duty)
-    [Anonymous Symbol]                       0x2000000c   Section        0  tim1_pwm.o(.data.s_phase_duty)
-    .bss                                     0x20000018   Section       96  libspace.o(.bss)
-    .L_MergedGlobals                         0x20000078   Data          24  tim1_pwm_verify.o(.bss..L_MergedGlobals)
-    s_part                                   0x20000078   Data           1  tim1_pwm_verify.o(.bss..L_MergedGlobals)
-    [Anonymous Symbol]                       0x20000078   Section        0  tim1_pwm_verify.o(.bss..L_MergedGlobals)
-    s_step                                   0x20000079   Data           1  tim1_pwm_verify.o(.bss..L_MergedGlobals)
-    s_failed                                 0x2000007a   Data           1  tim1_pwm_verify.o(.bss..L_MergedGlobals)
-    s_watchdog_fired                         0x2000007b   Data           1  tim1_pwm_verify.o(.bss..L_MergedGlobals)
-    s_running                                0x2000007c   Data           1  tim1_pwm_verify.o(.bss..L_MergedGlobals)
-    s_start_ms                               0x20000080   Data           4  tim1_pwm_verify.o(.bss..L_MergedGlobals)
-    s_part_start_ms                          0x20000084   Data           4  tim1_pwm_verify.o(.bss..L_MergedGlobals)
-    s_step_start_ms                          0x20000088   Data           4  tim1_pwm_verify.o(.bss..L_MergedGlobals)
-    s_watchdog_deadline_ms                   0x2000008c   Data           4  tim1_pwm_verify.o(.bss..L_MergedGlobals)
+    s_phase_duty                             0x20000024   Data           6  tim1_pwm.o(.data.s_phase_duty)
+    [Anonymous Symbol]                       0x20000024   Section        0  tim1_pwm.o(.data.s_phase_duty)
+    .bss                                     0x20000030   Section       96  libspace.o(.bss)
     .L_MergedGlobals                         0x20000090   Data          20  drv_monitor.o(.bss..L_MergedGlobals)
     [Anonymous Symbol]                       0x20000090   Section        0  drv_monitor.o(.bss..L_MergedGlobals)
     s_request                                0x20000091   Data           1  drv_monitor.o(.bss..L_MergedGlobals)
@@ -2685,30 +2660,31 @@ Image Symbol Table
     SystemInit                               0x08002b0d   Thumb Code    18  system_stm32g4xx.o(.text.SystemInit)
     TIM1_CC_IRQHandler                       0x08002b21   Thumb Code    12  stm32g4xx_it.o(.text.TIM1_CC_IRQHandler)
     TIM1_UP_TIM16_IRQHandler                 0x08002b2d   Thumb Code    12  stm32g4xx_it.o(.text.TIM1_UP_TIM16_IRQHandler)
-    TIM6_DAC_IRQHandler                      0x08002b39   Thumb Code    22  stm32g4xx_it.o(.text.TIM6_DAC_IRQHandler)
-    TIM_Base_SetConfig                       0x08002b51   Thumb Code   302  stm32g4xx_hal_tim.o(.text.TIM_Base_SetConfig)
-    Tim1PwmVerify_Start                      0x08002cfd   Thumb Code   100  tim1_pwm_verify.o(.text.Tim1PwmVerify_Start)
-    Tim1PwmVerify_Task                       0x08002d61   Thumb Code   164  tim1_pwm_verify.o(.text.Tim1PwmVerify_Task)
-    Tim1PwmVerify_TickIsr                    0x08002e05   Thumb Code    46  tim1_pwm_verify.o(.text.Tim1PwmVerify_TickIsr)
-    Tim1Pwm_EmergencyStop                    0x08002e35   Thumb Code    20  tim1_pwm.o(.text.Tim1Pwm_EmergencyStop)
-    Tim1Pwm_EnableOutputs                    0x08002e49   Thumb Code    20  tim1_pwm.o(.text.Tim1Pwm_EnableOutputs)
-    Tim1Pwm_IsOutputEnabled                  0x08002e5d   Thumb Code    16  tim1_pwm.o(.text.Tim1Pwm_IsOutputEnabled)
-    Tim1Pwm_SetNeutral                       0x08002e6d   Thumb Code    40  tim1_pwm.o(.text.Tim1Pwm_SetNeutral)
-    Tim1Pwm_SetPhaseDuty                     0x08002e95   Thumb Code   120  tim1_pwm.o(.text.Tim1Pwm_SetPhaseDuty)
-    UsageFault_Handler                       0x08002f21   Thumb Code     2  stm32g4xx_it.o(.text.UsageFault_Handler)
-    main                                     0x08002f25   Thumb Code   166  main.o(.text.main)
-    _fp_init                                 0x08002fcb   Thumb Code    26  fpinit.o(x$fpl$fpinit)
-    __fplib_config_fpu_vfp                   0x08002fe3   Thumb Code     0  fpinit.o(x$fpl$fpinit)
-    __fplib_config_pureend_doubles           0x08002fe3   Thumb Code     0  fpinit.o(x$fpl$fpinit)
-    AHBPrescTable                            0x08002fe4   Data          16  system_stm32g4xx.o(.rodata.AHBPrescTable)
-    APBPrescTable                            0x08002ff4   Data           8  system_stm32g4xx.o(.rodata.APBPrescTable)
-    Region$$Table$$Base                      0x08003020   Number         0  anon$$obj.o(Region$$Table)
-    Region$$Table$$Limit                     0x08003040   Number         0  anon$$obj.o(Region$$Table)
+    TIM6_DAC_IRQHandler                      0x08002b39   Thumb Code    30  stm32g4xx_it.o(.text.TIM6_DAC_IRQHandler)
+    TIM_Base_SetConfig                       0x08002b59   Thumb Code   302  stm32g4xx_hal_tim.o(.text.TIM_Base_SetConfig)
+    Tim1PwmVerify_Start                      0x08002c89   Thumb Code   190  tim1_pwm_verify.o(.text.Tim1PwmVerify_Start)
+    Tim1PwmVerify_Task                       0x08002d49   Thumb Code   224  tim1_pwm_verify.o(.text.Tim1PwmVerify_Task)
+    Tim1PwmVerify_TickIsr                    0x08002e29   Thumb Code    16  tim1_pwm_verify.o(.text.Tim1PwmVerify_TickIsr)
+    Tim1Pwm_EmergencyStop                    0x08002e39   Thumb Code    20  tim1_pwm.o(.text.Tim1Pwm_EmergencyStop)
+    Tim1Pwm_EnableOutputs                    0x08002e4d   Thumb Code    20  tim1_pwm.o(.text.Tim1Pwm_EnableOutputs)
+    Tim1Pwm_IsOutputEnabled                  0x08002e61   Thumb Code    16  tim1_pwm.o(.text.Tim1Pwm_IsOutputEnabled)
+    Tim1Pwm_SetNeutral                       0x08002e71   Thumb Code    40  tim1_pwm.o(.text.Tim1Pwm_SetNeutral)
+    Tim1Pwm_SetPhaseDuty                     0x08002e99   Thumb Code   120  tim1_pwm.o(.text.Tim1Pwm_SetPhaseDuty)
+    UsageFault_Handler                       0x08002f25   Thumb Code     2  stm32g4xx_it.o(.text.UsageFault_Handler)
+    main                                     0x08002f29   Thumb Code   174  main.o(.text.main)
+    _fp_init                                 0x08002fd7   Thumb Code    26  fpinit.o(x$fpl$fpinit)
+    __fplib_config_fpu_vfp                   0x08002fef   Thumb Code     0  fpinit.o(x$fpl$fpinit)
+    __fplib_config_pureend_doubles           0x08002fef   Thumb Code     0  fpinit.o(x$fpl$fpinit)
+    AHBPrescTable                            0x08002ff0   Data          16  system_stm32g4xx.o(.rodata.AHBPrescTable)
+    APBPrescTable                            0x08003000   Data           8  system_stm32g4xx.o(.rodata.APBPrescTable)
+    Region$$Table$$Base                      0x08003008   Number         0  anon$$obj.o(Region$$Table)
+    Region$$Table$$Limit                     0x08003028   Number         0  anon$$obj.o(Region$$Table)
     uwTickPrio                               0x20000000   Data           4  stm32g4xx_hal.o(.data..L_MergedGlobals)
     uwTickFreq                               0x20000004   Data           4  stm32g4xx_hal.o(.data..L_MergedGlobals)
     SystemCoreClock                          0x20000008   Data           4  system_stm32g4xx.o(.data.SystemCoreClock)
-    __libspace_start                         0x20000018   Data          96  libspace.o(.bss)
-    __temporary_stack_top$libspace           0x20000078   Data           0  libspace.o(.bss)
+    g_measurement_manager                    0x2000000c   Data          24  main.o(.data.g_measurement_manager)
+    __libspace_start                         0x20000030   Data          96  libspace.o(.bss)
+    __temporary_stack_top$libspace           0x20000090   Data           0  libspace.o(.bss)
     g_drv_monitor_tick                       0x20000090   Data           1  drv_monitor.o(.bss..L_MergedGlobals)
     s_mon                                    0x20000094   Data          16  drv_monitor.o(.bss..L_MergedGlobals)
     hi2c3                                    0x200000a4   Data          84  i2c.o(.bss.hi2c3)
@@ -2726,227 +2702,224 @@ Memory Map of the image
 
   Load Region LR_IROM1 (Base: 0x08000000, Size: 0x00003058, Max: 0x00020000, ABSOLUTE)
 
-    Execution Region ER_IROM1 (Exec base: 0x08000000, Load base: 0x08000000, Size: 0x00003040, Max: 0x00020000, ABSOLUTE)
+    Execution Region ER_IROM1 (Exec base: 0x08000000, Load base: 0x08000000, Size: 0x00003028, Max: 0x00020000, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
     0x08000000   0x08000000   0x000001d8   Data   RO            3    RESET               startup_stm32g431xx.o
-    0x080001d8   0x080001d8   0x00000008   Code   RO         1285  * !!!main             c_w.l(__main.o)
-    0x080001e0   0x080001e0   0x0000005c   Code   RO         1450    !!!scatter          c_w.l(__scatter.o)
-    0x0800023c   0x0800023c   0x0000001a   Code   RO         1454    !!handler_copy      c_w.l(__scatter_copy.o)
+    0x080001d8   0x080001d8   0x00000008   Code   RO         1280  * !!!main             c_w.l(__main.o)
+    0x080001e0   0x080001e0   0x0000005c   Code   RO         1445    !!!scatter          c_w.l(__scatter.o)
+    0x0800023c   0x0800023c   0x0000001a   Code   RO         1449    !!handler_copy      c_w.l(__scatter_copy.o)
     0x08000256   0x08000256   0x00000002   PAD
-    0x08000258   0x08000258   0x00000002   Code   RO         1451    !!handler_null      c_w.l(__scatter.o)
+    0x08000258   0x08000258   0x00000002   Code   RO         1446    !!handler_null      c_w.l(__scatter.o)
     0x0800025a   0x0800025a   0x00000002   PAD
-    0x0800025c   0x0800025c   0x0000001c   Code   RO         1456    !!handler_zi        c_w.l(__scatter_zi.o)
-    0x08000278   0x08000278   0x00000002   Code   RO         1312    .ARM.Collect$$libinit$$00000000  c_w.l(libinit.o)
-    0x0800027a   0x0800027a   0x00000004   Code   RO         1318    .ARM.Collect$$libinit$$00000001  c_w.l(libinit2.o)
-    0x0800027e   0x0800027e   0x00000000   Code   RO         1321    .ARM.Collect$$libinit$$00000004  c_w.l(libinit2.o)
-    0x0800027e   0x0800027e   0x00000000   Code   RO         1323    .ARM.Collect$$libinit$$00000006  c_w.l(libinit2.o)
-    0x0800027e   0x0800027e   0x00000000   Code   RO         1326    .ARM.Collect$$libinit$$0000000C  c_w.l(libinit2.o)
-    0x0800027e   0x0800027e   0x00000000   Code   RO         1328    .ARM.Collect$$libinit$$0000000E  c_w.l(libinit2.o)
-    0x0800027e   0x0800027e   0x00000000   Code   RO         1330    .ARM.Collect$$libinit$$00000010  c_w.l(libinit2.o)
-    0x0800027e   0x0800027e   0x00000000   Code   RO         1333    .ARM.Collect$$libinit$$00000013  c_w.l(libinit2.o)
-    0x0800027e   0x0800027e   0x00000000   Code   RO         1335    .ARM.Collect$$libinit$$00000015  c_w.l(libinit2.o)
-    0x0800027e   0x0800027e   0x00000000   Code   RO         1337    .ARM.Collect$$libinit$$00000017  c_w.l(libinit2.o)
-    0x0800027e   0x0800027e   0x00000000   Code   RO         1339    .ARM.Collect$$libinit$$00000019  c_w.l(libinit2.o)
-    0x0800027e   0x0800027e   0x00000000   Code   RO         1341    .ARM.Collect$$libinit$$0000001B  c_w.l(libinit2.o)
-    0x0800027e   0x0800027e   0x00000000   Code   RO         1343    .ARM.Collect$$libinit$$0000001D  c_w.l(libinit2.o)
-    0x0800027e   0x0800027e   0x00000000   Code   RO         1345    .ARM.Collect$$libinit$$0000001F  c_w.l(libinit2.o)
-    0x0800027e   0x0800027e   0x00000000   Code   RO         1347    .ARM.Collect$$libinit$$00000021  c_w.l(libinit2.o)
-    0x0800027e   0x0800027e   0x00000000   Code   RO         1349    .ARM.Collect$$libinit$$00000023  c_w.l(libinit2.o)
-    0x0800027e   0x0800027e   0x00000000   Code   RO         1351    .ARM.Collect$$libinit$$00000025  c_w.l(libinit2.o)
-    0x0800027e   0x0800027e   0x00000000   Code   RO         1353    .ARM.Collect$$libinit$$00000027  c_w.l(libinit2.o)
-    0x0800027e   0x0800027e   0x00000000   Code   RO         1357    .ARM.Collect$$libinit$$0000002E  c_w.l(libinit2.o)
-    0x0800027e   0x0800027e   0x00000000   Code   RO         1359    .ARM.Collect$$libinit$$00000030  c_w.l(libinit2.o)
-    0x0800027e   0x0800027e   0x00000000   Code   RO         1361    .ARM.Collect$$libinit$$00000032  c_w.l(libinit2.o)
-    0x0800027e   0x0800027e   0x00000000   Code   RO         1363    .ARM.Collect$$libinit$$00000034  c_w.l(libinit2.o)
-    0x0800027e   0x0800027e   0x00000002   Code   RO         1364    .ARM.Collect$$libinit$$00000035  c_w.l(libinit2.o)
-    0x08000280   0x08000280   0x00000002   Code   RO         1386    .ARM.Collect$$libshutdown$$00000000  c_w.l(libshutdown.o)
-    0x08000282   0x08000282   0x00000000   Code   RO         1401    .ARM.Collect$$libshutdown$$00000002  c_w.l(libshutdown2.o)
-    0x08000282   0x08000282   0x00000000   Code   RO         1403    .ARM.Collect$$libshutdown$$00000004  c_w.l(libshutdown2.o)
-    0x08000282   0x08000282   0x00000000   Code   RO         1406    .ARM.Collect$$libshutdown$$00000007  c_w.l(libshutdown2.o)
-    0x08000282   0x08000282   0x00000000   Code   RO         1409    .ARM.Collect$$libshutdown$$0000000A  c_w.l(libshutdown2.o)
-    0x08000282   0x08000282   0x00000000   Code   RO         1411    .ARM.Collect$$libshutdown$$0000000C  c_w.l(libshutdown2.o)
-    0x08000282   0x08000282   0x00000000   Code   RO         1414    .ARM.Collect$$libshutdown$$0000000F  c_w.l(libshutdown2.o)
-    0x08000282   0x08000282   0x00000002   Code   RO         1415    .ARM.Collect$$libshutdown$$00000010  c_w.l(libshutdown2.o)
-    0x08000284   0x08000284   0x00000000   Code   RO         1287    .ARM.Collect$$rtentry$$00000000  c_w.l(__rtentry.o)
-    0x08000284   0x08000284   0x00000000   Code   RO         1289    .ARM.Collect$$rtentry$$00000002  c_w.l(__rtentry2.o)
-    0x08000284   0x08000284   0x00000006   Code   RO         1301    .ARM.Collect$$rtentry$$00000004  c_w.l(__rtentry4.o)
-    0x0800028a   0x0800028a   0x00000000   Code   RO         1291    .ARM.Collect$$rtentry$$00000009  c_w.l(__rtentry2.o)
-    0x0800028a   0x0800028a   0x00000004   Code   RO         1292    .ARM.Collect$$rtentry$$0000000A  c_w.l(__rtentry2.o)
-    0x0800028e   0x0800028e   0x00000000   Code   RO         1294    .ARM.Collect$$rtentry$$0000000C  c_w.l(__rtentry2.o)
-    0x0800028e   0x0800028e   0x00000008   Code   RO         1295    .ARM.Collect$$rtentry$$0000000D  c_w.l(__rtentry2.o)
-    0x08000296   0x08000296   0x00000002   Code   RO         1316    .ARM.Collect$$rtexit$$00000000  c_w.l(rtexit.o)
-    0x08000298   0x08000298   0x00000000   Code   RO         1366    .ARM.Collect$$rtexit$$00000002  c_w.l(rtexit2.o)
-    0x08000298   0x08000298   0x00000004   Code   RO         1367    .ARM.Collect$$rtexit$$00000003  c_w.l(rtexit2.o)
-    0x0800029c   0x0800029c   0x00000006   Code   RO         1368    .ARM.Collect$$rtexit$$00000004  c_w.l(rtexit2.o)
+    0x0800025c   0x0800025c   0x0000001c   Code   RO         1451    !!handler_zi        c_w.l(__scatter_zi.o)
+    0x08000278   0x08000278   0x00000002   Code   RO         1307    .ARM.Collect$$libinit$$00000000  c_w.l(libinit.o)
+    0x0800027a   0x0800027a   0x00000004   Code   RO         1313    .ARM.Collect$$libinit$$00000001  c_w.l(libinit2.o)
+    0x0800027e   0x0800027e   0x00000000   Code   RO         1316    .ARM.Collect$$libinit$$00000004  c_w.l(libinit2.o)
+    0x0800027e   0x0800027e   0x00000000   Code   RO         1318    .ARM.Collect$$libinit$$00000006  c_w.l(libinit2.o)
+    0x0800027e   0x0800027e   0x00000000   Code   RO         1321    .ARM.Collect$$libinit$$0000000C  c_w.l(libinit2.o)
+    0x0800027e   0x0800027e   0x00000000   Code   RO         1323    .ARM.Collect$$libinit$$0000000E  c_w.l(libinit2.o)
+    0x0800027e   0x0800027e   0x00000000   Code   RO         1325    .ARM.Collect$$libinit$$00000010  c_w.l(libinit2.o)
+    0x0800027e   0x0800027e   0x00000000   Code   RO         1328    .ARM.Collect$$libinit$$00000013  c_w.l(libinit2.o)
+    0x0800027e   0x0800027e   0x00000000   Code   RO         1330    .ARM.Collect$$libinit$$00000015  c_w.l(libinit2.o)
+    0x0800027e   0x0800027e   0x00000000   Code   RO         1332    .ARM.Collect$$libinit$$00000017  c_w.l(libinit2.o)
+    0x0800027e   0x0800027e   0x00000000   Code   RO         1334    .ARM.Collect$$libinit$$00000019  c_w.l(libinit2.o)
+    0x0800027e   0x0800027e   0x00000000   Code   RO         1336    .ARM.Collect$$libinit$$0000001B  c_w.l(libinit2.o)
+    0x0800027e   0x0800027e   0x00000000   Code   RO         1338    .ARM.Collect$$libinit$$0000001D  c_w.l(libinit2.o)
+    0x0800027e   0x0800027e   0x00000000   Code   RO         1340    .ARM.Collect$$libinit$$0000001F  c_w.l(libinit2.o)
+    0x0800027e   0x0800027e   0x00000000   Code   RO         1342    .ARM.Collect$$libinit$$00000021  c_w.l(libinit2.o)
+    0x0800027e   0x0800027e   0x00000000   Code   RO         1344    .ARM.Collect$$libinit$$00000023  c_w.l(libinit2.o)
+    0x0800027e   0x0800027e   0x00000000   Code   RO         1346    .ARM.Collect$$libinit$$00000025  c_w.l(libinit2.o)
+    0x0800027e   0x0800027e   0x00000000   Code   RO         1348    .ARM.Collect$$libinit$$00000027  c_w.l(libinit2.o)
+    0x0800027e   0x0800027e   0x00000000   Code   RO         1352    .ARM.Collect$$libinit$$0000002E  c_w.l(libinit2.o)
+    0x0800027e   0x0800027e   0x00000000   Code   RO         1354    .ARM.Collect$$libinit$$00000030  c_w.l(libinit2.o)
+    0x0800027e   0x0800027e   0x00000000   Code   RO         1356    .ARM.Collect$$libinit$$00000032  c_w.l(libinit2.o)
+    0x0800027e   0x0800027e   0x00000000   Code   RO         1358    .ARM.Collect$$libinit$$00000034  c_w.l(libinit2.o)
+    0x0800027e   0x0800027e   0x00000002   Code   RO         1359    .ARM.Collect$$libinit$$00000035  c_w.l(libinit2.o)
+    0x08000280   0x08000280   0x00000002   Code   RO         1381    .ARM.Collect$$libshutdown$$00000000  c_w.l(libshutdown.o)
+    0x08000282   0x08000282   0x00000000   Code   RO         1396    .ARM.Collect$$libshutdown$$00000002  c_w.l(libshutdown2.o)
+    0x08000282   0x08000282   0x00000000   Code   RO         1398    .ARM.Collect$$libshutdown$$00000004  c_w.l(libshutdown2.o)
+    0x08000282   0x08000282   0x00000000   Code   RO         1401    .ARM.Collect$$libshutdown$$00000007  c_w.l(libshutdown2.o)
+    0x08000282   0x08000282   0x00000000   Code   RO         1404    .ARM.Collect$$libshutdown$$0000000A  c_w.l(libshutdown2.o)
+    0x08000282   0x08000282   0x00000000   Code   RO         1406    .ARM.Collect$$libshutdown$$0000000C  c_w.l(libshutdown2.o)
+    0x08000282   0x08000282   0x00000000   Code   RO         1409    .ARM.Collect$$libshutdown$$0000000F  c_w.l(libshutdown2.o)
+    0x08000282   0x08000282   0x00000002   Code   RO         1410    .ARM.Collect$$libshutdown$$00000010  c_w.l(libshutdown2.o)
+    0x08000284   0x08000284   0x00000000   Code   RO         1282    .ARM.Collect$$rtentry$$00000000  c_w.l(__rtentry.o)
+    0x08000284   0x08000284   0x00000000   Code   RO         1284    .ARM.Collect$$rtentry$$00000002  c_w.l(__rtentry2.o)
+    0x08000284   0x08000284   0x00000006   Code   RO         1296    .ARM.Collect$$rtentry$$00000004  c_w.l(__rtentry4.o)
+    0x0800028a   0x0800028a   0x00000000   Code   RO         1286    .ARM.Collect$$rtentry$$00000009  c_w.l(__rtentry2.o)
+    0x0800028a   0x0800028a   0x00000004   Code   RO         1287    .ARM.Collect$$rtentry$$0000000A  c_w.l(__rtentry2.o)
+    0x0800028e   0x0800028e   0x00000000   Code   RO         1289    .ARM.Collect$$rtentry$$0000000C  c_w.l(__rtentry2.o)
+    0x0800028e   0x0800028e   0x00000008   Code   RO         1290    .ARM.Collect$$rtentry$$0000000D  c_w.l(__rtentry2.o)
+    0x08000296   0x08000296   0x00000002   Code   RO         1311    .ARM.Collect$$rtexit$$00000000  c_w.l(rtexit.o)
+    0x08000298   0x08000298   0x00000000   Code   RO         1361    .ARM.Collect$$rtexit$$00000002  c_w.l(rtexit2.o)
+    0x08000298   0x08000298   0x00000004   Code   RO         1362    .ARM.Collect$$rtexit$$00000003  c_w.l(rtexit2.o)
+    0x0800029c   0x0800029c   0x00000006   Code   RO         1363    .ARM.Collect$$rtexit$$00000004  c_w.l(rtexit2.o)
     0x080002a2   0x080002a2   0x00000002   PAD
     0x080002a4   0x080002a4   0x00000040   Code   RO            4    .text               startup_stm32g431xx.o
-    0x080002e4   0x080002e4   0x0000004e   Code   RO         1281    .text               c_w.l(rt_memclr_w.o)
-    0x08000332   0x08000332   0x00000006   Code   RO         1283    .text               c_w.l(heapauxi.o)
-    0x08000338   0x08000338   0x0000004a   Code   RO         1303    .text               c_w.l(sys_stackheap_outer.o)
-    0x08000382   0x08000382   0x00000012   Code   RO         1305    .text               c_w.l(exit.o)
-    0x08000394   0x08000394   0x00000008   Code   RO         1313    .text               c_w.l(libspace.o)
-    0x0800039c   0x0800039c   0x0000000c   Code   RO         1376    .text               c_w.l(sys_exit.o)
-    0x080003a8   0x080003a8   0x00000002   Code   RO         1391    .text               c_w.l(use_no_semi.o)
-    0x080003aa   0x080003aa   0x00000000   Code   RO         1393    .text               c_w.l(indicate_semi.o)
+    0x080002e4   0x080002e4   0x0000004e   Code   RO         1276    .text               c_w.l(rt_memclr_w.o)
+    0x08000332   0x08000332   0x00000006   Code   RO         1278    .text               c_w.l(heapauxi.o)
+    0x08000338   0x08000338   0x0000004a   Code   RO         1298    .text               c_w.l(sys_stackheap_outer.o)
+    0x08000382   0x08000382   0x00000012   Code   RO         1300    .text               c_w.l(exit.o)
+    0x08000394   0x08000394   0x00000008   Code   RO         1308    .text               c_w.l(libspace.o)
+    0x0800039c   0x0800039c   0x0000000c   Code   RO         1371    .text               c_w.l(sys_exit.o)
+    0x080003a8   0x080003a8   0x00000002   Code   RO         1386    .text               c_w.l(use_no_semi.o)
+    0x080003aa   0x080003aa   0x00000000   Code   RO         1388    .text               c_w.l(indicate_semi.o)
     0x080003aa   0x080003aa   0x00000002   PAD
-    0x080003ac   0x080003ac   0x00000002   Code   RO          156    .text.BusFault_Handler  stm32g4xx_it.o
+    0x080003ac   0x080003ac   0x00000002   Code   RO           42    .text.BusFault_Handler  stm32g4xx_it.o
     0x080003ae   0x080003ae   0x00000002   PAD
-    0x080003b0   0x080003b0   0x00000002   Code   RO          162    .text.DebugMon_Handler  stm32g4xx_it.o
+    0x080003b0   0x080003b0   0x00000002   Code   RO           48    .text.DebugMon_Handler  stm32g4xx_it.o
     0x080003b2   0x080003b2   0x00000002   PAD
-    0x080003b4   0x080003b4   0x0000000c   Code   RO          139    .text.DrvMonitor_GetState  drv_monitor.o
-    0x080003c0   0x080003c0   0x000000b6   Code   RO          131    .text.DrvMonitor_Init  drv_monitor.o
+    0x080003b4   0x080003b4   0x0000000c   Code   RO          147    .text.DrvMonitor_GetState  drv_monitor.o
+    0x080003c0   0x080003c0   0x000000b6   Code   RO          139    .text.DrvMonitor_Init  drv_monitor.o
     0x08000476   0x08000476   0x00000002   PAD
-    0x08000478   0x08000478   0x00000134   Code   RO          133    .text.DrvMonitor_Task  drv_monitor.o
+    0x08000478   0x08000478   0x00000134   Code   RO          141    .text.DrvMonitor_Task  drv_monitor.o
     0x080005ac   0x080005ac   0x0000000a   Code   RO           15    .text.Error_Handler  main.o
     0x080005b6   0x080005b6   0x00000002   PAD
-    0x080005b8   0x080005b8   0x000001de   Code   RO          527    .text.HAL_GPIO_Init  stm32g4xx_hal_gpio.o
+    0x080005b8   0x080005b8   0x000001de   Code   RO          522    .text.HAL_GPIO_Init  stm32g4xx_hal_gpio.o
     0x08000796   0x08000796   0x00000002   PAD
-    0x08000798   0x08000798   0x0000000a   Code   RO          531    .text.HAL_GPIO_ReadPin  stm32g4xx_hal_gpio.o
+    0x08000798   0x08000798   0x0000000a   Code   RO          526    .text.HAL_GPIO_ReadPin  stm32g4xx_hal_gpio.o
     0x080007a2   0x080007a2   0x00000002   PAD
-    0x080007a4   0x080007a4   0x0000000c   Code   RO          533    .text.HAL_GPIO_WritePin  stm32g4xx_hal_gpio.o
-    0x080007b0   0x080007b0   0x0000000c   Code   RO          299    .text.HAL_GetTick   stm32g4xx_hal.o
-    0x080007bc   0x080007bc   0x0000004a   Code   RO          871    .text.HAL_I2CEx_ConfigAnalogFilter  stm32g4xx_hal_i2c_ex.o
+    0x080007a4   0x080007a4   0x0000000c   Code   RO          528    .text.HAL_GPIO_WritePin  stm32g4xx_hal_gpio.o
+    0x080007b0   0x080007b0   0x0000000c   Code   RO          294    .text.HAL_GetTick   stm32g4xx_hal.o
+    0x080007bc   0x080007bc   0x0000004a   Code   RO          866    .text.HAL_I2CEx_ConfigAnalogFilter  stm32g4xx_hal_i2c_ex.o
     0x08000806   0x08000806   0x00000002   PAD
-    0x08000808   0x08000808   0x00000048   Code   RO          873    .text.HAL_I2CEx_ConfigDigitalFilter  stm32g4xx_hal_i2c_ex.o
-    0x08000850   0x08000850   0x000000b0   Code   RO          717    .text.HAL_I2C_Init  stm32g4xx_hal_i2c.o
-    0x08000900   0x08000900   0x00000244   Code   RO          777    .text.HAL_I2C_Mem_Read  stm32g4xx_hal_i2c.o
-    0x08000b44   0x08000b44   0x00000238   Code   RO          775    .text.HAL_I2C_Mem_Write  stm32g4xx_hal_i2c.o
-    0x08000d7c   0x08000d7c   0x00000078   Code   RO          183    .text.HAL_I2C_MspInit  stm32g4xx_hal_msp.o
-    0x08000df4   0x08000df4   0x0000001a   Code   RO          297    .text.HAL_IncTick   stm32g4xx_hal.o
+    0x08000808   0x08000808   0x00000048   Code   RO          868    .text.HAL_I2CEx_ConfigDigitalFilter  stm32g4xx_hal_i2c_ex.o
+    0x08000850   0x08000850   0x000000b0   Code   RO          712    .text.HAL_I2C_Init  stm32g4xx_hal_i2c.o
+    0x08000900   0x08000900   0x00000244   Code   RO          772    .text.HAL_I2C_Mem_Read  stm32g4xx_hal_i2c.o
+    0x08000b44   0x08000b44   0x00000238   Code   RO          770    .text.HAL_I2C_Mem_Write  stm32g4xx_hal_i2c.o
+    0x08000d7c   0x08000d7c   0x00000078   Code   RO           69    .text.HAL_I2C_MspInit  stm32g4xx_hal_msp.o
+    0x08000df4   0x08000df4   0x0000001a   Code   RO          292    .text.HAL_IncTick   stm32g4xx_hal.o
     0x08000e0e   0x08000e0e   0x00000002   PAD
-    0x08000e10   0x08000e10   0x0000001e   Code   RO          287    .text.HAL_Init      stm32g4xx_hal.o
+    0x08000e10   0x08000e10   0x0000001e   Code   RO          282    .text.HAL_Init      stm32g4xx_hal.o
     0x08000e2e   0x08000e2e   0x00000002   PAD
-    0x08000e30   0x08000e30   0x00000050   Code   RO          289    .text.HAL_InitTick  stm32g4xx_hal.o
-    0x08000e80   0x08000e80   0x00000034   Code   RO          181    .text.HAL_MspInit   stm32g4xx_hal_msp.o
-    0x08000eb4   0x08000eb4   0x00000022   Code   RO          671    .text.HAL_NVIC_EnableIRQ  stm32g4xx_hal_cortex.o
+    0x08000e30   0x08000e30   0x00000050   Code   RO          284    .text.HAL_InitTick  stm32g4xx_hal.o
+    0x08000e80   0x08000e80   0x00000034   Code   RO           67    .text.HAL_MspInit   stm32g4xx_hal_msp.o
+    0x08000eb4   0x08000eb4   0x00000022   Code   RO          666    .text.HAL_NVIC_EnableIRQ  stm32g4xx_hal_cortex.o
     0x08000ed6   0x08000ed6   0x00000002   PAD
-    0x08000ed8   0x08000ed8   0x00000056   Code   RO          669    .text.HAL_NVIC_SetPriority  stm32g4xx_hal_cortex.o
+    0x08000ed8   0x08000ed8   0x00000056   Code   RO          664    .text.HAL_NVIC_SetPriority  stm32g4xx_hal_cortex.o
     0x08000f2e   0x08000f2e   0x00000002   PAD
-    0x08000f30   0x08000f30   0x00000020   Code   RO          667    .text.HAL_NVIC_SetPriorityGrouping  stm32g4xx_hal_cortex.o
-    0x08000f50   0x08000f50   0x0000010e   Code   RO          207    .text.HAL_PWREx_ControlVoltageScaling  stm32g4xx_hal_pwr_ex.o
+    0x08000f30   0x08000f30   0x00000020   Code   RO          662    .text.HAL_NVIC_SetPriorityGrouping  stm32g4xx_hal_cortex.o
+    0x08000f50   0x08000f50   0x0000010e   Code   RO          202    .text.HAL_PWREx_ControlVoltageScaling  stm32g4xx_hal_pwr_ex.o
     0x0800105e   0x0800105e   0x00000002   PAD
-    0x08001060   0x08001060   0x00000012   Code   RO          277    .text.HAL_PWREx_DisableUCPDDeadBattery  stm32g4xx_hal_pwr_ex.o
+    0x08001060   0x08001060   0x00000012   Code   RO          272    .text.HAL_PWREx_DisableUCPDDeadBattery  stm32g4xx_hal_pwr_ex.o
     0x08001072   0x08001072   0x00000002   PAD
-    0x08001074   0x08001074   0x00000304   Code   RO          377    .text.HAL_RCC_ClockConfig  stm32g4xx_hal_rcc.o
-    0x08001378   0x08001378   0x0000002a   Code   RO          387    .text.HAL_RCC_GetPCLK2Freq  stm32g4xx_hal_rcc.o
+    0x08001074   0x08001074   0x00000304   Code   RO          372    .text.HAL_RCC_ClockConfig  stm32g4xx_hal_rcc.o
+    0x08001378   0x08001378   0x0000002a   Code   RO          382    .text.HAL_RCC_GetPCLK2Freq  stm32g4xx_hal_rcc.o
     0x080013a2   0x080013a2   0x00000002   PAD
-    0x080013a4   0x080013a4   0x000004ce   Code   RO          375    .text.HAL_RCC_OscConfig  stm32g4xx_hal_rcc.o
+    0x080013a4   0x080013a4   0x000004ce   Code   RO          370    .text.HAL_RCC_OscConfig  stm32g4xx_hal_rcc.o
     0x08001872   0x08001872   0x00000002   PAD
-    0x08001874   0x08001874   0x0000002c   Code   RO          679    .text.HAL_SYSTICK_Config  stm32g4xx_hal_cortex.o
-    0x080018a0   0x080018a0   0x00000002   Code   RO         1242    .text.HAL_TIMEx_Break2Callback  stm32g4xx_hal_tim_ex.o
+    0x08001874   0x08001874   0x0000002c   Code   RO          674    .text.HAL_SYSTICK_Config  stm32g4xx_hal_cortex.o
+    0x080018a0   0x080018a0   0x00000002   Code   RO         1237    .text.HAL_TIMEx_Break2Callback  stm32g4xx_hal_tim_ex.o
     0x080018a2   0x080018a2   0x00000002   PAD
-    0x080018a4   0x080018a4   0x00000002   Code   RO         1240    .text.HAL_TIMEx_BreakCallback  stm32g4xx_hal_tim_ex.o
+    0x080018a4   0x080018a4   0x00000002   Code   RO         1235    .text.HAL_TIMEx_BreakCallback  stm32g4xx_hal_tim_ex.o
     0x080018a6   0x080018a6   0x00000002   PAD
-    0x080018a8   0x080018a8   0x00000002   Code   RO         1236    .text.HAL_TIMEx_CommutCallback  stm32g4xx_hal_tim_ex.o
+    0x080018a8   0x080018a8   0x00000002   Code   RO         1231    .text.HAL_TIMEx_CommutCallback  stm32g4xx_hal_tim_ex.o
     0x080018aa   0x080018aa   0x00000002   PAD
-    0x080018ac   0x080018ac   0x000000c8   Code   RO         1188    .text.HAL_TIMEx_ConfigBreakDeadTime  stm32g4xx_hal_tim_ex.o
-    0x08001974   0x08001974   0x00000002   Code   RO         1246    .text.HAL_TIMEx_DirectionChangeCallback  stm32g4xx_hal_tim_ex.o
+    0x080018ac   0x080018ac   0x000000c8   Code   RO         1183    .text.HAL_TIMEx_ConfigBreakDeadTime  stm32g4xx_hal_tim_ex.o
+    0x08001974   0x08001974   0x00000002   Code   RO         1241    .text.HAL_TIMEx_DirectionChangeCallback  stm32g4xx_hal_tim_ex.o
     0x08001976   0x08001976   0x00000002   PAD
-    0x08001978   0x08001978   0x00000002   Code   RO         1244    .text.HAL_TIMEx_EncoderIndexCallback  stm32g4xx_hal_tim_ex.o
+    0x08001978   0x08001978   0x00000002   Code   RO         1239    .text.HAL_TIMEx_EncoderIndexCallback  stm32g4xx_hal_tim_ex.o
     0x0800197a   0x0800197a   0x00000002   PAD
-    0x0800197c   0x0800197c   0x00000002   Code   RO         1248    .text.HAL_TIMEx_IndexErrorCallback  stm32g4xx_hal_tim_ex.o
+    0x0800197c   0x0800197c   0x00000002   Code   RO         1243    .text.HAL_TIMEx_IndexErrorCallback  stm32g4xx_hal_tim_ex.o
     0x0800197e   0x0800197e   0x00000002   PAD
-    0x08001980   0x08001980   0x000000a6   Code   RO         1186    .text.HAL_TIMEx_MasterConfigSynchronization  stm32g4xx_hal_tim_ex.o
+    0x08001980   0x08001980   0x000000a6   Code   RO         1181    .text.HAL_TIMEx_MasterConfigSynchronization  stm32g4xx_hal_tim_ex.o
     0x08001a26   0x08001a26   0x00000002   PAD
-    0x08001a28   0x08001a28   0x00000002   Code   RO         1250    .text.HAL_TIMEx_TransitionErrorCallback  stm32g4xx_hal_tim_ex.o
+    0x08001a28   0x08001a28   0x00000002   Code   RO         1245    .text.HAL_TIMEx_TransitionErrorCallback  stm32g4xx_hal_tim_ex.o
     0x08001a2a   0x08001a2a   0x00000002   PAD
-    0x08001a2c   0x08001a2c   0x00000062   Code   RO          891    .text.HAL_TIM_Base_Init  stm32g4xx_hal_tim.o
+    0x08001a2c   0x08001a2c   0x00000062   Code   RO          886    .text.HAL_TIM_Base_Init  stm32g4xx_hal_tim.o
     0x08001a8e   0x08001a8e   0x00000002   PAD
-    0x08001a90   0x08001a90   0x00000044   Code   RO          187    .text.HAL_TIM_Base_MspInit  stm32g4xx_hal_msp.o
-    0x08001ad4   0x08001ad4   0x00000092   Code   RO          905    .text.HAL_TIM_Base_Start_IT  stm32g4xx_hal_tim.o
+    0x08001a90   0x08001a90   0x00000044   Code   RO           73    .text.HAL_TIM_Base_MspInit  stm32g4xx_hal_msp.o
+    0x08001ad4   0x08001ad4   0x00000092   Code   RO          900    .text.HAL_TIM_Base_Start_IT  stm32g4xx_hal_tim.o
     0x08001b66   0x08001b66   0x00000002   PAD
-    0x08001b68   0x08001b68   0x00000002   Code   RO         1027    .text.HAL_TIM_IC_CaptureCallback  stm32g4xx_hal_tim.o
+    0x08001b68   0x08001b68   0x00000002   Code   RO         1022    .text.HAL_TIM_IC_CaptureCallback  stm32g4xx_hal_tim.o
     0x08001b6a   0x08001b6a   0x00000002   PAD
-    0x08001b6c   0x08001b6c   0x000001cc   Code   RO         1025    .text.HAL_TIM_IRQHandler  stm32g4xx_hal_tim.o
-    0x08001d38   0x08001d38   0x00000060   Code   RO          195    .text.HAL_TIM_MspPostInit  stm32g4xx_hal_msp.o
-    0x08001d98   0x08001d98   0x00000002   Code   RO         1029    .text.HAL_TIM_OC_DelayElapsedCallback  stm32g4xx_hal_tim.o
+    0x08001b6c   0x08001b6c   0x000001cc   Code   RO         1020    .text.HAL_TIM_IRQHandler  stm32g4xx_hal_tim.o
+    0x08001d38   0x08001d38   0x00000060   Code   RO           81    .text.HAL_TIM_MspPostInit  stm32g4xx_hal_msp.o
+    0x08001d98   0x08001d98   0x00000002   Code   RO         1024    .text.HAL_TIM_OC_DelayElapsedCallback  stm32g4xx_hal_tim.o
     0x08001d9a   0x08001d9a   0x00000002   PAD
-    0x08001d9c   0x08001d9c   0x000003d4   Code   RO         1045    .text.HAL_TIM_PWM_ConfigChannel  stm32g4xx_hal_tim.o
-    0x08002170   0x08002170   0x00000062   Code   RO          945    .text.HAL_TIM_PWM_Init  stm32g4xx_hal_tim.o
+    0x08001d9c   0x08001d9c   0x000003d4   Code   RO         1040    .text.HAL_TIM_PWM_ConfigChannel  stm32g4xx_hal_tim.o
+    0x08002170   0x08002170   0x00000062   Code   RO          940    .text.HAL_TIM_PWM_Init  stm32g4xx_hal_tim.o
     0x080021d2   0x080021d2   0x00000002   PAD
-    0x080021d4   0x080021d4   0x00000054   Code   RO          191    .text.HAL_TIM_PWM_MspInit  stm32g4xx_hal_msp.o
-    0x08002228   0x08002228   0x00000002   Code   RO         1031    .text.HAL_TIM_PWM_PulseFinishedCallback  stm32g4xx_hal_tim.o
+    0x080021d4   0x080021d4   0x00000054   Code   RO           77    .text.HAL_TIM_PWM_MspInit  stm32g4xx_hal_msp.o
+    0x08002228   0x08002228   0x00000002   Code   RO         1026    .text.HAL_TIM_PWM_PulseFinishedCallback  stm32g4xx_hal_tim.o
     0x0800222a   0x0800222a   0x00000002   PAD
-    0x0800222c   0x0800222c   0x0000001e   Code   RO          129    .text.HAL_TIM_PeriodElapsedCallback  drv_monitor.o
+    0x0800222c   0x0800222c   0x0000001e   Code   RO          137    .text.HAL_TIM_PeriodElapsedCallback  drv_monitor.o
     0x0800224a   0x0800224a   0x00000002   PAD
-    0x0800224c   0x0800224c   0x00000002   Code   RO         1035    .text.HAL_TIM_TriggerCallback  stm32g4xx_hal_tim.o
+    0x0800224c   0x0800224c   0x00000002   Code   RO         1030    .text.HAL_TIM_TriggerCallback  stm32g4xx_hal_tim.o
     0x0800224e   0x0800224e   0x00000002   PAD
-    0x08002250   0x08002250   0x00000002   Code   RO          152    .text.HardFault_Handler  stm32g4xx_it.o
+    0x08002250   0x08002250   0x00000002   Code   RO           38    .text.HardFault_Handler  stm32g4xx_it.o
     0x08002252   0x08002252   0x00000002   PAD
-    0x08002254   0x08002254   0x0000015c   Code   RO          861    .text.I2C_IsErrorOccurred  stm32g4xx_hal_i2c.o
-    0x080023b0   0x080023b0   0x000000e4   Code   RO          727    .text.I2C_WaitOnFlagUntilTimeout  stm32g4xx_hal_i2c.o
-    0x08002494   0x08002494   0x0000007c   Code   RO          731    .text.I2C_WaitOnSTOPFlagUntilTimeout  stm32g4xx_hal_i2c.o
-    0x08002510   0x08002510   0x00000098   Code   RO          729    .text.I2C_WaitOnTXISFlagUntilTimeout  stm32g4xx_hal_i2c.o
-    0x080025a8   0x080025a8   0x0000008a   Code   RO           28    .text.MX_GPIO_Init  gpio.o
+    0x08002254   0x08002254   0x0000015c   Code   RO          856    .text.I2C_IsErrorOccurred  stm32g4xx_hal_i2c.o
+    0x080023b0   0x080023b0   0x000000e4   Code   RO          722    .text.I2C_WaitOnFlagUntilTimeout  stm32g4xx_hal_i2c.o
+    0x08002494   0x08002494   0x0000007c   Code   RO          726    .text.I2C_WaitOnSTOPFlagUntilTimeout  stm32g4xx_hal_i2c.o
+    0x08002510   0x08002510   0x00000098   Code   RO          724    .text.I2C_WaitOnTXISFlagUntilTimeout  stm32g4xx_hal_i2c.o
+    0x080025a8   0x080025a8   0x0000008a   Code   RO           27    .text.MX_GPIO_Init  gpio.o
     0x08002632   0x08002632   0x00000002   PAD
-    0x08002634   0x08002634   0x0000006c   Code   RO           37    .text.MX_I2C3_Init  i2c.o
-    0x080026a0   0x080026a0   0x0000019e   Code   RO           83    .text.MX_TIM1_Init  tim1_pwm.o
+    0x08002634   0x08002634   0x0000006c   Code   RO           91    .text.MX_I2C3_Init  i2c.o
+    0x080026a0   0x080026a0   0x0000019e   Code   RO          158    .text.MX_TIM1_Init  tim1_pwm.o
     0x0800283e   0x0800283e   0x00000002   PAD
-    0x08002840   0x08002840   0x00000036   Code   RO           74    .text.MX_TIM6_Init  tim.o
+    0x08002840   0x08002840   0x00000036   Code   RO          100    .text.MX_TIM6_Init  tim.o
     0x08002876   0x08002876   0x00000002   PAD
-    0x08002878   0x08002878   0x00000002   Code   RO          154    .text.MemManage_Handler  stm32g4xx_it.o
+    0x08002878   0x08002878   0x00000002   Code   RO           40    .text.MemManage_Handler  stm32g4xx_it.o
     0x0800287a   0x0800287a   0x00000002   PAD
-    0x0800287c   0x0800287c   0x00000002   Code   RO          150    .text.NMI_Handler   stm32g4xx_it.o
+    0x0800287c   0x0800287c   0x00000002   Code   RO           36    .text.NMI_Handler   stm32g4xx_it.o
     0x0800287e   0x0800287e   0x00000002   PAD
-    0x08002880   0x08002880   0x00000002   Code   RO          164    .text.PendSV_Handler  stm32g4xx_it.o
+    0x08002880   0x08002880   0x00000002   Code   RO           50    .text.PendSV_Handler  stm32g4xx_it.o
     0x08002882   0x08002882   0x00000002   PAD
-    0x08002884   0x08002884   0x00000030   Code   RO           60    .text.STSPIN32G4_ClearFaults  stspin32g4.o
-    0x080028b4   0x080028b4   0x000000b8   Code   RO           64    .text.STSPIN32G4_EnterStandby  stspin32g4.o
-    0x0800296c   0x0800296c   0x000000b0   Code   RO           54    .text.STSPIN32G4_Init  stspin32g4.o
-    0x08002a1c   0x08002a1c   0x00000010   Code   RO           58    .text.STSPIN32G4_IsFault  stspin32g4.o
-    0x08002a2c   0x08002a2c   0x0000001c   Code   RO           56    .text.STSPIN32G4_IsReady  stspin32g4.o
-    0x08002a48   0x08002a48   0x0000002e   Code   RO           46    .text.STSPIN32G4_ReadRegister  stspin32g4.o
+    0x08002884   0x08002884   0x00000030   Code   RO          123    .text.STSPIN32G4_ClearFaults  stspin32g4.o
+    0x080028b4   0x080028b4   0x000000b8   Code   RO          127    .text.STSPIN32G4_EnterStandby  stspin32g4.o
+    0x0800296c   0x0800296c   0x000000b0   Code   RO          117    .text.STSPIN32G4_Init  stspin32g4.o
+    0x08002a1c   0x08002a1c   0x00000010   Code   RO          121    .text.STSPIN32G4_IsFault  stspin32g4.o
+    0x08002a2c   0x08002a2c   0x0000001c   Code   RO          119    .text.STSPIN32G4_IsReady  stspin32g4.o
+    0x08002a48   0x08002a48   0x0000002e   Code   RO          109    .text.STSPIN32G4_ReadRegister  stspin32g4.o
     0x08002a76   0x08002a76   0x00000002   PAD
-    0x08002a78   0x08002a78   0x0000008c   Code   RO           62    .text.STSPIN32G4_Wake  stspin32g4.o
-    0x08002b04   0x08002b04   0x00000002   Code   RO          160    .text.SVC_Handler   stm32g4xx_it.o
+    0x08002a78   0x08002a78   0x0000008c   Code   RO          125    .text.STSPIN32G4_Wake  stspin32g4.o
+    0x08002b04   0x08002b04   0x00000002   Code   RO           46    .text.SVC_Handler   stm32g4xx_it.o
     0x08002b06   0x08002b06   0x00000002   PAD
-    0x08002b08   0x08002b08   0x00000004   Code   RO          166    .text.SysTick_Handler  stm32g4xx_it.o
-    0x08002b0c   0x08002b0c   0x00000012   Code   RO         1265    .text.SystemInit    system_stm32g4xx.o
+    0x08002b08   0x08002b08   0x00000004   Code   RO           52    .text.SysTick_Handler  stm32g4xx_it.o
+    0x08002b0c   0x08002b0c   0x00000012   Code   RO         1260    .text.SystemInit    system_stm32g4xx.o
     0x08002b1e   0x08002b1e   0x00000002   PAD
-    0x08002b20   0x08002b20   0x0000000c   Code   RO          170    .text.TIM1_CC_IRQHandler  stm32g4xx_it.o
-    0x08002b2c   0x08002b2c   0x0000000c   Code   RO          172    .text.TIM1_UP_TIM16_IRQHandler  stm32g4xx_it.o
-    0x08002b38   0x08002b38   0x00000016   Code   RO          168    .text.TIM6_DAC_IRQHandler  stm32g4xx_it.o
-    0x08002b4e   0x08002b4e   0x00000002   PAD
-    0x08002b50   0x08002b50   0x0000012e   Code   RO          895    .text.TIM_Base_SetConfig  stm32g4xx_hal_tim.o
-    0x08002c7e   0x08002c7e   0x00000002   PAD
-    0x08002c80   0x08002c80   0x0000007a   Code   RO          111    .text.Tim1PwmVerify_ApplySector  tim1_pwm_verify.o
-    0x08002cfa   0x08002cfa   0x00000002   PAD
-    0x08002cfc   0x08002cfc   0x00000064   Code   RO          107    .text.Tim1PwmVerify_Start  tim1_pwm_verify.o
-    0x08002d60   0x08002d60   0x000000a4   Code   RO          109    .text.Tim1PwmVerify_Task  tim1_pwm_verify.o
-    0x08002e04   0x08002e04   0x0000002e   Code   RO          117    .text.Tim1PwmVerify_TickIsr  tim1_pwm_verify.o
-    0x08002e32   0x08002e32   0x00000002   PAD
-    0x08002e34   0x08002e34   0x00000014   Code   RO           93    .text.Tim1Pwm_EmergencyStop  tim1_pwm.o
-    0x08002e48   0x08002e48   0x00000014   Code   RO           91    .text.Tim1Pwm_EnableOutputs  tim1_pwm.o
-    0x08002e5c   0x08002e5c   0x00000010   Code   RO           95    .text.Tim1Pwm_IsOutputEnabled  tim1_pwm.o
-    0x08002e6c   0x08002e6c   0x00000028   Code   RO           89    .text.Tim1Pwm_SetNeutral  tim1_pwm.o
-    0x08002e94   0x08002e94   0x0000008c   Code   RO           85    .text.Tim1Pwm_SetPhaseDuty  tim1_pwm.o
-    0x08002f20   0x08002f20   0x00000002   Code   RO          158    .text.UsageFault_Handler  stm32g4xx_it.o
-    0x08002f22   0x08002f22   0x00000002   PAD
-    0x08002f24   0x08002f24   0x000000a6   Code   RO           11    .text.main          main.o
-    0x08002fca   0x08002fca   0x0000001a   Code   RO         1374    x$fpl$fpinit        fz_wm.l(fpinit.o)
-    0x08002fe4   0x08002fe4   0x00000010   Data   RO         1270    .rodata.AHBPrescTable  system_stm32g4xx.o
-    0x08002ff4   0x08002ff4   0x00000008   Data   RO         1271    .rodata.APBPrescTable  system_stm32g4xx.o
-    0x08002ffc   0x08002ffc   0x00000024   Data   RO          119    .rodata.s_sector_table  tim1_pwm_verify.o
-    0x08003020   0x08003020   0x00000020   Data   RO         1449    Region$$Table       anon$$obj.o
+    0x08002b20   0x08002b20   0x0000000c   Code   RO           56    .text.TIM1_CC_IRQHandler  stm32g4xx_it.o
+    0x08002b2c   0x08002b2c   0x0000000c   Code   RO           58    .text.TIM1_UP_TIM16_IRQHandler  stm32g4xx_it.o
+    0x08002b38   0x08002b38   0x0000001e   Code   RO           54    .text.TIM6_DAC_IRQHandler  stm32g4xx_it.o
+    0x08002b56   0x08002b56   0x00000002   PAD
+    0x08002b58   0x08002b58   0x0000012e   Code   RO          890    .text.TIM_Base_SetConfig  stm32g4xx_hal_tim.o
+    0x08002c86   0x08002c86   0x00000002   PAD
+    0x08002c88   0x08002c88   0x000000be   Code   RO          182    .text.Tim1PwmVerify_Start  tim1_pwm_verify.o
+    0x08002d46   0x08002d46   0x00000002   PAD
+    0x08002d48   0x08002d48   0x000000e0   Code   RO          184    .text.Tim1PwmVerify_Task  tim1_pwm_verify.o
+    0x08002e28   0x08002e28   0x00000010   Code   RO          190    .text.Tim1PwmVerify_TickIsr  tim1_pwm_verify.o
+    0x08002e38   0x08002e38   0x00000014   Code   RO          168    .text.Tim1Pwm_EmergencyStop  tim1_pwm.o
+    0x08002e4c   0x08002e4c   0x00000014   Code   RO          166    .text.Tim1Pwm_EnableOutputs  tim1_pwm.o
+    0x08002e60   0x08002e60   0x00000010   Code   RO          170    .text.Tim1Pwm_IsOutputEnabled  tim1_pwm.o
+    0x08002e70   0x08002e70   0x00000028   Code   RO          164    .text.Tim1Pwm_SetNeutral  tim1_pwm.o
+    0x08002e98   0x08002e98   0x0000008c   Code   RO          160    .text.Tim1Pwm_SetPhaseDuty  tim1_pwm.o
+    0x08002f24   0x08002f24   0x00000002   Code   RO           44    .text.UsageFault_Handler  stm32g4xx_it.o
+    0x08002f26   0x08002f26   0x00000002   PAD
+    0x08002f28   0x08002f28   0x000000ae   Code   RO           11    .text.main          main.o
+    0x08002fd6   0x08002fd6   0x0000001a   Code   RO         1369    x$fpl$fpinit        fz_wm.l(fpinit.o)
+    0x08002ff0   0x08002ff0   0x00000010   Data   RO         1265    .rodata.AHBPrescTable  system_stm32g4xx.o
+    0x08003000   0x08003000   0x00000008   Data   RO         1266    .rodata.APBPrescTable  system_stm32g4xx.o
+    0x08003008   0x08003008   0x00000020   Data   RO         1444    Region$$Table       anon$$obj.o
 
 
-    Execution Region RW_IRAM1 (Exec base: 0x20000000, Load base: 0x08003040, Size: 0x00000798, Max: 0x00008000, ABSOLUTE)
+    Execution Region RW_IRAM1 (Exec base: 0x20000000, Load base: 0x08003028, Size: 0x00000798, Max: 0x00008000, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
-    0x20000000   0x08003040   0x00000008   Data   RW          364    .data..L_MergedGlobals  stm32g4xx_hal.o
-    0x20000008   0x08003048   0x00000004   Data   RW         1269    .data.SystemCoreClock  system_stm32g4xx.o
-    0x2000000c   0x0800304c   0x00000006   Data   RW           98    .data.s_phase_duty  tim1_pwm.o
-    0x20000012   0x08003052   0x00000006   PAD
-    0x20000018        -       0x00000060   Zero   RW         1314    .bss                c_w.l(libspace.o)
-    0x20000078        -       0x00000018   Zero   RW          120    .bss..L_MergedGlobals  tim1_pwm_verify.o
-    0x20000090        -       0x00000014   Zero   RW          141    .bss..L_MergedGlobals  drv_monitor.o
-    0x200000a4        -       0x00000054   Zero   RW           39    .bss.hi2c3          i2c.o
-    0x200000f8        -       0x0000004c   Zero   RW           97    .bss.htim1          tim1_pwm.o
-    0x20000144        -       0x0000004c   Zero   RW           76    .bss.htim6          tim.o
-    0x20000190        -       0x00000004   Zero   RW          363    .bss.uwTick         stm32g4xx_hal.o
+    0x20000000   0x08003028   0x00000008   Data   RW          359    .data..L_MergedGlobals  stm32g4xx_hal.o
+    0x20000008   0x08003030   0x00000004   Data   RW         1264    .data.SystemCoreClock  system_stm32g4xx.o
+    0x2000000c   0x08003034   0x00000018   Data   RW           17    .data.g_measurement_manager  main.o
+    0x20000024   0x0800304c   0x00000006   Data   RW          173    .data.s_phase_duty  tim1_pwm.o
+    0x2000002a   0x08003052   0x00000006   PAD
+    0x20000030        -       0x00000060   Zero   RW         1309    .bss                c_w.l(libspace.o)
+    0x20000090        -       0x00000014   Zero   RW          149    .bss..L_MergedGlobals  drv_monitor.o
+    0x200000a4        -       0x00000054   Zero   RW           93    .bss.hi2c3          i2c.o
+    0x200000f8        -       0x0000004c   Zero   RW          172    .bss.htim1          tim1_pwm.o
+    0x20000144        -       0x0000004c   Zero   RW          102    .bss.htim6          tim.o
+    0x20000190        -       0x00000004   Zero   RW          358    .bss.uwTick         stm32g4xx_hal.o
     0x20000194   0x08003052   0x00000004   PAD
     0x20000198        -       0x00000200   Zero   RW            2    HEAP                startup_stm32g431xx.o
     0x20000398        -       0x00000400   Zero   RW            1    STACK               startup_stm32g431xx.o
@@ -2962,7 +2935,7 @@ Image component sizes
        532          0          0          0         20       7301   drv_monitor.o
        138          0          0          0          0       2406   gpio.o
        108          0          0          0         84       4017   i2c.o
-       176          0          0          0          0       3355   main.o
+       184          0          0         24          0       4221   main.o
         64         26        472          0       1536        868   startup_stm32g431xx.o
        148          0          0          8          4       8964   stm32g4xx_hal.o
        196          0          0          0          0      10454   stm32g4xx_hal_cortex.o
@@ -2974,17 +2947,17 @@ Image component sizes
       2044          0          0          0          0      10260   stm32g4xx_hal_rcc.o
       2092         14          0          0          0      63366   stm32g4xx_hal_tim.o
        380          0          0          0          0      30527   stm32g4xx_hal_tim_ex.o
-        66          0          0          0          0       5410   stm32g4xx_it.o
+        74          0          0          0          0       6300   stm32g4xx_it.o
        638          0          0          0          0       6143   stspin32g4.o
         18          0         24          4          0       2826   system_stm32g4xx.o
         54          0          0          0         76       4434   tim.o
        650         20          0          6         76       8274   tim1_pwm.o
-       432          0         36          0         24       3298   tim1_pwm_verify.o
+       430          0          0          0          0       3856   tim1_pwm_verify.o
 
     ----------------------------------------------------------------------
-     11358         60        564         20       1828     267088   Object Totals
+     11370         60        528         44       1804     269402   Object Totals
          0          0         32          0          0          0   (incl. Generated)
-        92          0          0          2          8          0   (incl. Padding)
+        90          0          0          2          8          0   (incl. Padding)
 
     ----------------------------------------------------------------------
 
@@ -3034,13 +3007,13 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
 
-     11788         76        564         20       1924     267348   Grand Totals
-     11788         76        564         20       1924     267348   ELF Image Totals
-     11788         76        564         20          0          0   ROM Totals
+     11800         76        528         44       1900     269662   Grand Totals
+     11800         76        528         44       1900     269662   ELF Image Totals
+     11800         76        528         44          0          0   ROM Totals
 
 ==============================================================================
 
-    Total RO  Size (Code + RO Data)                12352 (  12.06kB)
+    Total RO  Size (Code + RO Data)                12328 (  12.04kB)
     Total RW  Size (RW Data + ZI Data)              1944 (   1.90kB)
     Total ROM Size (Code + RO Data + RW Data)      12372 (  12.08kB)
 

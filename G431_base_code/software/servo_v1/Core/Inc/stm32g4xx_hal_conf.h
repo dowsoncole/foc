@@ -115,8 +115,8 @@
   *        (when HSE is used as system clock source, directly or through the PLL).
   */
 #if !defined  (HSE_VALUE)
-  /* The board fitted crystal X1 (TXC AV12000007) is 12 MHz. */
-  #define HSE_VALUE    (12000000UL) /*!< Value of the External oscillator in Hz */
+  /* The board fitted crystal X1 is 8 MHz. */
+  #define HSE_VALUE    (8000000UL) /*!< Value of the External oscillator in Hz */
 #endif /* HSE_VALUE */
 
 #if !defined  (HSE_STARTUP_TIMEOUT)
@@ -170,7 +170,7 @@ The real value may vary depending on the variations in voltage and temperature.*
   *        frequency, this source is inserted directly through I2S_CKIN pad.
   */
 #if !defined  (EXTERNAL_CLOCK_VALUE)
-#define EXTERNAL_CLOCK_VALUE    (12000000UL) /*!< Value of the External oscillator in Hz*/
+#define EXTERNAL_CLOCK_VALUE    (8000000UL) /*!< Value of the External oscillator in Hz*/
 #endif /* EXTERNAL_CLOCK_VALUE */
 
 /* Tip: To avoid modifying this file each time you need to use different HSE,
