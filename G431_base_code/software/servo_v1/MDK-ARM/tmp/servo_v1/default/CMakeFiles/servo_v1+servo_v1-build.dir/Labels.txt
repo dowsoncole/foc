@@ -1,0 +1,11 @@
+# Target labels
+ servo_v1+servo_v1
+# Source files and their labels
+C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/CMakeFiles/servo_v1+servo_v1-build
+C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/CMakeFiles/servo_v1+servo_v1-build.rule
+C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/servo_v1+servo_v1/src/servo_v1+servo_v1-stamp/servo_v1+servo_v1-build.rule
+C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/servo_v1+servo_v1/src/servo_v1+servo_v1-stamp/servo_v1+servo_v1-configure.rule
+C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/servo_v1+servo_v1/src/servo_v1+servo_v1-stamp/servo_v1+servo_v1-patch.rule
+C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/servo_v1+servo_v1/src/servo_v1+servo_v1-stamp/servo_v1+servo_v1-update.rule
+C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/servo_v1+servo_v1/src/servo_v1+servo_v1-stamp/servo_v1+servo_v1-download.rule
+C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/servo_v1+servo_v1/src/servo_v1+servo_v1-stamp/servo_v1+servo_v1-mkdir.rule

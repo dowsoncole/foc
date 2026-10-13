@@ -1,0 +1,52 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/CMakeFiles/servo_v1+servo_v1"
+		},
+		{
+			"file" : "C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/CMakeFiles/servo_v1+servo_v1.rule"
+		},
+		{
+			"file" : "C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/CMakeFiles/servo_v1+servo_v1-complete.rule"
+		},
+		{
+			"file" : "C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/servo_v1+servo_v1/src/servo_v1+servo_v1-stamp/servo_v1+servo_v1-build.rule"
+		},
+		{
+			"file" : "C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/servo_v1+servo_v1/src/servo_v1+servo_v1-stamp/servo_v1+servo_v1-configure.rule"
+		},
+		{
+			"file" : "C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/servo_v1+servo_v1/src/servo_v1+servo_v1-stamp/servo_v1+servo_v1-database.rule"
+		},
+		{
+			"file" : "C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/servo_v1+servo_v1/src/servo_v1+servo_v1-stamp/servo_v1+servo_v1-download.rule"
+		},
+		{
+			"file" : "C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/servo_v1+servo_v1/src/servo_v1+servo_v1-stamp/servo_v1+servo_v1-executes.rule"
+		},
+		{
+			"file" : "C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/servo_v1+servo_v1/src/servo_v1+servo_v1-stamp/servo_v1+servo_v1-install.rule"
+		},
+		{
+			"file" : "C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/servo_v1+servo_v1/src/servo_v1+servo_v1-stamp/servo_v1+servo_v1-mkdir.rule"
+		},
+		{
+			"file" : "C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/servo_v1+servo_v1/src/servo_v1+servo_v1-stamp/servo_v1+servo_v1-patch.rule"
+		},
+		{
+			"file" : "C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/servo_v1+servo_v1/src/servo_v1+servo_v1-stamp/servo_v1+servo_v1-test.rule"
+		},
+		{
+			"file" : "C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/servo_v1+servo_v1/src/servo_v1+servo_v1-stamp/servo_v1+servo_v1-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"servo_v1+servo_v1"
+		],
+		"name" : "servo_v1+servo_v1"
+	}
+}

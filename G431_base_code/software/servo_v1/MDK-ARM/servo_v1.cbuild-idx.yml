@@ -1,0 +1,20 @@
+build-idx:
+  generated-by: csolution version 2.15.1+p3-gf46d68bf
+  target: servo_v1
+  csolution: servo_v1.csolution.yml
+  cbuild-run: out/servo_v1+servo_v1.cbuild-run.yml
+  tmpdir: tmp/servo_v1/default
+  cprojects:
+    - cproject: servo_v1.cproject.yml
+  cbuilds:
+    - cbuild: out/servo_v1/servo_v1/servo_v1+servo_v1.cbuild.yml
+      project: servo_v1
+      configuration: +servo_v1
+      messages:
+        info:
+          - servo_v1.cbuild-pack.yml - file is already up-to-date
+          - servo_v1+servo_v1.cbuild-run.yml - file generated successfully
+          - servo_v1+servo_v1.cbuild.yml - file is already up-to-date
+      packs-unused:
+        - pack: ARM::CMSIS-DSP@1.16.2
+        - pack: ARM::CMSIS-NN@4.1.0

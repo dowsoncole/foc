@@ -1,0 +1,8 @@
+C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/1/CMakeFiles/database.dir
+C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/1/CMakeFiles/servo_v1+servo_v1.dir
+C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/1/CMakeFiles/Group_Application_MDK-ARM.dir
+C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/1/CMakeFiles/Group_Application_User_Core.dir
+C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/1/CMakeFiles/Group_Drivers_STM32G4xx_HAL_Driver.dir
+C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/1/CMakeFiles/Group_Drivers_CMSIS.dir
+C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/1/CMakeFiles/edit_cache.dir
+C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/1/CMakeFiles/rebuild_cache.dir

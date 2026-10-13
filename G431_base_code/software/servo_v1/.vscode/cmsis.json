@@ -1,0 +1,9 @@
+{
+    "targetSet": {
+        "MDK-ARM/servo_v1": {
+            "activeTargetType": "servo_v1"
+        }
+    },
+    "activeSolution": "../MDK-ARM/servo_v1.csolution.yml",
+    "activeTarget": "servo_v1"
+}

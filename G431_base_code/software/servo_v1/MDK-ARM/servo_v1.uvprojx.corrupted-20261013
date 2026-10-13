@@ -1,0 +1,7 @@
+﻿git : fatal: path 'G431_base_code/software/servo_v1/MDK-ARM/servo_v1.uvprojx' exists on disk, but not in 'HEAD'
+所在位置 行:1 字符: 362
++ ... ying HEAD"; git show HEAD:'G431_base_code/software/servo_v1/MDK-ARM/s ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (fatal: path 'G4...t not in 'HEAD':String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 

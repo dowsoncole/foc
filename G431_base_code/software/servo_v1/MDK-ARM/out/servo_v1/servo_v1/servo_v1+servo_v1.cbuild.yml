@@ -1,0 +1,227 @@
+build:
+  generated-by: csolution version 2.15.1+p3-gf46d68bf
+  solution: ../../../servo_v1.csolution.yml
+  project: ../../../servo_v1.cproject.yml
+  context: servo_v1+servo_v1
+  compiler: AC6@6.24.0
+  device: STMicroelectronics::STM32G431VBTx
+  device-pack: Keil::STM32G4xx_DFP@2.2.0
+  device-books:
+    - name: https://www.st.com/resource/en/datasheet/stm32g431c6.pdf
+      title: STM32G431xx Data Sheet
+    - name: https://developer.arm.com/documentation/dui0553/latest/
+      title: Arm Cortex-M4 Generic User Guide
+    - name: https://www.st.com/resource/en/reference_manual/rm0440-stm32g4-series-advanced-armbased-32bit-mcus-stmicroelectronics.pdf
+      title: STM32G4xx Reference Manual
+  dbgconf:
+    - file: ../../../.cmsis/servo_v1+servo_v1.dbgconf
+      version: 1.0.1
+  processor:
+    dsp: on
+    endian: little
+    fpu: sp
+    core: Cortex-M4
+  packs:
+    - pack: ARM::CMSIS@6.3.0
+      path: ${CMSIS_PACK_ROOT}/ARM/CMSIS/6.3.0
+    - pack: Keil::STM32G4xx_DFP@2.2.0
+      path: ${CMSIS_PACK_ROOT}/Keil/STM32G4xx_DFP/2.2.0
+  optimize: debug
+  debug: on
+  misc:
+    ASM:
+      - -masm=auto
+    C:
+      - -std=c99
+      - -fno-rtti
+      - -funsigned-char
+      - -fshort-enums
+      - -fshort-wchar
+      - -ffunction-sections
+      - -Wno-packed
+      - -Wno-missing-variable-declarations
+      - -Wno-missing-prototypes
+      - -Wno-missing-noreturn
+      - -Wno-sign-conversion
+      - -Wno-nonportable-include-path
+      - -Wno-reserved-id-macro
+      - -Wno-unused-macros
+      - -Wno-documentation-unknown-command
+      - -Wno-documentation
+      - -Wno-license-management
+      - -Wno-parentheses-equality
+    CPP:
+      - -xc++
+      - -std=c++11
+      - -fno-exceptions
+      - -fno-rtti
+      - -funsigned-char
+      - -fshort-enums
+      - -fshort-wchar
+      - -ffunction-sections
+      - -Wno-packed
+      - -Wno-missing-variable-declarations
+      - -Wno-missing-prototypes
+      - -Wno-missing-noreturn
+      - -Wno-sign-conversion
+      - -Wno-nonportable-include-path
+      - -Wno-reserved-id-macro
+      - -Wno-unused-macros
+      - -Wno-documentation-unknown-command
+      - -Wno-documentation
+      - -Wno-license-management
+      - -Wno-parentheses-equality
+    Link:
+      - --map
+      - --load_addr_map_info
+      - --xref
+      - --callgraph
+      - --symbols
+      - --info sizes
+      - --info totals
+      - --info unused
+      - --info veneers
+      - --strict
+      - --summary_stderr
+      - --info summarysizes
+  define:
+    - USE_HAL_DRIVER
+    - STM32G431xx
+    - STM32G431xx
+    - _RTE_
+  define-asm:
+    - STM32G431xx
+    - _RTE_
+  add-path:
+    - ../../../../Core/Inc
+    - ../../../../Drivers/STM32G4xx_HAL_Driver/Inc
+    - ../../../../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy
+    - ../../../../Drivers/CMSIS/Device/ST/STM32G4xx/Include
+    - ../../../../Drivers/CMSIS/Include
+    - ../../../RTE/_servo_v1
+    - ${CMSIS_PACK_ROOT}/ARM/CMSIS/6.3.0/CMSIS/Core/Include
+  add-path-asm:
+    - ../../../RTE/_servo_v1
+    - ${CMSIS_PACK_ROOT}/ARM/CMSIS/6.3.0/CMSIS/Core/Include
+  output-dirs:
+    intdir: ../../../tmp
+    outdir: .
+    rtedir: ../../../RTE
+  output:
+    - type: elf
+      file: servo_v1.axf
+    - type: comp-db
+      file: compile_commands.json
+    - type: comp-db
+      file: compile_macros_c.h
+    - type: comp-db
+      file: compile_macros_cxx.h
+  components:
+    - component: ARM::CMSIS:CORE@6.2.0
+      condition: ARMv6_7_8-M Device
+      from-pack: ARM::CMSIS@6.3.0
+      selected-by: ARM::CMSIS:CORE
+      files:
+        - file: ${CMSIS_PACK_ROOT}/ARM/CMSIS/6.3.0/CMSIS/Core/Include
+          category: include
+          version: 6.2.0
+        - file: ${CMSIS_PACK_ROOT}/ARM/CMSIS/6.3.0/CMSIS/Core/Include/tz_context.h
+          category: header
+          version: 6.2.0
+        - file: ${CMSIS_PACK_ROOT}/ARM/CMSIS/6.3.0/CMSIS/Core/Template/ARMv8-M/main_s.c
+          category: sourceC
+          attr: template
+          version: 1.1.1
+          select: Secure mode 'main' module for ARMv8-M
+        - file: ${CMSIS_PACK_ROOT}/ARM/CMSIS/6.3.0/CMSIS/Core/Template/ARMv8-M/tz_context.c
+          category: sourceC
+          attr: template
+          version: 1.1.1
+          select: RTOS Context Management (TrustZone for ARMv8-M)
+        - file: ${CMSIS_PACK_ROOT}/ARM/CMSIS/6.3.0/CMSIS/Documentation/html/Core/index.html
+          category: doc
+          version: 6.2.0
+  linker:
+    script: ../../../servo_v1_servo_v1.sct
+  groups:
+    - group: Application/MDK-ARM
+      files:
+        - file: ../../../startup_stm32g431xx.s
+          category: sourceAsm
+    - group: Application/User/Core
+      files:
+        - file: ../../../../Core/Src/main.c
+          category: sourceC
+        - file: ../../../../Core/Src/gpio.c
+          category: sourceC
+        - file: ../../../../Core/Src/i2c.c
+          category: sourceC
+        - file: ../../../../Core/Src/stspin32g4.c
+          category: sourceC
+        - file: ../../../../Core/Src/tim.c
+          category: sourceC
+        - file: ../../../../Core/Src/tim1_pwm.c
+          category: sourceC
+        - file: ../../../../Core/Src/tim1_pwm_verify.c
+          category: sourceC
+        - file: ../../../../Core/Src/drv_monitor.c
+          category: sourceC
+        - file: ../../../../Core/Src/stm32g4xx_it.c
+          category: sourceC
+        - file: ../../../../Core/Src/stm32g4xx_hal_msp.c
+          category: sourceC
+        - file: ../../../../Core/Src/readme.md
+          category: doc
+    - group: Drivers/STM32G4xx_HAL_Driver
+      files:
+        - file: ../../../../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_pwr_ex.c
+          category: sourceC
+        - file: ../../../../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal.c
+          category: sourceC
+        - file: ../../../../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_rcc.c
+          category: sourceC
+        - file: ../../../../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_rcc_ex.c
+          category: sourceC
+        - file: ../../../../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_flash.c
+          category: sourceC
+        - file: ../../../../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_flash_ex.c
+          category: sourceC
+        - file: ../../../../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_flash_ramfunc.c
+          category: sourceC
+        - file: ../../../../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_gpio.c
+          category: sourceC
+        - file: ../../../../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_exti.c
+          category: sourceC
+        - file: ../../../../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_dma.c
+          category: sourceC
+        - file: ../../../../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_dma_ex.c
+          category: sourceC
+        - file: ../../../../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_pwr.c
+          category: sourceC
+        - file: ../../../../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_cortex.c
+          category: sourceC
+        - file: ../../../../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_i2c.c
+          category: sourceC
+        - file: ../../../../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_i2c_ex.c
+          category: sourceC
+        - file: ../../../../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_tim.c
+          category: sourceC
+        - file: ../../../../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_tim_ex.c
+          category: sourceC
+    - group: Drivers/CMSIS
+      files:
+        - file: ../../../../Core/Src/system_stm32g4xx.c
+          category: sourceC
+  constructed-files:
+    - file: ../../../RTE/_servo_v1/RTE_Components.h
+      category: header
+  licenses:
+    - license: Apache-2.0
+      packs:
+        - pack: ARM::CMSIS@6.3.0
+        - pack: Keil::STM32G4xx_DFP@2.2.0
+      components:
+        - component: ARM::CMSIS:CORE@6.2.0
+    - license: BSD-3-Clause
+      packs:
+        - pack: Keil::STM32G4xx_DFP@2.2.0

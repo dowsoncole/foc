@@ -1,0 +1,10 @@
+solution:
+  created-by: uv2csolution@1.6.0
+  created-for: CMSIS-Toolbox@2.7.0
+  compiler: AC6@6.24.0
+  target-types:
+    - type: servo_v1
+      device: STM32G431VBTx
+      optimize: debug
+  projects:
+    - project: servo_v1.cproject.yml

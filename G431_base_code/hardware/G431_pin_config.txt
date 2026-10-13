@@ -1,0 +1,2 @@
+STSPIN 内部驱动控制逻辑:
+PC9->I2C-SDA; PC8->I2C-SCL;
