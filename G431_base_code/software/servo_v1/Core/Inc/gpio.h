@@ -26,13 +26,20 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"
+#include "stm32g4xx_hal.h"
 
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
 
 /* USER CODE BEGIN Private defines */
+
+#define GD_WAKE_Pin          GPIO_PIN_7
+#define GD_WAKE_GPIO_Port    GPIOE
+#define GD_READY_Pin         GPIO_PIN_14
+#define GD_READY_GPIO_Port   GPIOE
+#define GD_NFAULT_Pin        GPIO_PIN_15
+#define GD_NFAULT_GPIO_Port  GPIOE
 
 /* USER CODE END Private defines */
 

@@ -18,8 +18,8 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"
-#include "i2c.h"
+#include "stm32g4xx_hal.h"
+#include "i2c3_bus.h"
 /* USER CODE BEGIN Includes */
 #include "tim1_pwm.h"
 /* USER CODE END Includes */

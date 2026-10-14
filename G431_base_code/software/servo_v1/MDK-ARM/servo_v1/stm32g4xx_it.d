@@ -1,4 +1,4 @@
-servo_v1/stm32g4xx_it.o: ..\Core\Src\stm32g4xx_it.c ..\Core\Inc\main.h \
+servo_v1/stm32g4xx_it.o: ..\Core\Src\stm32g4xx_it.c \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal.h \
   ..\Core\Inc\stm32g4xx_hal_conf.h \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_rcc.h \
@@ -24,5 +24,6 @@ servo_v1/stm32g4xx_it.o: ..\Core\Src\stm32g4xx_it.c ..\Core\Inc\main.h \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_pwr_ex.h \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_tim.h \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_tim_ex.h \
-  ..\Core\Inc\stm32g4xx_it.h ..\Core\Inc\tim.h ..\Core\Inc\tim1_pwm.h \
-  ..\Core\Inc\tim1_pwm_verify.h ..\Core\Inc\measurement_manager.h
+  ..\Core\Inc\stm32g4xx_it.h \
+  ..\Modules\Driver_Communication\Inc\tim6_heartbeat.h \
+  ..\Modules\Three_Phase_Driver\Inc\tim1_pwm.h

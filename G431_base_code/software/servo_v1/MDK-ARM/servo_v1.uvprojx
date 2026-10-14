@@ -341,7 +341,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32G431xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32G4xx_HAL_Driver/Inc;../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32G4xx/Include;../Drivers/CMSIS/Include</IncludePath>
+              <IncludePath>../Core/Inc;../FOC/Inc;../Modules/Driver_Communication/Inc;../Modules/Three_Phase_Driver/Inc;../Tests/Inc;../Drivers/STM32G4xx_HAL_Driver/Inc;../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32G4xx/Include;../Drivers/CMSIS/Include</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -435,55 +435,50 @@
               <FileType>5</FileType>
               <FilePath>../Core/Inc/stm32g4xx_hal_conf.h</FilePath>
             </File>
-            <File>
-              <FileName>readme.md</FileName>
-              <FileType>5</FileType>
-              <FilePath>../Core/Src/readme.md</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>Modules/Three-Phase Communication</GroupName>
+          <GroupName>Modules/Driver Communication</GroupName>
           <Files>
             <File>
-              <FileName>i2c.c</FileName>
+              <FileName>i2c3_bus.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Core/Src/i2c.c</FilePath>
+              <FilePath>../Modules/Driver_Communication/Src/i2c3_bus.c</FilePath>
             </File>
             <File>
-              <FileName>i2c.h</FileName>
+              <FileName>i2c3_bus.h</FileName>
               <FileType>5</FileType>
-              <FilePath>../Core/Inc/i2c.h</FilePath>
+              <FilePath>../Modules/Driver_Communication/Inc/i2c3_bus.h</FilePath>
             </File>
             <File>
-              <FileName>tim.c</FileName>
+              <FileName>tim6_heartbeat.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Core/Src/tim.c</FilePath>
+              <FilePath>../Modules/Driver_Communication/Src/tim6_heartbeat.c</FilePath>
             </File>
             <File>
-              <FileName>tim.h</FileName>
+              <FileName>tim6_heartbeat.h</FileName>
               <FileType>5</FileType>
-              <FilePath>../Core/Inc/tim.h</FilePath>
+              <FilePath>../Modules/Driver_Communication/Inc/tim6_heartbeat.h</FilePath>
             </File>
             <File>
               <FileName>stspin32g4.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Core/Src/stspin32g4.c</FilePath>
+              <FilePath>../Modules/Driver_Communication/Src/stspin32g4.c</FilePath>
             </File>
             <File>
               <FileName>stspin32g4.h</FileName>
               <FileType>5</FileType>
-              <FilePath>../Core/Inc/stspin32g4.h</FilePath>
+              <FilePath>../Modules/Driver_Communication/Inc/stspin32g4.h</FilePath>
             </File>
             <File>
               <FileName>drv_monitor.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Core/Src/drv_monitor.c</FilePath>
+              <FilePath>../Modules/Driver_Communication/Src/drv_monitor.c</FilePath>
             </File>
             <File>
               <FileName>drv_monitor.h</FileName>
               <FileType>5</FileType>
-              <FilePath>../Core/Inc/drv_monitor.h</FilePath>
+              <FilePath>../Modules/Driver_Communication/Inc/drv_monitor.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -493,27 +488,12 @@
             <File>
               <FileName>tim1_pwm.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Core/Src/tim1_pwm.c</FilePath>
+              <FilePath>../Modules/Three_Phase_Driver/Src/tim1_pwm.c</FilePath>
             </File>
             <File>
               <FileName>tim1_pwm.h</FileName>
               <FileType>5</FileType>
-              <FilePath>../Core/Inc/tim1_pwm.h</FilePath>
-            </File>
-            <File>
-              <FileName>tim1_pwm_verify.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Core/Src/tim1_pwm_verify.c</FilePath>
-            </File>
-            <File>
-              <FileName>tim1_pwm_verify.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>../Core/Inc/tim1_pwm_verify.h</FilePath>
-            </File>
-            <File>
-              <FileName>measurement_manager.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>../Core/Inc/measurement_manager.h</FilePath>
+              <FilePath>../Modules/Three_Phase_Driver/Inc/tim1_pwm.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -522,6 +502,51 @@
         </Group>
         <Group>
           <GroupName>Modules/Encoder</GroupName>
+        </Group>
+        <Group>
+          <GroupName>Modules/FOC</GroupName>
+          <Files>
+            <File>
+              <FileName>foc_algorithm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../FOC/Src/foc_algorithm.c</FilePath>
+            </File>
+            <File>
+              <FileName>foc_algorithm.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>../FOC/Inc/foc_algorithm.h</FilePath>
+            </File>
+            <File>
+              <FileName>foc_interface.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../FOC/Src/foc_interface.c</FilePath>
+            </File>
+            <File>
+              <FileName>foc_interface.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>../FOC/Inc/foc_interface.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Tests</GroupName>
+          <Files>
+            <File>
+              <FileName>tim1_pwm_verify.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Tests/Src/tim1_pwm_verify.c</FilePath>
+            </File>
+            <File>
+              <FileName>tim1_pwm_verify.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>../Tests/Inc/tim1_pwm_verify.h</FilePath>
+            </File>
+            <File>
+              <FileName>measurement_manager.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>../Tests/Inc/measurement_manager.h</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>Drivers/STM32G4xx_HAL_Driver</GroupName>

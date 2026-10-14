@@ -1,4 +1,5 @@
-servo_v1/i2c.o: ..\Core\Src\i2c.c ..\Core\Inc\i2c.h ..\Core\Inc\main.h \
+servo_v1/i2c.o: ..\Modules\MOS_Driver\Src\i2c.c \
+  ..\Modules\MOS_Driver\Inc\i2c.h ..\Core\Inc\main.h \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal.h \
   ..\Core\Inc\stm32g4xx_hal_conf.h \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_rcc.h \

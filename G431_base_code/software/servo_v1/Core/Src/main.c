@@ -19,11 +19,11 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "gpio.h"
-#include "i2c.h"
+#include "i2c3_bus.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "tim.h"
+#include "tim6_heartbeat.h"
 #include "tim1_pwm.h"
 #include "tim1_pwm_verify.h"
 #include "measurement_manager.h"
@@ -62,7 +62,9 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-/* Change only this object to select and configure the active board test. */
+/* 统一的测量配置与运行状态对象：由 L6 应用入口层持有，交给 L5 测试层消费。
+   刻意做成全局对象，一是能在调试器 Watch 窗口直接观察，二是能在测量运行途中
+   改字段来切换被测相或占空比，无需重新编译烧录。 */
 measurement_manager_t g_measurement_manager =
 {
   .module = MEASUREMENT_MODULE_MOS_DRIVER,
@@ -70,15 +72,15 @@ measurement_manager_t g_measurement_manager =
   .config.mos_driver =
   {
     .phase = MOS_DRIVER_PHASE_U,
-    .duty = 50U,         /* 10 % high-side PWM on the selected phase (0..1000 scale). */
-    .moe_enable = 0U,      /* Start gated off; set to 1 to enable waveform output. */
-    .duration_ms = 0U,     /* 0 = no automatic waveform shutdown. */
-    .deadline_ms = 0U,
-    .moe_applied = 1U,
+    .duty = 50U,         /* 选中相的高侧占空比，标度 0..1000，故 50 表示 5 %。 */
+    .moe_enable = 1U,    /* 预充电延时结束后自动使能波形输出。 */
+    .startup_delay_ms = 50U, /* 等 VCC 与栅极驱动自举电容稳定。 */
+    .moe_applied = 0U,
     .phase_applied = MOS_DRIVER_PHASE_U,
     .duty_applied = 0U
   }
 };
+
 /* USER CODE END 0 */
 
 /**
@@ -110,52 +112,41 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_I2C3_Init();
-  MX_TIM6_Init();
-  MX_TIM1_Init();
+  if (MX_I2C3_Init() != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (MX_TIM6_Init() != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (MX_TIM1_Init() != HAL_OK)
+  {
+    Error_Handler();
+  }
   /* USER CODE BEGIN 2 */
   /* ------------------------------------------------------------------------
-   * Layer 0 - bring-up, runs once before any real-time task starts
+   * Layer 0 上电初始化：在任何实时任务开始之前一次性跑完
    * ------------------------------------------------------------------------
-   * DrvMonitor_Init() clears the power-up latched fault (mandatory: the device
-   * stays inoperative until CLEAR is written) and starts the 1 s heartbeat.
-   * Blocking retries here are harmless because nothing real-time is running.
+   * DrvMonitor_Init() 会清除上电锁存故障（必须做：不写 CLEAR，芯片一直处于
+   * 不动作状态），并启动 1 s 心跳。此处允许阻塞重试，因为此时还没有任何
+   * 实时任务在运行，阻塞不会破坏 PWM 或采样时序。
    */
-  DrvMonitor_Init();
-
-  /* ------------------------------------------------------------------------
-   * Layer 1 - measurement module selected in g_measurement_manager
-   * ------------------------------------------------------------------------
-   * MX_TIM1_Init() has already produced the 20 kHz carrier, but MOE is still
-   * cleared, so no gate signal can reach the power stage. The sequence below
-   * checks the MCU -> gate driver -> external MOSFET path with a fixed pattern
-   * that is easy to judge on a scope. Keep the motor disconnected for this
-   * measurement and use a current-limited DC link.
-   *
-   * Read the runbook in tim1_pwm_verify.h before enabling it, and keep the DC
-   * link current limited for every run. The selected-phase pattern applies a
-   * non-zero line-to-line voltage, so it is not a no-torque motor test.
-   *
-   * Set TIM1_PWM_VERIFY_ENABLE to 0 to skip it. While it is enabled, the driver
-   * has to be reported healthy first: a faulted driver must never be driven.
-   * The duration only bounds the pattern; it does not replace a current limit.
-   */
-#define TIM1_PWM_VERIFY_ENABLE       1U
-
-  if ((TIM1_PWM_VERIFY_ENABLE != 0U) &&
-      (DrvMonitor_GetState() == DRV_STATE_READY))
+  if (DrvMonitor_Init() != HAL_OK)
   {
-    if (Tim1PwmVerify_Start(&g_measurement_manager) != HAL_OK)
-    {
-      /* The outputs never left the neutral pattern; the driver monitor keeps
-         running so the reason can be read from the snapshot. */
-      Error_Handler();
-    }
+    Error_Handler();
   }
 
-  /* TODO: MX_ADC1_Init() + the current loop replace the verification, and the
-   * power stage may only be enabled while DrvMonitor_GetState() == DRV_STATE_READY
-   * and TIM1->BDTR still has MOE set. */
+  /* 只有栅极驱动报告 READY 之后才启动测量。
+     MOE 仍由 g_measurement_manager.config.mos_driver.moe_enable 控制。 */
+  if (DrvMonitor_GetState() == DRV_STATE_READY)
+  {
+    (void)Tim1PwmVerify_Start(&g_measurement_manager);
+  }
+
+  /* TODO: MX_ADC1_Init() + 电流环。功率级只能在
+   * DrvMonitor_GetState() == DRV_STATE_READY 且 TIM1->BDTR 的 MOE 仍置位时
+   * 才允许使能。 */
 
   /* USER CODE END 2 */
 
@@ -167,26 +158,37 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
     /* --------------------------------------------------------------------
-     * Layer 3 - background tasks, no deadline, may block for tens of us
+     * 后台任务层：无截止时间，可阻塞数十 µs
      * --------------------------------------------------------------------
-     * DrvMonitor_Task() returns immediately unless TIM6 has raised the 1 s
-     * tick, so calling it every iteration costs nothing. All I2C traffic of
-     * the whole application happens inside this call, never in an ISR.
+     * DrvMonitor_Task() 在 TIM6 心跳未到时立即返回，所以每轮都调用的开销
+     * 近乎为零。全工程的所有 I2C 通信都发生在这一次调用内部，绝不在中断里。
      */
     DrvMonitor_Task();
 
-    /* --------------------------------------------------------------------
-     * Layer 2 - active measurement module
-     * --------------------------------------------------------------------
-     * Non-blocking: it returns immediately while the selected waveform is held.
-     * Remove this call once the current loop owns the PWM channels.
+    /* ------------------------------------------------------------------
+     * L6 跨层仲裁：驱动报告非 READY 时关断功率级
+     * ------------------------------------------------------------------
+     * 修复：原先 DrvMonitor 检测到 FAULT / COMM_LOST 后只更新自身状态，
+     * 没有任何一方去清 MOE。STSPIN32G4 的内部保护（VDS_P / THSD）确实会把
+     * 栅极强制拉低，硬件不会损坏；但软件侧 MOE 仍保持置位、测量状态仍是
+     * RUNNING，一旦故障条件消失，输出会在无人复核的情况下自行恢复。
+     *
+     * 这段仲裁放在 L6 而不是 L3：监控层不得调用三相驱动层（下层不能依赖
+     * 上层），跨层仲裁本来就是应用入口层的职责。
+     *
+     * 只在 IsRunning 为真时触发，因此每轮循环最多关断一次；Stop 会把状态置为
+     * IDLE，之后不再重复调用。恢复输出必须显式重新 Start，不会自动重启。
      */
-#if (TIM1_PWM_VERIFY_ENABLE != 0U)
-    (void)Tim1PwmVerify_Task(&g_measurement_manager);
-#endif
+    if ((Tim1PwmVerify_IsRunning(&g_measurement_manager) != 0U) &&
+        (DrvMonitor_GetState() != DRV_STATE_READY))
+    {
+      Tim1PwmVerify_Stop(&g_measurement_manager);
+    }
 
-    /* TODO: protocol stack (CAN/UART), parameter storage, temperature
-     * logging, host telemetry ... all belong to this layer. */
+    (void)Tim1PwmVerify_Task(&g_measurement_manager);
+
+    /* TODO: 协议栈（CAN/UART）、参数存储、温度记录、上位机遥测 ……
+     * 都属于这一层。 */
   }
   /* USER CODE END 3 */
 }
@@ -211,11 +213,11 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-  /* X1 is 8 MHz: 8 MHz / 2 = 4 MHz VCO input, * 84 = 336 MHz VCO, /2 = 168 MHz
-     SYSCLK. A 4 MHz VCO input is what ST recommends for the lowest PLL jitter,
-     and SYSCLK deliberately stays at 168 MHz so every derived timing constant
-     keeps holding: the 20 kHz TIM1 carrier, the 500 ns dead time, the 10 kHz
-     TIM6 tick (prescaler 16800) and the I2C timing word. */
+  /* X1 为 8 MHz：8 MHz / 2 = 4 MHz VCO 输入，× 84 = 336 MHz VCO，/ 2 = 168 MHz
+     SYSCLK。VCO 输入取 4 MHz 是 ST 推荐的最低 PLL 抖动点。
+     SYSCLK 刻意保持 168 MHz，因为所有派生时序常量都依赖它：20 kHz TIM1 载波、
+     500 ns 死区、10 kHz TIM6 计数时钟（分频 16800）以及 I2C 时序字。改主频会
+     连带让这些常量全部失效。 */
   RCC_OscInitStruct.PLL.PLLM = RCC_PLLM_DIV2;
   RCC_OscInitStruct.PLL.PLLN = 84;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
@@ -242,11 +244,7 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-// whatever it is 
-// oe
-// complex 
-// st 
-// 
+
 /* USER CODE END 4 */
 
 /**
@@ -255,7 +253,7 @@ void SystemClock_Config(void)
   */
 void Error_Handler(void)
 {
-  /* USER CODE BEGIN Error_H-andler_Debug */
+  /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
   __disable_irq();
   while (1)
@@ -268,7 +266,7 @@ void Error_Handler(void)
   * @brief  Reports the name of the source file and the source line number
   *         where the assert_param error has occurred.
   * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
+  * @param  line: assert_param error source line number
   * @retval None
   */
 void assert_failed(uint8_t *file, uint32_t line)

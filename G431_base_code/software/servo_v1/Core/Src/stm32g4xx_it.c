@@ -1,4 +1,4 @@
-/* USER CODE BEGIN Header */
+﻿/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    stm32g4xx_it.c
@@ -18,13 +18,12 @@
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"
+#include "stm32g4xx_hal.h"
 #include "stm32g4xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "tim.h"
+#include "tim6_heartbeat.h"
 #include "tim1_pwm.h"
-#include "tim1_pwm_verify.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -212,10 +211,7 @@ void TIM6_DAC_IRQHandler(void)
 {
   HAL_TIM_IRQHandler(&htim6);
 
-  /* Deadline enforcement for a running TIM1 verification. Does nothing while no
-     verification is armed. */
-  Tim1PwmVerify_TickIsr(&g_measurement_manager);
-}
+  }
 
 /**
   * @brief This function handles TIM1 capture/compare interrupt.

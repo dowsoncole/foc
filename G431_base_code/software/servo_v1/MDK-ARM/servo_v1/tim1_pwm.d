@@ -1,5 +1,6 @@
-servo_v1/tim1_pwm.o: ..\Core\Src\tim1_pwm.c ..\Core\Inc\tim1_pwm.h \
-  ..\Core\Inc\main.h ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal.h \
+servo_v1/tim1_pwm.o: ..\Modules\Three_Phase_Driver\Src\tim1_pwm.c \
+  ..\Modules\Three_Phase_Driver\Inc\tim1_pwm.h \
+  ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal.h \
   ..\Core\Inc\stm32g4xx_hal_conf.h \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_rcc.h \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_def.h \

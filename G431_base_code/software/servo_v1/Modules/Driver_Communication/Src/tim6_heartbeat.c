@@ -1,14 +1,14 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file    tim.c
+  * @file    tim6_heartbeat.c
   * @brief   TIM6 basic timer initialization: 1 s heartbeat for the driver
   *          monitor task.
   ******************************************************************************
   */
 /* USER CODE END Header */
 
-#include "tim.h"
+#include "tim6_heartbeat.h"
 
 /* USER CODE BEGIN 0 */
 
@@ -17,7 +17,7 @@
 TIM_HandleTypeDef htim6;
 
 /* TIM6 init function */
-void MX_TIM6_Init(void)
+HAL_StatusTypeDef MX_TIM6_Init(void)
 {
   /* USER CODE BEGIN TIM6_Init 0 */
 
@@ -44,12 +44,13 @@ void MX_TIM6_Init(void)
 
   if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
   {
-    Error_Handler();
+    return HAL_ERROR;
   }
 
   /* USER CODE BEGIN TIM6_Init 2 */
 
   /* USER CODE END TIM6_Init 2 */
+  return HAL_OK;
 }
 
 /* USER CODE BEGIN 1 */

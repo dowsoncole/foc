@@ -1,5 +1,6 @@
-servo_v1/stspin32g4.o: ..\Core\Src\stspin32g4.c ..\Core\Inc\stspin32g4.h \
-  ..\Core\Inc\main.h ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal.h \
+servo_v1/stspin32g4.o: ..\Modules\Driver_Communication\Src\stspin32g4.c \
+  ..\Modules\Driver_Communication\Inc\stspin32g4.h \
+  ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal.h \
   ..\Core\Inc\stm32g4xx_hal_conf.h \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_rcc.h \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_def.h \
@@ -24,4 +25,4 @@ servo_v1/stspin32g4.o: ..\Core\Src\stspin32g4.c ..\Core\Inc\stspin32g4.h \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_pwr_ex.h \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_tim.h \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_tim_ex.h \
-  ..\Core\Inc\i2c.h
+  ..\Core\Inc\gpio.h ..\Modules\Driver_Communication\Inc\i2c3_bus.h

@@ -24,7 +24,9 @@ servo_v1/main.o: ..\Core\Src\main.c ..\Core\Inc\main.h \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_pwr_ex.h \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_tim.h \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_tim_ex.h \
-  ..\Core\Inc\gpio.h ..\Core\Inc\i2c.h ..\Core\Inc\tim.h \
-  ..\Core\Inc\tim1_pwm.h ..\Core\Inc\tim1_pwm_verify.h \
-  ..\Core\Inc\measurement_manager.h ..\Core\Inc\stspin32g4.h \
-  ..\Core\Inc\drv_monitor.h
+  ..\Core\Inc\gpio.h ..\Modules\Driver_Communication\Inc\i2c3_bus.h \
+  ..\Modules\Driver_Communication\Inc\tim6_heartbeat.h \
+  ..\Modules\Three_Phase_Driver\Inc\tim1_pwm.h \
+  ..\Tests\Inc\tim1_pwm_verify.h ..\Tests\Inc\measurement_manager.h \
+  ..\Modules\Driver_Communication\Inc\stspin32g4.h \
+  ..\Modules\Driver_Communication\Inc\drv_monitor.h

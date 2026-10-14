@@ -54,39 +54,40 @@ target_link_libraries(Group_Application_Core PUBLIC
   Group_Application_Core_ABSTRACTIONS
 )
 
-# group Modules/MOS Driver
-add_library(Group_Modules_MOS_Driver OBJECT
-  "${SOLUTION_ROOT}/../Core/Src/i2c.c"
-  "${SOLUTION_ROOT}/../Core/Src/tim.c"
-  "${SOLUTION_ROOT}/../Core/Src/stspin32g4.c"
-  "${SOLUTION_ROOT}/../Core/Src/drv_monitor.c"
+# group Modules/Driver Communication
+add_library(Group_Modules_Driver_Communication OBJECT
+  "${SOLUTION_ROOT}/../Modules/Driver_Communication/Src/i2c3_bus.c"
+  "${SOLUTION_ROOT}/../Modules/Driver_Communication/Src/tim6_heartbeat.c"
+  "${SOLUTION_ROOT}/../Modules/Driver_Communication/Src/stspin32g4.c"
+  "${SOLUTION_ROOT}/../Modules/Driver_Communication/Src/drv_monitor.c"
 )
-target_include_directories(Group_Modules_MOS_Driver PUBLIC
+target_include_directories(Group_Modules_Driver_Communication PUBLIC
   $<TARGET_PROPERTY:${CONTEXT},INTERFACE_INCLUDE_DIRECTORIES>
   "${SOLUTION_ROOT}/../Core/Inc"
+  "${SOLUTION_ROOT}/../Modules/Driver_Communication/Inc"
 )
-target_compile_definitions(Group_Modules_MOS_Driver PUBLIC
+target_compile_definitions(Group_Modules_Driver_Communication PUBLIC
   $<TARGET_PROPERTY:${CONTEXT},INTERFACE_COMPILE_DEFINITIONS>
 )
-add_library(Group_Modules_MOS_Driver_ABSTRACTIONS INTERFACE)
-target_link_libraries(Group_Modules_MOS_Driver_ABSTRACTIONS INTERFACE
+add_library(Group_Modules_Driver_Communication_ABSTRACTIONS INTERFACE)
+target_link_libraries(Group_Modules_Driver_Communication_ABSTRACTIONS INTERFACE
   ${CONTEXT}_ABSTRACTIONS
 )
-target_compile_options(Group_Modules_MOS_Driver PUBLIC
+target_compile_options(Group_Modules_Driver_Communication PUBLIC
   $<TARGET_PROPERTY:${CONTEXT},INTERFACE_COMPILE_OPTIONS>
 )
-target_link_libraries(Group_Modules_MOS_Driver PUBLIC
-  Group_Modules_MOS_Driver_ABSTRACTIONS
+target_link_libraries(Group_Modules_Driver_Communication PUBLIC
+  Group_Modules_Driver_Communication_ABSTRACTIONS
 )
 
 # group Modules/Three-Phase Driver
 add_library(Group_Modules_Three-Phase_Driver OBJECT
-  "${SOLUTION_ROOT}/../Core/Src/tim1_pwm.c"
-  "${SOLUTION_ROOT}/../Core/Src/tim1_pwm_verify.c"
+  "${SOLUTION_ROOT}/../Modules/Three_Phase_Driver/Src/tim1_pwm.c"
 )
 target_include_directories(Group_Modules_Three-Phase_Driver PUBLIC
   $<TARGET_PROPERTY:${CONTEXT},INTERFACE_INCLUDE_DIRECTORIES>
   "${SOLUTION_ROOT}/../Core/Inc"
+  "${SOLUTION_ROOT}/../Modules/Three_Phase_Driver/Inc"
 )
 target_compile_definitions(Group_Modules_Three-Phase_Driver PUBLIC
   $<TARGET_PROPERTY:${CONTEXT},INTERFACE_COMPILE_DEFINITIONS>
@@ -100,6 +101,53 @@ target_compile_options(Group_Modules_Three-Phase_Driver PUBLIC
 )
 target_link_libraries(Group_Modules_Three-Phase_Driver PUBLIC
   Group_Modules_Three-Phase_Driver_ABSTRACTIONS
+)
+
+# group Tests
+add_library(Group_Tests OBJECT
+  "${SOLUTION_ROOT}/../Tests/Src/tim1_pwm_verify.c"
+)
+target_include_directories(Group_Tests PUBLIC
+  $<TARGET_PROPERTY:${CONTEXT},INTERFACE_INCLUDE_DIRECTORIES>
+  "${SOLUTION_ROOT}/../Core/Inc"
+  "${SOLUTION_ROOT}/../Tests/Inc"
+)
+target_compile_definitions(Group_Tests PUBLIC
+  $<TARGET_PROPERTY:${CONTEXT},INTERFACE_COMPILE_DEFINITIONS>
+)
+add_library(Group_Tests_ABSTRACTIONS INTERFACE)
+target_link_libraries(Group_Tests_ABSTRACTIONS INTERFACE
+  ${CONTEXT}_ABSTRACTIONS
+)
+target_compile_options(Group_Tests PUBLIC
+  $<TARGET_PROPERTY:${CONTEXT},INTERFACE_COMPILE_OPTIONS>
+)
+target_link_libraries(Group_Tests PUBLIC
+  Group_Tests_ABSTRACTIONS
+)
+
+# group Modules/FOC
+add_library(Group_Modules_FOC OBJECT
+  "${SOLUTION_ROOT}/../FOC/Src/foc_algorithm.c"
+  "${SOLUTION_ROOT}/../FOC/Src/foc_interface.c"
+)
+target_include_directories(Group_Modules_FOC PUBLIC
+  $<TARGET_PROPERTY:${CONTEXT},INTERFACE_INCLUDE_DIRECTORIES>
+  "${SOLUTION_ROOT}/../Core/Inc"
+  "${SOLUTION_ROOT}/../FOC/Inc"
+)
+target_compile_definitions(Group_Modules_FOC PUBLIC
+  $<TARGET_PROPERTY:${CONTEXT},INTERFACE_COMPILE_DEFINITIONS>
+)
+add_library(Group_Modules_FOC_ABSTRACTIONS INTERFACE)
+target_link_libraries(Group_Modules_FOC_ABSTRACTIONS INTERFACE
+  ${CONTEXT}_ABSTRACTIONS
+)
+target_compile_options(Group_Modules_FOC PUBLIC
+  $<TARGET_PROPERTY:${CONTEXT},INTERFACE_COMPILE_OPTIONS>
+)
+target_link_libraries(Group_Modules_FOC PUBLIC
+  Group_Modules_FOC_ABSTRACTIONS
 )
 
 # group Drivers/STM32G4xx_HAL_Driver

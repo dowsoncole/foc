@@ -10,6 +10,10 @@ project:
         fpu: sp
       add-path:
         - ../Core/Inc
+        - ../FOC/Inc
+        - ../Modules/Driver_Communication/Inc
+        - ../Modules/Three_Phase_Driver/Inc
+        - ../Tests/Inc
         - ../Drivers/STM32G4xx_HAL_Driver/Inc
         - ../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy
         - ../Drivers/CMSIS/Device/ST/STM32G4xx/Include
@@ -75,26 +79,36 @@ project:
         - file: ../Core/Src/stm32g4xx_hal_msp.c
         - file: ../Core/Inc/stm32g4xx_hal_conf.h
         - file: ../Core/Src/readme.md
-    - group: Modules/MOS Driver
+    - group: Modules/Driver Communication
       files:
-        - file: ../Core/Src/i2c.c
-        - file: ../Core/Inc/i2c.h
-        - file: ../Core/Src/tim.c
-        - file: ../Core/Inc/tim.h
-        - file: ../Core/Src/stspin32g4.c
-        - file: ../Core/Inc/stspin32g4.h
-        - file: ../Core/Src/drv_monitor.c
-        - file: ../Core/Inc/drv_monitor.h
+        - file: ../Modules/Driver_Communication/Src/i2c3_bus.c
+        - file: ../Modules/Driver_Communication/Inc/i2c3_bus.h
+        - file: ../Modules/Driver_Communication/Src/tim6_heartbeat.c
+        - file: ../Modules/Driver_Communication/Inc/tim6_heartbeat.h
+        - file: ../Modules/Driver_Communication/Src/stspin32g4.c
+        - file: ../Modules/Driver_Communication/Inc/stspin32g4.h
+        - file: ../Modules/Driver_Communication/Src/drv_monitor.c
+        - file: ../Modules/Driver_Communication/Inc/drv_monitor.h
     - group: Modules/Three-Phase Driver
       files:
-        - file: ../Core/Inc/measurement_manager.h
-        - file: ../Core/Src/tim1_pwm.c
-        - file: ../Core/Inc/tim1_pwm.h
-        - file: ../Core/Src/tim1_pwm_verify.c
-        - file: ../Core/Inc/tim1_pwm_verify.h
+        - file: ../Modules/Three_Phase_Driver/Src/tim1_pwm.c
+        - file: ../Modules/Three_Phase_Driver/Inc/tim1_pwm.h
+    - group: Tests
+      files:
+        - file: ../Tests/Src/tim1_pwm_verify.c
+        - file: ../Tests/Inc/tim1_pwm_verify.h
+        - file: ../Tests/Inc/measurement_manager.h
     # Reserved functional groups for upcoming peripherals.
     - group: Modules/Current Sampling
+      files: []
     - group: Modules/Encoder
+      files: []
+    - group: Modules/FOC
+      files:
+        - file: ../FOC/Inc/foc_algorithm.h
+        - file: ../FOC/Src/foc_algorithm.c
+        - file: ../FOC/Inc/foc_interface.h
+        - file: ../FOC/Src/foc_interface.c
     - group: Drivers/STM32G4xx_HAL_Driver
       files:
         - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_pwr_ex.c
