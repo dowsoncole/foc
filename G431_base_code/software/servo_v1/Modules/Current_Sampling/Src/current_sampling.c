@@ -161,10 +161,14 @@ float CurrentSampling_GetCurrentA(current_sampling_phase_t phase)
   uint16_t offset = (phase == CURRENT_SAMPLING_PHASE_V) ?
       g_current_sampling.offset_v : g_current_sampling.offset_u;
 
+  /* raw 和 offset 都是 16 倍过采样后的累加码；零点必须在同一
+     数值空间内相减，不能在这里或校准结果保存时先除以 16。 */
   raw_delta = (int32_t)raw - (int32_t)offset;
   raw_delta *= (phase == CURRENT_SAMPLING_PHASE_V) ?
       (int32_t)g_current_sampling.polarity_v :
       (int32_t)g_current_sampling.polarity_u;
+  /* 只有从“累加码”换算回单次 ADC 等效电压时，物理安培换算才除以
+     oversampling_ratio。S16 FOC 接口不经过这条物理量换算路径。 */
   return ((float)raw_delta * (float)g_current_sampling.vref_mv) /
          ((float)g_current_sampling.oversampling_ratio *
           (float)g_current_sampling.adc_full_scale *
@@ -172,14 +176,52 @@ float CurrentSampling_GetCurrentA(current_sampling_phase_t phase)
           g_current_sampling.opamp_gain);
 }
 
-void CurrentSampling_ReadFeedback(float *phase_u_a, float *phase_v_a)
+static int16_t CurrentSampling_ClampS16(int32_t value)
 {
-  if (phase_u_a != NULL)
+  if (value > 32767)
   {
-    *phase_u_a = CurrentSampling_GetCurrentA(CURRENT_SAMPLING_PHASE_U);
+    return 32767;
   }
-  if (phase_v_a != NULL)
+  if (value < -32768)
   {
-    *phase_v_a = CurrentSampling_GetCurrentA(CURRENT_SAMPLING_PHASE_V);
+    return -32768;
   }
+  return (int16_t)value;
+}
+
+static int32_t CurrentSampling_GetSignedDelta(current_sampling_phase_t phase)
+{
+  int32_t delta = (phase == CURRENT_SAMPLING_PHASE_V) ?
+      (int32_t)g_current_sampling.raw_v - (int32_t)g_current_sampling.offset_v :
+      (int32_t)g_current_sampling.raw_u - (int32_t)g_current_sampling.offset_u;
+  delta *= (phase == CURRENT_SAMPLING_PHASE_V) ?
+      (int32_t)g_current_sampling.polarity_v :
+      (int32_t)g_current_sampling.polarity_u;
+  return delta;
+}
+
+void CurrentSampling_ReadFeedback_s16(int16_t *phase_u_s16,
+                                      int16_t *phase_v_s16,
+                                      int16_t *phase_w_s16)
+{
+  int32_t phase_u = CurrentSampling_GetSignedDelta(CURRENT_SAMPLING_PHASE_U);
+  int32_t phase_v = CurrentSampling_GetSignedDelta(CURRENT_SAMPLING_PHASE_V);
+  int32_t phase_w = -(phase_u + phase_v);
+
+  if (phase_u_s16 != NULL) *phase_u_s16 = CurrentSampling_ClampS16(phase_u);
+  if (phase_v_s16 != NULL) *phase_v_s16 = CurrentSampling_ClampS16(phase_v);
+  if (phase_w_s16 != NULL) *phase_w_s16 = CurrentSampling_ClampS16(phase_w);
+}
+
+void CurrentSampling_ReadFeedback_A(float *phase_u_a,
+                                    float *phase_v_a,
+                                    float *phase_w_a)
+{
+  float phase_u = CurrentSampling_GetCurrentA(CURRENT_SAMPLING_PHASE_U);
+  float phase_v = CurrentSampling_GetCurrentA(CURRENT_SAMPLING_PHASE_V);
+  float phase_w = -(phase_u + phase_v);
+
+  if (phase_u_a != NULL) *phase_u_a = phase_u;
+  if (phase_v_a != NULL) *phase_v_a = phase_v;
+  if (phase_w_a != NULL) *phase_w_a = phase_w;
 }

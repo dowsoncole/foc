@@ -72,24 +72,6 @@ void SystemClock_Config(void);
 foc_controller_t g_foc_controller;
 UART_HandleTypeDef huart1;
 
-static void MX_USART1_RS485_Init(void)
-{
-  huart1.Instance = USART1;
-  huart1.Init.BaudRate = WAVEFORM_RS485_BAUDRATE;
-  huart1.Init.WordLength = UART_WORDLENGTH_8B;
-  huart1.Init.StopBits = UART_STOPBITS_1;
-  huart1.Init.Parity = UART_PARITY_NONE;
-  huart1.Init.Mode = UART_MODE_TX_RX;
-  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
-  huart1.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
-  huart1.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
-  if (HAL_UART_Init(&huart1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-}
-
 static uint8_t MainFoc_IsPowerStageSafe(void *context)
 {
   (void)context;
@@ -103,7 +85,15 @@ static void MainFoc_ReadFeedback(void *context, foc_input_t *input)
   {
     return;
   }
-  CurrentSampling_ReadFeedback(&input->phase_a, &input->phase_b);
+  {
+    int16_t phase_u_s16;
+    int16_t phase_v_s16;
+    int16_t phase_w_s16;
+    CurrentSampling_ReadFeedback_s16(&phase_u_s16, &phase_v_s16,
+                                     &phase_w_s16);
+    input->phase_a = phase_u_s16;
+    input->phase_b = phase_v_s16;
+  }
   /* 当前工程尚未接入编码器；角度和电流给定由上层后续更新。 */
   input->electrical_angle_rad = 0.0f;
   input->d_reference = 0.0f;
@@ -115,7 +105,9 @@ static void MainFoc_WriteVoltage(void *context, const foc_output_t *output)
   (void)context;
   if (output != NULL)
   {
-    (void)Tim1Pwm_SetPhaseVoltage(output->alpha_voltage, output->beta_voltage);
+    (void)Tim1Pwm_SetPhaseVoltage(output->phase_a_duty,
+                                  output->phase_b_duty,
+                                  output->phase_c_duty);
   }
 }
 
@@ -179,7 +171,10 @@ int main(void)
   {
     Error_Handler();
   }
-  MX_USART1_RS485_Init();
+  if (WaveformGenerator_PortInit(&huart1) != HAL_OK)
+  {
+    Error_Handler();
+  }
   if (WaveformGenerator_Init(&huart1) != HAL_OK)
   {
     Error_Handler();

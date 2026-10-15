@@ -45,6 +45,35 @@ static void foc_limit_voltage(float *d_voltage, float *q_voltage, float limit,
   *saturated = 1U;
 }
 
+static float foc_clamp_duty(float duty)
+{
+  return foc_clamp(duty, 0.0f, 1.0f);
+}
+
+/* FOC 数学层：将三相相电压做零序平移，得到对称 PWM 占空比。
+   定时器层只接收 0..1 占空比并完成 CCR 写入。 */
+static void foc_phase_voltage_to_duty(float phase_a,
+                                      float phase_b,
+                                      float phase_c,
+                                      float *duty_a,
+                                      float *duty_b,
+                                      float *duty_c)
+{
+  float maximum = phase_a;
+  float minimum = phase_a;
+  float zero_sequence;
+
+  if (phase_b > maximum) maximum = phase_b;
+  if (phase_c > maximum) maximum = phase_c;
+  if (phase_b < minimum) minimum = phase_b;
+  if (phase_c < minimum) minimum = phase_c;
+
+  zero_sequence = 0.5f - 0.5f * (maximum + minimum);
+  *duty_a = foc_clamp_duty(phase_a + zero_sequence);
+  *duty_b = foc_clamp_duty(phase_b + zero_sequence);
+  *duty_c = foc_clamp_duty(phase_c + zero_sequence);
+}
+
 void FOC_AlgorithmInit(foc_algorithm_t *algorithm,
                        const foc_parameters_t *parameters)
 {
@@ -85,8 +114,9 @@ void FOC_AlgorithmStep(foc_algorithm_t *algorithm,
     return;
   }
 
-  alpha_current = input->phase_a;
-  beta_current = (input->phase_a + (2.0f * input->phase_b)) * 0.5773502692f;
+  alpha_current = (float)input->phase_a;
+  beta_current = ((float)input->phase_a +
+                  (2.0f * (float)input->phase_b)) * 0.5773502692f;
   sin_angle = sinf(input->electrical_angle_rad);
   cos_angle = cosf(input->electrical_angle_rad);
 
@@ -132,4 +162,10 @@ void FOC_AlgorithmStep(foc_algorithm_t *algorithm,
                                       (0.8660254038f * algorithm->output.beta_voltage);
   algorithm->output.phase_c_voltage = (-0.5f * algorithm->output.alpha_voltage) -
                                       (0.8660254038f * algorithm->output.beta_voltage);
+  foc_phase_voltage_to_duty(algorithm->output.phase_a_voltage,
+                            algorithm->output.phase_b_voltage,
+                            algorithm->output.phase_c_voltage,
+                            &algorithm->output.phase_a_duty,
+                            &algorithm->output.phase_b_duty,
+                            &algorithm->output.phase_c_duty);
 }

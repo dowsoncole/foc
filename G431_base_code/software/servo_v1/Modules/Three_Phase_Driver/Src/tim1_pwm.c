@@ -34,6 +34,7 @@
 #include "stm32g4xx_ll_tim.h"
 
 #include <float.h>
+#include <math.h>
 
 /* USER CODE BEGIN 0 */
 
@@ -52,7 +53,7 @@
 static void Tim1Pwm_WriteCompare(uint32_t channel, uint32_t compare);
 static uint32_t Tim1Pwm_NsToCounts(uint32_t nanoseconds);
 static int32_t  Tim1Pwm_FindPhase(uint32_t channel);
-static uint16_t Tim1Pwm_VoltageToDuty(float voltage);
+static uint16_t Tim1Pwm_DutyToScale(float duty);
 
 /* 每一相的指令占空比，与已装载的比较值保持同步，这样 Tim1Pwm_SetNeutral()
    和验证模块都能恢复到一个已知状态，而不必反读定时器。
@@ -135,9 +136,9 @@ static uint32_t Tim1Pwm_NsToCounts(uint32_t nanoseconds)
 }
 
 /* 把已经归一化到 0..1 的相占空比转换成驱动层标度。 */
-static uint16_t Tim1Pwm_VoltageToDuty(float voltage)
+static uint16_t Tim1Pwm_DutyToScale(float duty)
 {
-  float scaled = voltage * (float)TIM1_PWM_DUTY_SCALE;
+  float scaled = duty * (float)TIM1_PWM_DUTY_SCALE;
 
   if (scaled <= 0.0f)
   {
@@ -148,6 +149,30 @@ static uint16_t Tim1Pwm_VoltageToDuty(float voltage)
     return TIM1_PWM_DUTY_SCALE;
   }
   return (uint16_t)(scaled + 0.5f);
+}
+
+HAL_StatusTypeDef Tim1Pwm_SetPhaseVoltage(float phase_a_duty,
+                                          float phase_b_duty,
+                                          float phase_c_duty)
+{
+  if (!isfinite(phase_a_duty) || !isfinite(phase_b_duty) ||
+      !isfinite(phase_c_duty))
+  {
+    return HAL_ERROR;
+  }
+
+  if (Tim1Pwm_SetPhaseDuty(TIM_CHANNEL_1,
+                           Tim1Pwm_DutyToScale(phase_a_duty)) != HAL_OK)
+  {
+    return HAL_ERROR;
+  }
+  if (Tim1Pwm_SetPhaseDuty(TIM_CHANNEL_2,
+                           Tim1Pwm_DutyToScale(phase_b_duty)) != HAL_OK)
+  {
+    return HAL_ERROR;
+  }
+  return Tim1Pwm_SetPhaseDuty(TIM_CHANNEL_3,
+                              Tim1Pwm_DutyToScale(phase_c_duty));
 }
 
 /* USER CODE END 1 */
@@ -341,68 +366,7 @@ HAL_StatusTypeDef Tim1Pwm_SetPhaseDuty(uint32_t channel, uint16_t duty)
   return HAL_OK;
 }
 
-/**
-  * @brief  用零序注入实现三相对称 SVPWM。
-  *
-  * 输入的幅值约定与 FOC 的 alpha_voltage/beta_voltage 一致；这里不再把
-  * MCSDK 的 q31_t、扇区编号或 PWMC_Handle_t 带进工程。三相相量的范围若
-  * 超出 PWM 比较带，则先整体缩放，再注入零序，避免单相独立钳位造成矢量
-  * 方向突变。
-  */
-HAL_StatusTypeDef Tim1Pwm_SetPhaseVoltage(float alpha, float beta)
-{
-  float phase_a;
-  float phase_b;
-  float phase_c;
-  float maximum;
-  float minimum;
-  float span;
-  float scale = 1.0f;
-  float offset;
 
-  /* C 语言中 NaN 与自身不相等；该检查避免 NaN 转整数的未定义行为。 */
-  if ((alpha != alpha) || (beta != beta) ||
-      (alpha > FLT_MAX) || (alpha < -FLT_MAX) ||
-      (beta > FLT_MAX) || (beta < -FLT_MAX))
-  {
-    return HAL_ERROR;
-  }
-
-  phase_a = alpha;
-  phase_b = (-0.5f * alpha) + (0.8660254038f * beta);
-  phase_c = (-0.5f * alpha) - (0.8660254038f * beta);
-
-  maximum = phase_a;
-  minimum = phase_a;
-  if (phase_b > maximum) maximum = phase_b;
-  if (phase_c > maximum) maximum = phase_c;
-  if (phase_b < minimum) minimum = phase_b;
-  if (phase_c < minimum) minimum = phase_c;
-
-  /* 三相 duty 的可用范围是 1.0；保留矢量方向而不是逐相硬钳位。 */
-  span = maximum - minimum;
-  if (span > 1.0f)
-  {
-    scale = 1.0f / span;
-    phase_a *= scale;
-    phase_b *= scale;
-    phase_c *= scale;
-    maximum *= scale;
-    minimum *= scale;
-  }
-
-  /* 零序注入：min duty = 0，max duty = 1。 */
-  offset = -0.5f * (maximum + minimum);
-  phase_a = 0.5f + phase_a + offset;
-  phase_b = 0.5f + phase_b + offset;
-  phase_c = 0.5f + phase_c + offset;
-
-  (void)Tim1Pwm_SetPhaseDuty(TIM_CHANNEL_1, Tim1Pwm_VoltageToDuty(phase_a));
-  (void)Tim1Pwm_SetPhaseDuty(TIM_CHANNEL_2, Tim1Pwm_VoltageToDuty(phase_b));
-  (void)Tim1Pwm_SetPhaseDuty(TIM_CHANNEL_3, Tim1Pwm_VoltageToDuty(phase_c));
-
-  return HAL_OK;
-}
 
 /**
   * @brief  读回某一相最后写入的占空比。

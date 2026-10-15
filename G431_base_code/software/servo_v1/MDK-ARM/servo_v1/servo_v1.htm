@@ -3,7 +3,7 @@
 <title>Static Call Graph - [servo_v1\servo_v1.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image servo_v1\servo_v1.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6240002: Last Updated: Thu Oct 15 17:57:57 2026
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6240002: Last Updated: Thu Oct 15 23:24:16 2026
 <BR><P>
 <H3>Maximum Stack Usage =        280 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -600,8 +600,8 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[62]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[e3]"></a>CurrentSampling_ReadFeedback</STRONG> (Thumb, 220 bytes, Stack size 8 bytes, current_sampling.o(.text.CurrentSampling_ReadFeedback))
-<BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = CurrentSampling_ReadFeedback
+<P><STRONG><a name="[e3]"></a>CurrentSampling_ReadFeedback_s16</STRONG> (Thumb, 84 bytes, Stack size 16 bytes, current_sampling.o(.text.CurrentSampling_ReadFeedback_s16))
+<BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = CurrentSampling_ReadFeedback_s16
 </UL>
 <BR>[Called By]<UL><LI><a href="#[54]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MainFoc_ReadFeedback
 </UL>
@@ -688,7 +688,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[8c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FOC_ControllerStep
 </UL>
 
-<P><STRONG><a name="[88]"></a>FOC_AlgorithmStep</STRONG> (Thumb, 584 bytes, Stack size 48 bytes, foc_algorithm.o(.text.FOC_AlgorithmStep))
+<P><STRONG><a name="[88]"></a>FOC_AlgorithmStep</STRONG> (Thumb, 804 bytes, Stack size 48 bytes, foc_algorithm.o(.text.FOC_AlgorithmStep))
 <BR><BR>[Stack]<UL><LI>Max Depth = 84 + Unknown Stack Size
 <LI>Call Chain = FOC_AlgorithmStep &rArr; __hardfp_sinf &rArr; __mathlib_rredf2
 </UL>
@@ -1509,7 +1509,7 @@ Global Symbols
 <LI><a href="#[56]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MainFoc_DisableOutput
 </UL>
 
-<P><STRONG><a name="[e4]"></a>Tim1Pwm_SetPhaseVoltage</STRONG> (Thumb, 508 bytes, Stack size 16 bytes, tim1_pwm.o(.text.Tim1Pwm_SetPhaseVoltage))
+<P><STRONG><a name="[e4]"></a>Tim1Pwm_SetPhaseVoltage</STRONG> (Thumb, 304 bytes, Stack size 16 bytes, tim1_pwm.o(.text.Tim1Pwm_SetPhaseVoltage))
 <BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = Tim1Pwm_SetPhaseVoltage
 </UL>
 <BR>[Called By]<UL><LI><a href="#[55]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MainFoc_WriteVoltage
@@ -1687,10 +1687,10 @@ Local Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> main.o(.text.main)
 </UL>
-<P><STRONG><a name="[54]"></a>MainFoc_ReadFeedback</STRONG> (Thumb, 34 bytes, Stack size 8 bytes, main.o(.text.MainFoc_ReadFeedback))
-<BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = MainFoc_ReadFeedback &rArr; CurrentSampling_ReadFeedback
+<P><STRONG><a name="[54]"></a>MainFoc_ReadFeedback</STRONG> (Thumb, 54 bytes, Stack size 16 bytes, main.o(.text.MainFoc_ReadFeedback))
+<BR><BR>[Stack]<UL><LI>Max Depth = 32<LI>Call Chain = MainFoc_ReadFeedback &rArr; CurrentSampling_ReadFeedback_s16
 </UL>
-<BR>[Calls]<UL><LI><a href="#[e3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CurrentSampling_ReadFeedback
+<BR>[Calls]<UL><LI><a href="#[e3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CurrentSampling_ReadFeedback_s16
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> main.o(.text.main)
 </UL>

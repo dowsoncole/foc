@@ -75,7 +75,7 @@ void FOC_ControllerStop(foc_controller_t *controller)
 }
 
 /**
-  * @brief  单次电流环迭代。必须由 20 kHz 的 TIM1_CC 中断调用（ADC 采样完成后），
+  * @brief  单次电流环迭代。必须由 20 kHz 的 ADC 注入序列完成回调调用，
   *         不能放在主循环——主循环没有确定性周期，电流环会失效。
   *
   *         安全门：每一步都先问 port.is_power_stage_safe()。该回调应绑定到

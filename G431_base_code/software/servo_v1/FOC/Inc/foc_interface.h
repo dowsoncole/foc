@@ -14,11 +14,11 @@
      is_power_stage_safe : 绑定 DrvMonitor_IsPowerStageSafeFast()。
                            必须只读引脚、绝不走 I2C，因为它会在 20 kHz
                            电流环里被调用，执行时间必须恒定。
-     read_feedback       : 填 phase_a / phase_b（两相电流，第三相由
+     read_feedback       : 填 phase_a / phase_b（标定 S16 两相电流，第三相由
                            ia+ib+ic=0 推出）、electrical_angle_rad（编码器
                            机械角 × 极对数）、d_reference / q_reference。
-     write_voltage       : 把 foc_output_t 的电压换算成占空比后写入
-                           Tim1Pwm_SetPhaseDuty()。
+     write_voltage       : 把 foc_output_t 已计算好的三相占空比交给
+                           定时器层，最终写入 Tim1 的 CCR。
      disable_output      : 绑定 Tim1Pwm_EmergencyStop()，用于安全关断。 */
 typedef struct
 {
@@ -60,7 +60,7 @@ void FOC_ControllerStart(foc_controller_t *controller);
 /* 停止：清运行标志、复位积分器，并把零电压与安全关断下发到硬件。 */
 void FOC_ControllerStop(foc_controller_t *controller);
 
-/* 单次电流环迭代。必须由 20 kHz 的 TIM1_CC 中断调用（ADC 采样完成后），
+/* 单次电流环迭代。必须由 20 kHz 的 ADC 注入序列完成回调调用，
    不能放主循环——主循环没有确定性周期，电流环会失效。
    每步先问 is_power_stage_safe()，一旦不安全立即停环并关断输出。 */
 void FOC_ControllerStep(foc_controller_t *controller);

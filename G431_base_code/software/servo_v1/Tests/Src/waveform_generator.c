@@ -13,6 +13,27 @@ static volatile uint32_t s_source_count;
 static uint16_t s_phase_index;
 static uint8_t s_frame_sequence;
 
+HAL_StatusTypeDef WaveformGenerator_PortInit(UART_HandleTypeDef *huart)
+{
+  if (huart == NULL)
+  {
+    return HAL_ERROR;
+  }
+
+  huart->Instance = USART1;
+  huart->Init.BaudRate = WAVEFORM_RS485_BAUDRATE;
+  huart->Init.WordLength = UART_WORDLENGTH_8B;
+  huart->Init.StopBits = UART_STOPBITS_1;
+  huart->Init.Parity = UART_PARITY_NONE;
+  huart->Init.Mode = UART_MODE_TX_RX;
+  huart->Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart->Init.OverSampling = UART_OVERSAMPLING_16;
+  huart->Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+  huart->AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+
+  return (HAL_UART_Init(huart) == HAL_OK) ? HAL_OK : HAL_ERROR;
+}
+
 static uint8_t WaveformGenerator_Crc8(const uint8_t *data, uint32_t length)
 {
   uint8_t crc = 0U;

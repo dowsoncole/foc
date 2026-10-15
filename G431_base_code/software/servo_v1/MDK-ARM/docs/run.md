@@ -75,8 +75,9 @@ TIM1 计数器、比较通道和 CC4 触发会先运行，但 MOE 未置位前�
 2. JDR1 作为 U 相电流，JDR2 作为 V 相电流；
 3. 回调 `MainFoc_OnAdcConversion()`，进入 `FOC_ControllerStep()`；
 4. 先用 `DrvMonitor_IsPowerStageSafeFast()` 快速检查 READY/nFAULT 引脚；
-5. 读取电流反馈，执行 d/q PI 和电压限幅；
-6. `MainFoc_WriteVoltage()` 调用 `Tim1Pwm_SetPhaseVoltage(alpha, beta)`，更新三相 PWM 比较值。
+5. 通过 `CurrentSampling_ReadFeedback_s16()` 读取已扣零点、已修正方向的 U/V/W 三相 S16 电流（FOC 当前使用 U/V）；
+6. 执行 d/q PI 和电压限幅；
+7. FOC 算法先完成三相电压到三相占空比的 SPWM/SVPWM 计算；`MainFoc_WriteVoltage()` 再通过 `Tim1Pwm_SetPhaseVoltage(phase_a_duty, phase_b_duty, phase_c_duty)` 把占空比转换为 CCR 并更新三相 PWM 比较值。
 
 FOC 参数当前为：采样/电流环周期 20 kHz，电压限幅 0.95，电流限幅 10 A，d/q PI 的 `Kp=0.1`、`Ki=5.0`。
 
@@ -87,11 +88,11 @@ FOC 参数当前为：采样/电流环周期 20 kHz，电压限幅 0.95，电流
 - `q_reference=0`；
 - 没有编码器或位置环输入。
 
-所以现阶段 FOC 只具备“根据两相电流反馈调节电压”的框架，不能据此认为电机已经实现了闭环定位或正常转速控制。
+所以现阶段 FOC 只具备“根据标定 S16 两相电流反馈调节电压”的框架，不能据此认为电机已经实现了闭环定位或正常转速控制。
 
 ### 3.3 PWM 比较值与实际输出
 
-FOC 运行期间，`Tim1Pwm_SetPhaseVoltage()` 仍会更新 CH1/CH2/CH3 比较寄存器。这些寄存器值可用于调试算法输出，但由于 MOE 始终清零，不会转换为实际的栅极波形。
+FOC 运行期间，`foc_algorithm.c` 先计算三相电压和归一化占空比，`Tim1Pwm_SetPhaseVoltage()` 只负责把占空比转换为 CH1/CH2/CH3 比较寄存器值。由于 MOE 始终清零，这些比较值不会转换为实际的栅极波形。
 
 ## 4. 电流采样和零点校准
 

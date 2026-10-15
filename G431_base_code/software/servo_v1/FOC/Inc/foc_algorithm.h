@@ -25,8 +25,8 @@ typedef struct
 
 typedef struct
 {
-  float phase_a;
-  float phase_b;
+  int16_t phase_a;
+  int16_t phase_b;
   float electrical_angle_rad;
   float d_reference;
   float q_reference;
@@ -44,6 +44,9 @@ typedef struct
   float phase_a_voltage;
   float phase_b_voltage;
   float phase_c_voltage;
+  float phase_a_duty;
+  float phase_b_duty;
+  float phase_c_duty;
   uint8_t saturated;
 } foc_output_t;
 

@@ -13,6 +13,9 @@ extern "C" {
 #define WAVEFORM_SOURCE_RATE_HZ       20000U
 #define WAVEFORM_DECIMATION           (WAVEFORM_SOURCE_RATE_HZ / WAVEFORM_SAMPLE_RATE_HZ)
 
+/* 配置并初始化测试波形使用的 USART1/RS485 外设。 */
+HAL_StatusTypeDef WaveformGenerator_PortInit(UART_HandleTypeDef *huart);
+
 HAL_StatusTypeDef WaveformGenerator_Init(UART_HandleTypeDef *huart);
 
 /* Call once for every current-loop sample (ISR-safe, no peripheral access). */

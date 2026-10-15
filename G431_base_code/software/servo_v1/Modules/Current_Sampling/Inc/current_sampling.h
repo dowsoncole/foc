@@ -33,6 +33,7 @@ typedef enum
 
 typedef struct
 {
+  /* 配置参数：初始化后由应用/板级配置设定，运行过程中通常不变。 */
   uint32_t shunt_resistor_uohm;
   float    opamp_gain;
   uint32_t vref_mv;
@@ -46,6 +47,7 @@ typedef struct
   int8_t polarity_u;
   int8_t polarity_v;
 
+  /* 运行参数：由 ADC 中断和校准状态机实时更新。 */
   volatile uint16_t raw_u;
   volatile uint16_t raw_v;
   volatile uint32_t sample_sequence;
@@ -69,14 +71,21 @@ void CurrentSampling_Service(void);
 
 current_sampling_cal_state_t CurrentSampling_GetCalibrationState(void);
 
-/** 返回 16 倍过采样后的原始累加值，范围 0..65535。 */
+/** 返回指定相的 16 倍过采样原始累加值，范围约 0..65520。 */
 uint16_t CurrentSampling_GetRaw(current_sampling_phase_t phase);
 
 /** 返回减去零点后的实际电流，单位 A。 */
 float CurrentSampling_GetCurrentA(current_sampling_phase_t phase);
 
-/** 给 FOC 端口层使用的两相反馈读取接口。 */
-void CurrentSampling_ReadFeedback(float *phase_u_a, float *phase_v_a);
+/** 给 FOC 使用的三相标定 S16 电流反馈，范围 -32768..32767。 */
+void CurrentSampling_ReadFeedback_s16(int16_t *phase_u_s16,
+                                      int16_t *phase_v_s16,
+                                      int16_t *phase_w_s16);
+
+/** 给需要物理量的上层使用的三相电流反馈，单位 A。 */
+void CurrentSampling_ReadFeedback_A(float *phase_u_a,
+                                    float *phase_v_a,
+                                    float *phase_w_a);
 
 /** 注册 ADC 注入序列完成后的实时回调。回调运行在 ADC1_2_IRQHandler 中。 */
 void CurrentSampling_SetConversionCallback(
