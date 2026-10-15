@@ -152,19 +152,13 @@ int main(void)
    * （PA2 = ADC1_IN3，PB1 = ADC1_IN12），运放没起来时那两个节点上没有有效
    * 信号，先校准 ADC 只会把噪声当成基线记下来。
    *
-   * MX_ADC1_Init() 传入 software_trigger_flag = 1，即注入组由软件触发、
-   * 不挂 TIM1_CH4。这是刻意的：本固件当前运行的是模块 D 的栅极验证波形，
-   * 此时 TIM1_CH4 已经以 20 kHz 在跑，若让注入组跟随它触发，每个载波周期
-   * 都会多做一轮 11.43 µs 的过采样转换（时序余量问题见 README「待核对项」
-   * I），而目前还没有任何消费者去读这些数据。
+   * ADC 使用 TIM1_CH4 硬件触发。MX_ADC1_Init() 只配置和校准，
+   * CurrentSampling_Start() 负责按“运放先启动、ADC 后启动”的顺序接通信号链。
+   * ADC 运行时不需要在 TIM1_CC ISR 里手工发起转换；CC4 的 OC4REF 会自动触发
+   * 注入序列，JDR1/JDR2 由硬件更新。
    *
-   * 配置只把硬件准备好，不接通信号通路：这里不启动运放、不启动注入转换。
-   * 启动属于未来的业务层，且必须在 DrvMonitor_GetState() == DRV_STATE_READY
-   * 且 TIM1->BDTR 的 MOE 仍置位时才允许。
-   *
-   * 电流环真正上线时，把下面这一次调用换成 software_trigger_flag = 0
-   * （由 ADC_EXTERNALTRIGINJEC_T1_CC4 触发），并先做一轮零电流偏置标定，
-   * 结果写入 ia_offsets / ib_offsets。 */
+   * 零电流偏置标定和 JDR 到安培的换算仍属于业务层，接入 FOC 前还需按 README
+   * 待核对项确认采样序列时序以及两路通道的实际相别。 */
   if (MX_OPAMP1_Init() != HAL_OK)
   {
     Error_Handler();
@@ -173,7 +167,12 @@ int main(void)
   {
     Error_Handler();
   }
-  if (MX_ADC1_Init(1U) != HAL_OK)
+  if (MX_ADC1_Init(0U) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  if (CurrentSampling_Start() != HAL_OK)
   {
     Error_Handler();
   }

@@ -101,8 +101,8 @@ extern volatile uint32_t ib_offsets;
   * 同相与反相输入都选 IO0（PA1 / PA3），增益完全由外部电阻网络决定，
   * 运放本身不引入内部增益。不使用定时器控制的 Mux 切换，采用出厂 trimming。
   *
-  * 只初始化外设，不启动运放。启动由 MX_ADC1_Init() 之后的显式步骤完成，
-  * 保持「配置只把硬件准备好，不接通信号通路」的分界。
+   * 只初始化外设，不启动运放。启动由 CurrentSampling_Start() 完成，
+   * 保持配置与信号链启动的分界。
   *
   * 引脚的模拟模式配置实现在 MSP 层（Core/Src/stm32g4xx_hal_msp.c 的
   * HAL_OPAMP_MspInit），由 HAL_OPAMP_Init() 自动回调。
@@ -151,10 +151,22 @@ HAL_StatusTypeDef MX_OPAMP3_Init(void);
   *         此时 TIM1_CH4 的触发被摘除，标定不受 PWM 时序干扰）；
   *         0 = 由 ADC_EXTERNALTRIGINJEC_T1_CC4 上升沿触发（运行时的电流环）。
   * @retval HAL_OK；任一步 HAL 调用失败时返回 HAL_ERROR。
-  * @note   本函数只配置与校准，不启动注入转换。启动是独立的显式步骤，
-  *         由未来的业务层在确认功率级安全后调用。
+   * @note   本函数只配置与校准，不启动注入转换。启动由
+   *         CurrentSampling_Start() 独立完成。
   */
 HAL_StatusTypeDef MX_ADC1_Init(uint8_t software_trigger_flag);
+
+/**
+  * @brief  启动两路电流采样信号链。
+  *
+  * 先启动 OPAMP1/OPAMP3，再使能 ADC1 注入组。若 ADC 初始化时选择了
+  * TIM1_CH4 外部触发，本函数只负责把 ADC 置于可接受外部触发的状态；
+  * 后续转换由 TIM1_CH4 自动启动。若选择软件触发，则本函数启动一次
+  * 注入序列。
+  *
+  * @retval HAL_OK；任一步启动失败时返回 HAL_ERROR。
+  */
+HAL_StatusTypeDef CurrentSampling_Start(void);
 
 #ifdef __cplusplus
 }

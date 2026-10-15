@@ -232,6 +232,35 @@ HAL_StatusTypeDef MX_ADC1_Init(uint8_t software_trigger_flag)
   return HAL_OK;
 }
 
+/**
+  * @brief  启动电流采样信号链。
+  *
+  * MX_*_Init() 只完成配置和 ADC 校准；校准结束后 ADC 仍处于停止状态，
+  * OPAMP 也尚未使能。把启动集中在本模块，避免 main 或实时中断直接操作
+  * 外设寄存器，也保证运放先于 ADC 建立模拟信号。
+  */
+HAL_StatusTypeDef CurrentSampling_Start(void)
+{
+  if (HAL_OPAMP_Start(&hopamp1) != HAL_OK)
+  {
+    return HAL_ERROR;
+  }
+
+  if (HAL_OPAMP_Start(&hopamp3) != HAL_OK)
+  {
+    return HAL_ERROR;
+  }
+
+  /* 外部触发模式下，该调用只负责使能 ADC 并武装注入触发器；
+     软件触发模式下，HAL 会同时启动一次注入序列。 */
+  if (HAL_ADCEx_InjectedStart(&hadc1) != HAL_OK)
+  {
+    return HAL_ERROR;
+  }
+
+  return HAL_OK;
+}
+
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */
