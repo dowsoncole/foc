@@ -27,6 +27,7 @@
 #include "tim1_pwm.h"
 #include "tim1_pwm_verify.h"
 #include "measurement_manager.h"
+#include "adc1_current_sampling.h"
 #include "stspin32g4.h"
 #include "drv_monitor.h"
 
@@ -144,7 +145,40 @@ int main(void)
     (void)Tim1PwmVerify_Start(&g_measurement_manager);
   }
 
-  /* TODO: MX_ADC1_Init() + 电流环。功率级只能在
+  /* ------------------------------------------------------------------------
+   * 电流采样外设配置（模块 F：Modules/Current_Sampling/）
+   * ------------------------------------------------------------------------
+   * 顺序有意义：两个运放必须先于 ADC 配好。ADC1 采的是运放输出脚
+   * （PA2 = ADC1_IN3，PB1 = ADC1_IN12），运放没起来时那两个节点上没有有效
+   * 信号，先校准 ADC 只会把噪声当成基线记下来。
+   *
+   * MX_ADC1_Init() 传入 software_trigger_flag = 1，即注入组由软件触发、
+   * 不挂 TIM1_CH4。这是刻意的：本固件当前运行的是模块 D 的栅极验证波形，
+   * 此时 TIM1_CH4 已经以 20 kHz 在跑，若让注入组跟随它触发，每个载波周期
+   * 都会多做一轮 11.43 µs 的过采样转换（时序余量问题见 README「待核对项」
+   * I），而目前还没有任何消费者去读这些数据。
+   *
+   * 配置只把硬件准备好，不接通信号通路：这里不启动运放、不启动注入转换。
+   * 启动属于未来的业务层，且必须在 DrvMonitor_GetState() == DRV_STATE_READY
+   * 且 TIM1->BDTR 的 MOE 仍置位时才允许。
+   *
+   * 电流环真正上线时，把下面这一次调用换成 software_trigger_flag = 0
+   * （由 ADC_EXTERNALTRIGINJEC_T1_CC4 触发），并先做一轮零电流偏置标定，
+   * 结果写入 ia_offsets / ib_offsets。 */
+  if (MX_OPAMP1_Init() != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (MX_OPAMP3_Init() != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (MX_ADC1_Init(1U) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /* TODO: 电流环。功率级只能在
    * DrvMonitor_GetState() == DRV_STATE_READY 且 TIM1->BDTR 的 MOE 仍置位时
    * 才允许使能。 */
 

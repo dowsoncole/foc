@@ -1,4 +1,4 @@
-/* USER CODE BEGIN Header */
+﻿/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file         stm32g4xx_hal_msp.c
@@ -22,6 +22,7 @@
 #include "i2c3_bus.h"
 /* USER CODE BEGIN Includes */
 #include "tim1_pwm.h"
+#include "adc1_current_sampling.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -187,6 +188,94 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim)
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
     GPIO_InitStruct.Alternate = GPIO_AF2_TIM1;
     HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+  }
+}
+
+
+/**
+  * @brief  OPAMP GPIO configuration for the phase-current amplifiers.
+  *         OPAMP1: PA1 (VINP0) / PA3 (VINM0) / PA2 (OUT)   -> U phase
+  *         OPAMP3: PB0 (VINP0) / PB2 (VINM0) / PB1 (OUT)   -> W phase
+  *
+  *         All six pins must sit in analog mode. PB2 doubles as BOOT1, so it
+  *         has to be configured explicitly or the leftover boot-mode setting
+  *         will disturb the inverting input.
+  *
+  *         PA2 and PB1 are also the ADC1_IN3 / ADC1_IN12 inputs: the amplifier
+  *         outputs come back through the external pins (not the internal
+  *         VOPAMP channels) because the schematic hangs a post-stage RC
+  *         network on those nodes.
+  *
+  *         The STM32G4 OPAMPs have no dedicated RCC gate, so only the GPIO
+  *         clocks are enabled here; the amplifier itself is turned on through
+  *         its own CSR enable bit inside HAL_OPAMP_Init().
+  */
+void HAL_OPAMP_MspInit(OPAMP_HandleTypeDef *hopamp)
+{
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+  if (hopamp->Instance == OPAMP1)
+  {
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+
+    /**OPAMP1 GPIO Configuration
+    PA1     ------> OPAMP1_VINP
+    PA2     ------> OPAMP1_VOUT
+    PA3     ------> OPAMP1_VINM
+    */
+    GPIO_InitStruct.Pin = GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3;
+    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  }
+  else if (hopamp->Instance == OPAMP3)
+  {
+    __HAL_RCC_GPIOB_CLK_ENABLE();
+
+    /**OPAMP3 GPIO Configuration
+    PB0     ------> OPAMP3_VINP
+    PB1     ------> OPAMP3_VOUT
+    PB2     ------> OPAMP3_VINM
+    */
+    GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2;
+    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+  }
+}
+
+void HAL_OPAMP_MspDeInit(OPAMP_HandleTypeDef *hopamp)
+{
+  if (hopamp->Instance == OPAMP1)
+  {
+    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3);
+  }
+  else if (hopamp->Instance == OPAMP3)
+  {
+    HAL_GPIO_DeInit(GPIOB, GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2);
+  }
+}
+
+/**
+  * @brief  ADC1 clock enable for the injected current-sampling group.
+  *
+  *         No ADC interrupt is configured here on purpose: the injected group
+  *         is consumed inside the TIM1_CC ISR that tim1_pwm.c already owns
+  *         (priority 0), so a second vector would only add latency.
+  */
+void HAL_ADC_MspInit(ADC_HandleTypeDef *hadc)
+{
+  if (hadc->Instance == ADC1)
+  {
+    __HAL_RCC_ADC12_CLK_ENABLE();
+  }
+}
+
+void HAL_ADC_MspDeInit(ADC_HandleTypeDef *hadc)
+{
+  if (hadc->Instance == ADC1)
+  {
+    __HAL_RCC_ADC12_CLK_DISABLE();
   }
 }
 

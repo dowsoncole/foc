@@ -160,6 +160,24 @@ void     HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 HAL_StatusTypeDef Tim1Pwm_SetPhaseDuty(uint32_t channel, uint16_t duty);
 
 /**
+  * @brief  根据归一化 α/β 电压矢量更新三相 PWM（对称 SVPWM）。
+  *
+  *         alpha/beta 使用无量纲标度：电压矢量的三个相量由
+  *         [alpha, -0.5*alpha + sqrt(3)/2*beta,
+  *          -0.5*alpha - sqrt(3)/2*beta] 构成。函数用零序分量把三相
+  *         指令平移到 0..1000，并在必要时等比例缩放，保证比较值始终
+  *         落在有效的 PWM 比较带内。
+  *
+  *         这是 TIM1 驱动层的实时安全入口：只写三个比较寄存器，不访问
+  *         I2C/GPIO，不改变 MOE，也不依赖 MCSDK 的 PWMC_Handle_t。
+  *         FOC 层应通过 foc_port_t.write_voltage 调用它。
+  * @param  alpha  归一化 α 轴电压指令
+  * @param  beta   归一化 β 轴电压指令
+  * @retval HAL_OK；输入为 NaN/无穷值时返回 HAL_ERROR 且不更新输出
+  */
+HAL_StatusTypeDef Tim1Pwm_SetPhaseVoltage(float alpha, float beta);
+
+/**
   * @brief  【业务线】读回某一相最后写入的占空比。
   * @retval 0..TIM1_PWM_DUTY_SCALE 内的占空比；channel 非法时返回 0。
   */

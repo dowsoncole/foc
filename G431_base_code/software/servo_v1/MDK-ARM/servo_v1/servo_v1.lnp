@@ -9,6 +9,7 @@
 "servo_v1\stspin32g4.o"
 "servo_v1\drv_monitor.o"
 "servo_v1\tim1_pwm.o"
+"servo_v1\adc1_current_sampling.o"
 "servo_v1\foc_algorithm.o"
 "servo_v1\foc_interface.o"
 "servo_v1\tim1_pwm_verify.o"
@@ -29,6 +30,10 @@
 "servo_v1\stm32g4xx_hal_i2c_ex.o"
 "servo_v1\stm32g4xx_hal_tim.o"
 "servo_v1\stm32g4xx_hal_tim_ex.o"
+"servo_v1\stm32g4xx_hal_adc.o"
+"servo_v1\stm32g4xx_hal_adc_ex.o"
+"servo_v1\stm32g4xx_hal_opamp.o"
+"servo_v1\stm32g4xx_hal_opamp_ex.o"
 "servo_v1\system_stm32g4xx.o"
 --strict --scatter "servo_v1\servo_v1.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols

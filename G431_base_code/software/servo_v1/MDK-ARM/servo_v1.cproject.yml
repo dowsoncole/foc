@@ -13,6 +13,7 @@ project:
         - ../FOC/Inc
         - ../Modules/Driver_Communication/Inc
         - ../Modules/Three_Phase_Driver/Inc
+        - ../Modules/Current_Sampling/Inc
         - ../Tests/Inc
         - ../Drivers/STM32G4xx_HAL_Driver/Inc
         - ../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy
@@ -98,9 +99,11 @@ project:
         - file: ../Tests/Src/tim1_pwm_verify.c
         - file: ../Tests/Inc/tim1_pwm_verify.h
         - file: ../Tests/Inc/measurement_manager.h
-    # Reserved functional groups for upcoming peripherals.
     - group: Modules/Current Sampling
-      files: []
+      files:
+        - file: ../Modules/Current_Sampling/Src/adc1_current_sampling.c
+        - file: ../Modules/Current_Sampling/Inc/adc1_current_sampling.h
+    # Reserved functional groups for upcoming peripherals.
     - group: Modules/Encoder
       files: []
     - group: Modules/FOC
@@ -128,6 +131,10 @@ project:
         - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_i2c_ex.c
         - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_tim.c
         - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_tim_ex.c
+        - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_adc.c
+        - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_adc_ex.c
+        - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_opamp.c
+        - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_opamp_ex.c
     - group: Drivers/CMSIS
       files:
         - file: ../Core/Src/system_stm32g4xx.c
