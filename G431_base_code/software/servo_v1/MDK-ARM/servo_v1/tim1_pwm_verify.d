@@ -28,7 +28,13 @@ servo_v1/tim1_pwm_verify.o: ..\Tests\Src\tim1_pwm_verify.c \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_opamp_ex.h \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_pwr.h \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_pwr_ex.h \
+  ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_spi.h \
+  ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_spi_ex.h \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_tim.h \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_tim_ex.h \
+  ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_uart.h \
+  ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_uart_ex.h \
+  ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_usart.h \
+  ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_usart_ex.h \
   ..\Tests\Inc\measurement_manager.h \
   ..\Modules\Three_Phase_Driver\Inc\tim1_pwm.h

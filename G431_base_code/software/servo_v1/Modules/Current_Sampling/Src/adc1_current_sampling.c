@@ -30,12 +30,13 @@ HAL_StatusTypeDef MX_OPAMP1_Init(void)
 
   /* USER CODE END OPAMP1_Init 0 */
 
-  /* 独立跟随模式：同相输入 IO0 = PA1，反相输入 IO0 = PA3。
-     增益由原理图上的外部电阻网络决定，运放不引入内部增益。
-     InternalOutput = DISABLE：输出经 PA2 引脚外发再回到 ADC1_IN3。
-     ADC1 上确实有 OPAMP1 的内部通道（ADC_CHANNEL_VOPAMP1 = IN13），但原理图
-     在 PA2 节点上挂了后级 RC 网络，走内部通道会绕过它，采到的就不是滤波后
-     的信号，所以取外部路径。 */
+  /* U 相电流放大。
+     独立（STANDALONE）模式：同相输入 IO0 = PA1，反相输入 IO0 = PA3。
+     两个输入都走外部引脚，所以增益完全由板级外部电阻网络决定，运放本身
+     不引入内部增益（内部增益只在 PGA 模式下才有）。
+     InternalOutput = DISABLE：输出经 PA2 引脚外发，再由 ADC1_IN3 采样。
+     ADC1 上其实有 OPAMP1 的内部通道（ADC_CHANNEL_VOPAMP1 = IN13），但参考
+     配置取的是外部路径，本文件与之一致。 */
   hopamp1.Instance = OPAMP1;
   hopamp1.Init.PowerMode = OPAMP_POWERMODE_NORMALSPEED;
   hopamp1.Init.Mode = OPAMP_STANDALONE_MODE;
@@ -63,9 +64,12 @@ HAL_StatusTypeDef MX_OPAMP3_Init(void)
 
   /* USER CODE END OPAMP3_Init 0 */
 
-  /* 独立跟随模式：同相输入 IO0 = PB0，反相输入 IO0 = PB2，输出 PB1。
+  /* V 相电流放大。
+     独立跟随模式：同相输入 IO0 = PB0，反相输入 IO0 = PB2，输出 PB1。
      ⚠ PB2 兼作 BOOT1：必须显式配为模拟模式，否则残留的启动模式配置
      会干扰运放输入。该配置由 MSP 层的 HAL_OPAMP_MspInit() 完成。
+     这会改变 PB2 的 BOOT1 行为——本工程从 Flash 启动、经 SWD 下载，不依赖
+     PB2 电平。
      InternalOutput = DISABLE 在这里不是可选项而是必须：VOPAMP3 只挂在
      ADC2_IN18 / ADC3_IN13，ADC1 上没有 OPAMP3 的内部通道，只能经 PB1
      = ADC1_IN12 外部采样。 */
@@ -90,7 +94,7 @@ HAL_StatusTypeDef MX_OPAMP3_Init(void)
 }
 
 /**
-  * @brief  配置 ADC1 注入组两个通道（rank 1 = 通道 3 / PA2，rank 2 = 通道 12 / PB1），
+  * @brief  配置 ADC1 注入组两个通道（rank 1 = 通道 3 / PA2 / U 相，rank 2 = 通道 12 / PB1 / V 相），
   *         16 倍过采样，随后执行一次上电自校准。
   *
   * 时钟换算：ADC12 内核时钟 168 MHz，ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4
@@ -98,9 +102,8 @@ HAL_StatusTypeDef MX_OPAMP3_Init(void)
   *   单次转换 = 采样 2.5 cycles + 12 位逐次逼近 12.5 cycles = 15 cycles
   *   -> 357 ns；过采样 16 倍 -> 5.71 µs / 通道，两通道序列 11.43 µs。
   *
-  * ⚠ 采样时间 2.5 cycles 是全表最短档，且过采样会把单通道耗时放大 16 倍，
-  *   两个通道合计 11.43 µs，已明显超过 TIM1_CH4 相对更新事件 1 µs 的提前量。
-  *   时序余量需要实测确认，见 README「待核对项」I。
+  * 触发时序：TIM1_CH4 的提前量取本序列耗时的一半（5.714 µs），使序列正好以
+  *   更新事件为中心——T - 5.71 µs 触发、T + 5.71 µs 结束。详见 README 9.3。
   */
 HAL_StatusTypeDef MX_ADC1_Init(uint8_t software_trigger_flag)
 {
@@ -183,8 +186,9 @@ HAL_StatusTypeDef MX_ADC1_Init(uint8_t software_trigger_flag)
   /* 关闭注入上下文队列：每个 TIM1_CH4 触发点都重新开跑固定的两通道序列，
      适合 20 kHz 的等间隔触发。 */
   sConfigInjected.QueueInjectedContext = DISABLE;
-  /* 2.5 cycles 是采样时间最短档。运放输出阻抗低、且外部已挂 RC 网络，
-     短采样时间足够；过采样 16 倍本身也提供了额外的噪声平均。 */
+  /* 2.5 cycles 是采样时间最短档。驱动源是片内运放输出，源阻抗低，短采样
+     时间足够；过采样 16 倍本身也提供了额外的噪声平均。
+     ⚠ 提前量取序列耗时的一半，见 TIM1_PWM_ADC_TRIGGER_LEAD_NS。 */
   sConfigInjected.InjectedSamplingTime = ADC_SAMPLETIME_2CYCLES_5;
 
   /* 软件触发用于上电偏置标定：此时 TIM1_CH4 的触发被摘除，标定不受 PWM
@@ -206,8 +210,7 @@ HAL_StatusTypeDef MX_ADC1_Init(uint8_t software_trigger_flag)
   sConfigInjected.InjecOversamplingMode = ENABLE;
   sConfigInjected.InjecOversampling = oversampleConfig;
 
-  /* rank 1：ADC_CHANNEL_3 = PA2 = OPAMP1 输出。
-     ⚠ 对应哪一相尚未确认，见头文件说明与 README 待核对项 J。 */
+  /* rank 1：ADC_CHANNEL_3 = PA2 = OPAMP1 输出 = U 相 = foc_input_t.phase_a。 */
   sConfigInjected.InjectedRank = ADC_INJECTED_RANK_1;
   sConfigInjected.InjectedChannel = ADC_CHANNEL_3;
 
@@ -216,8 +219,8 @@ HAL_StatusTypeDef MX_ADC1_Init(uint8_t software_trigger_flag)
     return HAL_ERROR;
   }
 
-  /* rank 2：ADC_CHANNEL_12 = PB1 = OPAMP3 输出。
-     ⚠ 对应哪一相尚未确认，见头文件说明与 README 待核对项 J。 */
+  /* rank 2：ADC_CHANNEL_12 = PB1 = OPAMP3 输出 = V 相 = foc_input_t.phase_b。
+     W 相不采样，由 -(ia + ib) 推出。 */
   sConfigInjected.InjectedRank = ADC_INJECTED_RANK_2;
   sConfigInjected.InjectedChannel = ADC_CHANNEL_12;
 
@@ -253,7 +256,9 @@ HAL_StatusTypeDef CurrentSampling_Start(void)
 
   /* 外部触发模式下，该调用只负责使能 ADC 并武装注入触发器；
      软件触发模式下，HAL 会同时启动一次注入序列。 */
-  if (HAL_ADCEx_InjectedStart(&hadc1) != HAL_OK)
+  /* JEOS 中断在每个 TIM1_CH4 触发的完整注入序列结束时产生；FOC 调度
+     放在该中断回调中，确保使用的是本周期刚完成的两相电流。 */
+  if (HAL_ADCEx_InjectedStart_IT(&hadc1) != HAL_OK)
   {
     return HAL_ERROR;
   }

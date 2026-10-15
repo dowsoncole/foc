@@ -14,6 +14,7 @@ project:
         - ../Modules/Driver_Communication/Inc
         - ../Modules/Three_Phase_Driver/Inc
         - ../Modules/Current_Sampling/Inc
+        - ../Modules/Encoder/Inc
         - ../Tests/Inc
         - ../Drivers/STM32G4xx_HAL_Driver/Inc
         - ../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy
@@ -79,7 +80,6 @@ project:
         - file: ../Core/Inc/stm32g4xx_it.h
         - file: ../Core/Src/stm32g4xx_hal_msp.c
         - file: ../Core/Inc/stm32g4xx_hal_conf.h
-        - file: ../Core/Src/readme.md
     - group: Modules/Driver Communication
       files:
         - file: ../Modules/Driver_Communication/Src/i2c3_bus.c
@@ -94,18 +94,27 @@ project:
       files:
         - file: ../Modules/Three_Phase_Driver/Src/tim1_pwm.c
         - file: ../Modules/Three_Phase_Driver/Inc/tim1_pwm.h
+    - group: Modules/Encoder
+      files:
+        - file: ../Modules/Encoder/Src/spi1_encoder.c
+        - file: ../Modules/Encoder/Inc/spi1_encoder.h
+        - file: ../Modules/Encoder/Src/mt6835.c
+        - file: ../Modules/Encoder/Inc/mt6835.h
     - group: Tests
       files:
         - file: ../Tests/Src/tim1_pwm_verify.c
         - file: ../Tests/Inc/tim1_pwm_verify.h
         - file: ../Tests/Inc/measurement_manager.h
+        - file: ../Tests/Src/waveform_generator.c
+        - file: ../Tests/Inc/waveform_generator.h
+        - file: ../Tests/Src/mt6835_verify.c
+        - file: ../Tests/Inc/mt6835_verify.h
     - group: Modules/Current Sampling
       files:
         - file: ../Modules/Current_Sampling/Src/adc1_current_sampling.c
         - file: ../Modules/Current_Sampling/Inc/adc1_current_sampling.h
-    # Reserved functional groups for upcoming peripherals.
-    - group: Modules/Encoder
-      files: []
+        - file: ../Modules/Current_Sampling/Src/current_sampling.c
+        - file: ../Modules/Current_Sampling/Inc/current_sampling.h
     - group: Modules/FOC
       files:
         - file: ../FOC/Inc/foc_algorithm.h
@@ -135,6 +144,10 @@ project:
         - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_adc_ex.c
         - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_opamp.c
         - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_opamp_ex.c
+        - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_uart.c
+        - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_uart_ex.c
+        - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_spi.c
+        - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_spi_ex.c
     - group: Drivers/CMSIS
       files:
         - file: ../Core/Src/system_stm32g4xx.c

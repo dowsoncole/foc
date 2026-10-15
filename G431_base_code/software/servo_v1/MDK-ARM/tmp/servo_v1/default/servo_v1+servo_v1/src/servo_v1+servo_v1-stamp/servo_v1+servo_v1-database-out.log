@@ -1,5 +1,2 @@
-[0/1] Re-running CMake...
--- Configuring done (5.5s)
--- Generating done (0.4s)
--- Build files have been written to: C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/1
 [1/2] Generating C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/out/servo_v1/servo_v1/compile_commands.json
+[2/2] Generating C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/out/servo_v1/servo_v1/compile_macros_c.h

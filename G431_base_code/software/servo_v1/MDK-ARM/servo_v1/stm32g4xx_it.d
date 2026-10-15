@@ -27,8 +27,15 @@ servo_v1/stm32g4xx_it.o: ..\Core\Src\stm32g4xx_it.c \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_opamp_ex.h \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_pwr.h \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_pwr_ex.h \
+  ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_spi.h \
+  ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_spi_ex.h \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_tim.h \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_tim_ex.h \
+  ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_uart.h \
+  ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_uart_ex.h \
+  ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_usart.h \
+  ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_usart_ex.h \
   ..\Core\Inc\stm32g4xx_it.h \
   ..\Modules\Driver_Communication\Inc\tim6_heartbeat.h \
-  ..\Modules\Three_Phase_Driver\Inc\tim1_pwm.h
+  ..\Modules\Three_Phase_Driver\Inc\tim1_pwm.h \
+  ..\Modules\Current_Sampling\Inc\adc1_current_sampling.h

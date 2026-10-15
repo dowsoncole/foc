@@ -2,8 +2,12 @@ C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp
 C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/1/CMakeFiles/servo_v1+servo_v1.dir
 C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/1/CMakeFiles/Group_Application_Startup.dir
 C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/1/CMakeFiles/Group_Application_Core.dir
-C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/1/CMakeFiles/Group_Modules_MOS_Driver.dir
+C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/1/CMakeFiles/Group_Modules_Driver_Communication.dir
 C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/1/CMakeFiles/Group_Modules_Three-Phase_Driver.dir
+C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/1/CMakeFiles/Group_Modules_Encoder.dir
+C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/1/CMakeFiles/Group_Tests.dir
+C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/1/CMakeFiles/Group_Modules_Current_Sampling.dir
+C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/1/CMakeFiles/Group_Modules_FOC.dir
 C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/1/CMakeFiles/Group_Drivers_STM32G4xx_HAL_Driver.dir
 C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/1/CMakeFiles/Group_Drivers_CMSIS.dir
 C:/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/tmp/servo_v1/default/1/CMakeFiles/edit_cache.dir

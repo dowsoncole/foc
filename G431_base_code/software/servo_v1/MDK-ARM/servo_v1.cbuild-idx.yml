@@ -14,7 +14,7 @@ build-idx:
         info:
           - servo_v1.cbuild-pack.yml - file is already up-to-date
           - servo_v1+servo_v1.cbuild-run.yml - file generated successfully
-          - servo_v1+servo_v1.cbuild.yml - file is already up-to-date
+          - servo_v1+servo_v1.cbuild.yml - file generated successfully
       packs-unused:
         - pack: ARM::CMSIS-DSP@1.16.2
         - pack: ARM::CMSIS-NN@4.1.0

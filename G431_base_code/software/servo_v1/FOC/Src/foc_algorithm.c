@@ -78,6 +78,7 @@ void FOC_AlgorithmStep(foc_algorithm_t *algorithm,
   float cos_angle;
   float d_voltage;
   float q_voltage;
+  float control_period_s;
 
   if ((algorithm == 0) || (input == 0))
   {
@@ -101,18 +102,21 @@ void FOC_AlgorithmStep(foc_algorithm_t *algorithm,
     return;
   }
 
+  control_period_s = (algorithm->parameters.pwm_period_s > 0.0f) ?
+                     algorithm->parameters.pwm_period_s :
+                     algorithm->parameters.sample_period_s;
   d_voltage = foc_pi_step(&algorithm->parameters.d_controller,
                           foc_clamp(input->d_reference,
                                     -algorithm->parameters.current_limit,
                                     algorithm->parameters.current_limit) -
                           algorithm->output.d_current,
-                          algorithm->parameters.sample_period_s);
+                          control_period_s);
   q_voltage = foc_pi_step(&algorithm->parameters.q_controller,
                           foc_clamp(input->q_reference,
                                     -algorithm->parameters.current_limit,
                                     algorithm->parameters.current_limit) -
                           algorithm->output.q_current,
-                          algorithm->parameters.sample_period_s);
+                          control_period_s);
   foc_limit_voltage(&d_voltage, &q_voltage,
                     algorithm->parameters.voltage_limit,
                     &algorithm->output.saturated);

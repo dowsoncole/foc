@@ -109,6 +109,84 @@ void HAL_I2C_MspDeInit(I2C_HandleTypeDef *hi2c)
   }
 }
 
+/**
+  * @brief  SPI1 clock and GPIO for the MT6835 magnetic encoder.
+  *         PA5 = SCK, PA6 = MISO, PA7 = MOSI, all AF5 (DS12589 Table 13).
+  *         PA4 (software CSN) is configured by MX_SPI1_Encoder_Init() itself
+  *         so the chip select is high before the SPI peripheral comes up.
+  */
+void HAL_SPI_MspInit(SPI_HandleTypeDef *hspi)
+{
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+  if (hspi->Instance == SPI1)
+  {
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    __HAL_RCC_SPI1_CLK_ENABLE();
+
+    /* A debugger reset can leave SPI1 enabled with the previous CR1/CR2
+       contents.  Reset the peripheral before HAL_SPI_Init() writes the new
+       mode so an old baud-rate/SPE setting cannot suppress the first frame. */
+    __HAL_RCC_SPI1_FORCE_RESET();
+    __HAL_RCC_SPI1_RELEASE_RESET();
+
+    /**SPI1 GPIO Configuration
+    PA5     ------> SPI1_SCK
+    PA6     ------> SPI1_MISO
+    PA7     ------> SPI1_MOSI
+    */
+    GPIO_InitStruct.Pin = GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF5_SPI1;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  }
+}
+
+void HAL_SPI_MspDeInit(SPI_HandleTypeDef *hspi)
+{
+  if (hspi->Instance == SPI1)
+  {
+    __HAL_RCC_SPI1_CLK_DISABLE();
+    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7);
+  }
+}
+
+void HAL_UART_MspInit(UART_HandleTypeDef *huart)
+{
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+  if (huart->Instance == USART1)
+  {
+    __HAL_RCC_USART1_CLK_ENABLE();
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    /* PA9 = 485_TX, PA10 = 485_RX, PA8 = transceiver DE/nRE. */
+    GPIO_InitStruct.Pin = GPIO_PIN_9 | GPIO_PIN_10;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF7_USART1;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = GPIO_PIN_8;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_RESET);
+  }
+}
+
+void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
+{
+  if (huart->Instance == USART1)
+  {
+    __HAL_RCC_USART1_CLK_DISABLE();
+    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10);
+  }
+}
+
 void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim)
 {
   if (htim->Instance == TIM6)
@@ -194,8 +272,8 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim)
 
 /**
   * @brief  OPAMP GPIO configuration for the phase-current amplifiers.
-  *         OPAMP1: PA1 (VINP0) / PA3 (VINM0) / PA2 (OUT)   -> U phase
-  *         OPAMP3: PB0 (VINP0) / PB2 (VINM0) / PB1 (OUT)   -> W phase
+  *         OPAMP1: PA1 (VINP0) / PA3 (VINM0) / PA2 (OUT)   -> U phase (rank 1)
+  *         OPAMP3: PB0 (VINP0) / PB2 (VINM0) / PB1 (OUT)   -> V phase (rank 2)
   *
   *         All six pins must sit in analog mode. PB2 doubles as BOOT1, so it
   *         has to be configured explicitly or the leftover boot-mode setting
@@ -259,15 +337,16 @@ void HAL_OPAMP_MspDeInit(OPAMP_HandleTypeDef *hopamp)
 /**
   * @brief  ADC1 clock enable for the injected current-sampling group.
   *
-  *         No ADC interrupt is configured here on purpose: the injected group
-  *         is consumed inside the TIM1_CC ISR that tim1_pwm.c already owns
-  *         (priority 0), so a second vector would only add latency.
+  *         JEOS is consumed in ADC1_2_IRQHandler after the complete injected
+  *         sequence; keep this interrupt below the timer trigger priority.
   */
 void HAL_ADC_MspInit(ADC_HandleTypeDef *hadc)
 {
   if (hadc->Instance == ADC1)
   {
     __HAL_RCC_ADC12_CLK_ENABLE();
+    HAL_NVIC_SetPriority(ADC1_2_IRQn, 1U, 0U);
+    HAL_NVIC_EnableIRQ(ADC1_2_IRQn);
   }
 }
 
@@ -275,6 +354,7 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef *hadc)
 {
   if (hadc->Instance == ADC1)
   {
+    HAL_NVIC_DisableIRQ(ADC1_2_IRQn);
     __HAL_RCC_ADC12_CLK_DISABLE();
   }
 }

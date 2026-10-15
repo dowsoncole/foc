@@ -62,9 +62,34 @@ extern "C" {
 #define TIM1_PWM_DUTY_SCALE         1000U
 #define TIM1_PWM_DUTY_NEUTRAL       (TIM1_PWM_DUTY_SCALE / 2U)
 
-/* ADC 采样相对 20 kHz 更新事件提前 1 µs；一个计数是 5.952 ns，
-   即 ADC 触发提前 168 个计数。 */
-#define TIM1_PWM_ADC_TRIGGER_LEAD_NS 1000U
+/* ADC 采样相对 20 kHz 更新事件提前的时间；一个计数是 5.952 ns。
+
+   取值 = 模块 F 注入序列总耗时的一半（11.43 µs / 2 = 5.714 µs），
+   即 959 个计数，CH4 比较值 = 4199 - 959 = 3240。这样注入序列正好以更新
+   事件为中心：T - 5.71 µs 触发、T + 5.71 µs 结束，两个通道的采样点分别
+   落在更新事件两侧对称位置。
+
+   ⚠ 本值与模块 F 的 ADC1_CS_SEQUENCE_CONV_NS 强耦合。改动过采样倍率、
+   采样时间或注入通道数时，必须同步这里（见 README 第 14 节规则 9）。 */
+#define TIM1_PWM_ADC_TRIGGER_LEAD_NS 5714U
+
+/* 提前量换算成计数，公式与 tim1_pwm.c 的 Tim1Pwm_NsToCounts() 一致。
+   5714 ns * 168 / 1000 = 959 计数。 */
+#define TIM1_PWM_ADC_LEAD_COUNTS \
+  ((TIM1_PWM_ADC_TRIGGER_LEAD_NS * (TIM1_PWM_TIMER_CLOCK_HZ / 1000000UL)) / 1000UL)
+
+/* 防下溢：CH4 的比较值由 ARR - NsToCounts(LEAD) 得出，是无符号减法，
+   所以提前量的计数值必须不超过 ARR（= TIM1_PWM_COUNTER_PERIOD = 4199，
+   即提前量上限 24994 ns）。注意界限是半周期计数 ARR，不是整个载波周期：
+   中央对齐下计数器只走到 ARR 就折返。
+   一旦越界，减法会回绕成一个远大于 ARR 的值，比较寄存器永远匹配不上，
+   ADC 触发彻底失效且不会报错——静默失效，所以在编译期就挡住。 */
+#define TIM1_PWM_ADC_LEAD_FITS_PERIOD \
+  (TIM1_PWM_ADC_LEAD_COUNTS <= TIM1_PWM_COUNTER_PERIOD)
+
+#if (TIM1_PWM_ADC_LEAD_FITS_PERIOD == 0)
+#error "TIM1_PWM_ADC_TRIGGER_LEAD_NS 过大：其计数值必须 <= TIM1_PWM_COUNTER_PERIOD，否则 CH4 比较值会下溢回绕，ADC 触发静默失效"
+#endif
 
 /* --------------------------------------------------------------------------*/
 /* 寄存器级换算                                                              */

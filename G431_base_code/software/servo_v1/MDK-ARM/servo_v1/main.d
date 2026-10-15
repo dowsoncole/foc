@@ -27,12 +27,22 @@ servo_v1/main.o: ..\Core\Src\main.c ..\Core\Inc\main.h \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_opamp_ex.h \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_pwr.h \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_pwr_ex.h \
+  ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_spi.h \
+  ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_spi_ex.h \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_tim.h \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_tim_ex.h \
+  ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_uart.h \
+  ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_uart_ex.h \
+  ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_usart.h \
+  ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_usart_ex.h \
   ..\Core\Inc\gpio.h ..\Modules\Driver_Communication\Inc\i2c3_bus.h \
   ..\Modules\Driver_Communication\Inc\tim6_heartbeat.h \
   ..\Modules\Three_Phase_Driver\Inc\tim1_pwm.h \
-  ..\Tests\Inc\tim1_pwm_verify.h ..\Tests\Inc\measurement_manager.h \
   ..\Modules\Current_Sampling\Inc\adc1_current_sampling.h \
+  ..\Modules\Current_Sampling\Inc\current_sampling.h \
   ..\Modules\Driver_Communication\Inc\stspin32g4.h \
-  ..\Modules\Driver_Communication\Inc\drv_monitor.h
+  ..\Modules\Driver_Communication\Inc\drv_monitor.h \
+  ..\FOC\Inc\foc_interface.h ..\FOC\Inc\foc_algorithm.h \
+  ..\Tests\Inc\waveform_generator.h \
+  ..\Modules\Encoder\Inc\spi1_encoder.h ..\Modules\Encoder\Inc\mt6835.h \
+  ..\Tests\Inc\mt6835_verify.h

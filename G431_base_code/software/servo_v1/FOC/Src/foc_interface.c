@@ -32,6 +32,9 @@ void FOC_ControllerInit(foc_controller_t *controller,
   (void)memset(controller, 0, sizeof(*controller));
   controller->port = *port;
   FOC_AlgorithmInit(&controller->algorithm, parameters);
+  controller->timing.pwm_period_s =
+      (parameters->pwm_period_s > 0.0f) ? parameters->pwm_period_s :
+      parameters->sample_period_s;
 }
 
 /**
@@ -111,6 +114,7 @@ void FOC_ControllerStep(foc_controller_t *controller)
   controller->port.read_feedback(controller->port.context, &controller->input);
   controller->input.enabled = 1U;
   FOC_AlgorithmStep(&controller->algorithm, &controller->input);
+  controller->timing.cycle_count++;
   controller->port.write_voltage(controller->port.context,
                                   &controller->algorithm.output);
 }

@@ -15,8 +15,10 @@
 # Rule for linking C executable.
 
 rule C_EXECUTABLE_LINKER__servo_v1.2bservo_v1_
-  command = C:\WINDOWS\system32\cmd.exe /C "$PRE_LINK && c:\Users\penghao\.vcpkg\artifacts\2139c4c6\compilers.arm.armclang\6.24.0\bin\armlink.exe $LINK_FLAGS $LINK_PATH $LINK_LIBRARIES $in -o $TARGET_FILE  --list=$TARGET_FILE.map && $POST_BUILD"
+  command = C:\WINDOWS\system32\cmd.exe /C "$PRE_LINK && c:\Users\penghao\.vcpkg\artifacts\2139c4c6\compilers.arm.armclang\6.24.0\bin\armlink.exe $LINK_FLAGS  --via=$RSP_FILE -o $TARGET_FILE  --list=$TARGET_FILE.map && $POST_BUILD"
   description = Linking C executable $TARGET_FILE
+  rspfile = $RSP_FILE
+  rspfile_content = $in $LINK_PATH $LINK_LIBRARIES
   restat = $RESTAT
 
 
@@ -43,7 +45,7 @@ rule C_COMPILER__Group_Application_Core_unscanned_
 #############################################
 # Rule for compiling C files.
 
-rule C_COMPILER__Group_Modules_MOS_Driver_unscanned_
+rule C_COMPILER__Group_Modules_Driver_Communication_unscanned_
   depfile = $DEP_FILE
   deps = gcc
   command = ${LAUNCHER}${CODE_CHECK}c:\Users\penghao\.vcpkg\artifacts\2139c4c6\compilers.arm.armclang\6.24.0\bin\armclang.exe --target=arm-arm-none-eabi $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
@@ -54,6 +56,46 @@ rule C_COMPILER__Group_Modules_MOS_Driver_unscanned_
 # Rule for compiling C files.
 
 rule C_COMPILER__Group_Modules_Three-Phase_Driver_unscanned_
+  depfile = $DEP_FILE
+  deps = gcc
+  command = ${LAUNCHER}${CODE_CHECK}c:\Users\penghao\.vcpkg\artifacts\2139c4c6\compilers.arm.armclang\6.24.0\bin\armclang.exe --target=arm-arm-none-eabi $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
+  description = Building C object $out
+
+
+#############################################
+# Rule for compiling C files.
+
+rule C_COMPILER__Group_Modules_Encoder_unscanned_
+  depfile = $DEP_FILE
+  deps = gcc
+  command = ${LAUNCHER}${CODE_CHECK}c:\Users\penghao\.vcpkg\artifacts\2139c4c6\compilers.arm.armclang\6.24.0\bin\armclang.exe --target=arm-arm-none-eabi $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
+  description = Building C object $out
+
+
+#############################################
+# Rule for compiling C files.
+
+rule C_COMPILER__Group_Tests_unscanned_
+  depfile = $DEP_FILE
+  deps = gcc
+  command = ${LAUNCHER}${CODE_CHECK}c:\Users\penghao\.vcpkg\artifacts\2139c4c6\compilers.arm.armclang\6.24.0\bin\armclang.exe --target=arm-arm-none-eabi $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
+  description = Building C object $out
+
+
+#############################################
+# Rule for compiling C files.
+
+rule C_COMPILER__Group_Modules_Current_Sampling_unscanned_
+  depfile = $DEP_FILE
+  deps = gcc
+  command = ${LAUNCHER}${CODE_CHECK}c:\Users\penghao\.vcpkg\artifacts\2139c4c6\compilers.arm.armclang\6.24.0\bin\armclang.exe --target=arm-arm-none-eabi $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
+  description = Building C object $out
+
+
+#############################################
+# Rule for compiling C files.
+
+rule C_COMPILER__Group_Modules_FOC_unscanned_
   depfile = $DEP_FILE
   deps = gcc
   command = ${LAUNCHER}${CODE_CHECK}c:\Users\penghao\.vcpkg\artifacts\2139c4c6\compilers.arm.armclang\6.24.0\bin\armclang.exe --target=arm-arm-none-eabi $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in

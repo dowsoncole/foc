@@ -24,6 +24,7 @@
 /* USER CODE BEGIN Includes */
 #include "tim6_heartbeat.h"
 #include "tim1_pwm.h"
+#include "adc1_current_sampling.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -201,6 +202,11 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 /* USER CODE BEGIN 1 */
+void ADC1_2_IRQHandler(void)
+{
+  HAL_ADC_IRQHandler(&hadc1);
+}
+
 /**
   * @brief This function handles TIM6 global interrupt.
   *
@@ -216,11 +222,10 @@ void TIM6_DAC_IRQHandler(void)
 /**
   * @brief This function handles TIM1 capture/compare interrupt.
   *
-  * Reached from the channel 4 compare, which MX_TIM1_Init() places just before
-  * the update event. This is the sampling instant of the current loop:
-  * start the injected ADC conversion here and let the end-of-conversion ISR run
-  * the regulator. Nothing else may be added to this path - it runs at the PWM
-  * frequency.
+ * Reached from the channel 4 compare, which MX_TIM1_Init() places just before
+ * the update event. The OC4REF hardware trigger starts the injected ADC
+ * sequence; the ADC1_2_IRQHandler runs the current loop only after JEOS.
+ * Nothing else may be added to this path - it runs at the PWM frequency.
   */
 void TIM1_CC_IRQHandler(void)
 {

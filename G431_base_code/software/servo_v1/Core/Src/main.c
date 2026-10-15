@@ -25,11 +25,15 @@
 /* USER CODE BEGIN Includes */
 #include "tim6_heartbeat.h"
 #include "tim1_pwm.h"
-#include "tim1_pwm_verify.h"
-#include "measurement_manager.h"
 #include "adc1_current_sampling.h"
+#include "current_sampling.h"
 #include "stspin32g4.h"
 #include "drv_monitor.h"
+#include "foc_interface.h"
+#include "waveform_generator.h"
+#include "spi1_encoder.h"
+#include "mt6835.h"
+#include "mt6835_verify.h"
 
 /* USER CODE END Includes */
 
@@ -63,24 +67,74 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-/* 统一的测量配置与运行状态对象：由 L6 应用入口层持有，交给 L5 测试层消费。
-   刻意做成全局对象，一是能在调试器 Watch 窗口直接观察，二是能在测量运行途中
-   改字段来切换被测相或占空比，无需重新编译烧录。 */
-measurement_manager_t g_measurement_manager =
+/* ADC JEOS 回调使用的唯一 FOC 控制器实例。PID 参数、限幅和 PWM 周期均由
+   该实例的 algorithm.parameters/timing 管理，避免在中断中散落全局变量。 */
+foc_controller_t g_foc_controller;
+UART_HandleTypeDef huart1;
+
+static void MX_USART1_RS485_Init(void)
 {
-  .module = MEASUREMENT_MODULE_MOS_DRIVER,
-  .state = MEASUREMENT_STATE_IDLE,
-  .config.mos_driver =
+  huart1.Instance = USART1;
+  huart1.Init.BaudRate = WAVEFORM_RS485_BAUDRATE;
+  huart1.Init.WordLength = UART_WORDLENGTH_8B;
+  huart1.Init.StopBits = UART_STOPBITS_1;
+  huart1.Init.Parity = UART_PARITY_NONE;
+  huart1.Init.Mode = UART_MODE_TX_RX;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  huart1.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+  huart1.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+  if (HAL_UART_Init(&huart1) != HAL_OK)
   {
-    .phase = MOS_DRIVER_PHASE_U,
-    .duty = 50U,         /* 选中相的高侧占空比，标度 0..1000，故 50 表示 5 %。 */
-    .moe_enable = 1U,    /* 预充电延时结束后自动使能波形输出。 */
-    .startup_delay_ms = 50U, /* 等 VCC 与栅极驱动自举电容稳定。 */
-    .moe_applied = 0U,
-    .phase_applied = MOS_DRIVER_PHASE_U,
-    .duty_applied = 0U
+    Error_Handler();
   }
-};
+}
+
+static uint8_t MainFoc_IsPowerStageSafe(void *context)
+{
+  (void)context;
+  return DrvMonitor_IsPowerStageSafeFast();
+}
+
+static void MainFoc_ReadFeedback(void *context, foc_input_t *input)
+{
+  (void)context;
+  if (input == NULL)
+  {
+    return;
+  }
+  CurrentSampling_ReadFeedback(&input->phase_a, &input->phase_b);
+  /* 当前工程尚未接入编码器；角度和电流给定由上层后续更新。 */
+  input->electrical_angle_rad = 0.0f;
+  input->d_reference = 0.0f;
+  input->q_reference = 0.0f;
+}
+
+static void MainFoc_WriteVoltage(void *context, const foc_output_t *output)
+{
+  (void)context;
+  if (output != NULL)
+  {
+    (void)Tim1Pwm_SetPhaseVoltage(output->alpha_voltage, output->beta_voltage);
+  }
+}
+
+static void MainFoc_DisableOutput(void *context)
+{
+  (void)context;
+  Tim1Pwm_EmergencyStop();
+}
+
+static void MainFoc_OnAdcConversion(void *context)
+{
+  WaveformGenerator_SampleTick();
+  if (context != NULL)
+  {
+    FOC_ControllerStep((foc_controller_t *)context);
+    ((foc_controller_t *)context)->timing.last_sample_sequence =
+        g_current_sampling.sample_sequence;
+  }
+}
 
 /* USER CODE END 0 */
 
@@ -125,6 +179,15 @@ int main(void)
   {
     Error_Handler();
   }
+  MX_USART1_RS485_Init();
+  if (WaveformGenerator_Init(&huart1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* 功率级保持硬件关断：TIM1 初始化默认清 MOE，这里再次显式清除，
+     并且本应用生命周期内不调用 Tim1Pwm_EnableOutputs()。比较寄存器和
+     ADC/FOC 时序仍可运行，但六路栅极信号不会送到 STSPIN32G4。 */
+  Tim1Pwm_EmergencyStop();
   /* USER CODE BEGIN 2 */
   /* ------------------------------------------------------------------------
    * Layer 0 上电初始化：在任何实时任务开始之前一次性跑完
@@ -136,13 +199,6 @@ int main(void)
   if (DrvMonitor_Init() != HAL_OK)
   {
     Error_Handler();
-  }
-
-  /* 只有栅极驱动报告 READY 之后才启动测量。
-     MOE 仍由 g_measurement_manager.config.mos_driver.moe_enable 控制。 */
-  if (DrvMonitor_GetState() == DRV_STATE_READY)
-  {
-    (void)Tim1PwmVerify_Start(&g_measurement_manager);
   }
 
   /* ------------------------------------------------------------------------
@@ -157,8 +213,11 @@ int main(void)
    * ADC 运行时不需要在 TIM1_CC ISR 里手工发起转换；CC4 的 OC4REF 会自动触发
    * 注入序列，JDR1/JDR2 由硬件更新。
    *
-   * 零电流偏置标定和 JDR 到安培的换算仍属于业务层，接入 FOC 前还需按 README
-   * 待核对项确认采样序列时序以及两路通道的实际相别。 */
+   * 相别已确认：rank 1 = U 相 = foc_input_t.phase_a，rank 2 = V 相 =
+   * foc_input_t.phase_b，W 相由 -(ia + ib) 推出。
+   * CH4 提前量已改为注入序列耗时的一半（5.714 µs），使序列以更新事件为中心。
+   *
+   * 零电流偏置标定和 JDR 到安培的换算仍属于业务层，尚未实现。 */
   if (MX_OPAMP1_Init() != HAL_OK)
   {
     Error_Handler();
@@ -172,14 +231,55 @@ int main(void)
     Error_Handler();
   }
 
+  {
+    const foc_parameters_t foc_parameters =
+    {
+      .sample_period_s = 1.0f / 20000.0f,
+      .pwm_period_s = 1.0f / 20000.0f,
+      .voltage_limit = 0.95f,
+      .current_limit = 10.0f,
+      .d_controller = { .kp = 0.1f, .ki = 5.0f,
+                        .integral_min = -0.95f, .integral_max = 0.95f },
+      .q_controller = { .kp = 0.1f, .ki = 5.0f,
+                        .integral_min = -0.95f, .integral_max = 0.95f }
+    };
+    const foc_port_t foc_port =
+    {
+      .is_power_stage_safe = MainFoc_IsPowerStageSafe,
+      .read_feedback = MainFoc_ReadFeedback,
+      .write_voltage = MainFoc_WriteVoltage,
+      .disable_output = MainFoc_DisableOutput,
+      .context = NULL
+    };
+    FOC_ControllerInit(&g_foc_controller, &foc_parameters, &foc_port);
+    CurrentSampling_SetConversionCallback(MainFoc_OnAdcConversion,
+                                           &g_foc_controller);
+  }
+
   if (CurrentSampling_Start() != HAL_OK)
   {
     Error_Handler();
   }
 
-  /* TODO: 电流环。功率级只能在
-   * DrvMonitor_GetState() == DRV_STATE_READY 且 TIM1->BDTR 的 MOE 仍置位时
-   * 才允许使能。 */
+  /* 先采集零点，再允许 ADC 完成中断驱动 FOC，避免偏置被当成电流。 */
+  CurrentSampling_RequestCalibration();
+
+  /* ------------------------------------------------------------------------
+   * 编码器 SPI 配置与通讯验证（Modules/Encoder + Tests）
+   * ------------------------------------------------------------------------
+   * MT6835 走 SPI1：PA4 = 软件片选、PA5 = SCK、PA6 = MISO、PA7 = MOSI，
+   * 模式 3、10.5 MHz。配置层只管外设，器件语义在 mt6835.c。
+   *
+   * 上电等待必须在任何 SPI 通讯之前：手册 T_PwrUp = 2 ms。
+   * 通讯验证测试在此启动，主循环每轮推进，非阻塞。 */
+  if (MX_SPI1_Encoder_Init() != HAL_OK)
+  {
+    Error_Handler();
+  }
+  MT6835_PowerUpWait();
+  (void)Mt6835Verify_Start();
+
+  /* 当前版本只运行采样与 FOC 计算，功率级始终保持 MOE=0。 */
 
   /* USER CODE END 2 */
 
@@ -190,6 +290,14 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    CurrentSampling_Service();
+    WaveformGenerator_Task();
+    (void)Mt6835Verify_Task();
+    if ((CurrentSampling_GetCalibrationState() == CURRENT_SAMPLING_CAL_DONE) &&
+        (g_foc_controller.running == 0U))
+    {
+      FOC_ControllerStart(&g_foc_controller);
+    }
     /* --------------------------------------------------------------------
      * 后台任务层：无截止时间，可阻塞数十 µs
      * --------------------------------------------------------------------
@@ -197,28 +305,6 @@ int main(void)
      * 近乎为零。全工程的所有 I2C 通信都发生在这一次调用内部，绝不在中断里。
      */
     DrvMonitor_Task();
-
-    /* ------------------------------------------------------------------
-     * L6 跨层仲裁：驱动报告非 READY 时关断功率级
-     * ------------------------------------------------------------------
-     * 修复：原先 DrvMonitor 检测到 FAULT / COMM_LOST 后只更新自身状态，
-     * 没有任何一方去清 MOE。STSPIN32G4 的内部保护（VDS_P / THSD）确实会把
-     * 栅极强制拉低，硬件不会损坏；但软件侧 MOE 仍保持置位、测量状态仍是
-     * RUNNING，一旦故障条件消失，输出会在无人复核的情况下自行恢复。
-     *
-     * 这段仲裁放在 L6 而不是 L3：监控层不得调用三相驱动层（下层不能依赖
-     * 上层），跨层仲裁本来就是应用入口层的职责。
-     *
-     * 只在 IsRunning 为真时触发，因此每轮循环最多关断一次；Stop 会把状态置为
-     * IDLE，之后不再重复调用。恢复输出必须显式重新 Start，不会自动重启。
-     */
-    if ((Tim1PwmVerify_IsRunning(&g_measurement_manager) != 0U) &&
-        (DrvMonitor_GetState() != DRV_STATE_READY))
-    {
-      Tim1PwmVerify_Stop(&g_measurement_manager);
-    }
-
-    (void)Tim1PwmVerify_Task(&g_measurement_manager);
 
     /* TODO: 协议栈（CAN/UART）、参数存储、温度记录、上位机遥测 ……
      * 都属于这一层。 */

@@ -341,7 +341,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32G431xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../FOC/Inc;../Modules/Driver_Communication/Inc;../Modules/Three_Phase_Driver/Inc;../Modules/Current_Sampling/Inc;../Tests/Inc;../Drivers/STM32G4xx_HAL_Driver/Inc;../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32G4xx/Include;../Drivers/CMSIS/Include</IncludePath>
+              <IncludePath>../Core/Inc;../FOC/Inc;../Modules/Driver_Communication/Inc;../Modules/Three_Phase_Driver/Inc;../Modules/Current_Sampling/Inc;../Modules/Encoder/Inc;../Tests/Inc;../Drivers/STM32G4xx_HAL_Driver/Inc;../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32G4xx/Include;../Drivers/CMSIS/Include</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -510,10 +510,42 @@
               <FileType>5</FileType>
               <FilePath>../Modules/Current_Sampling/Inc/adc1_current_sampling.h</FilePath>
             </File>
+            <File>
+              <FileName>current_sampling.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Modules/Current_Sampling/Src/current_sampling.c</FilePath>
+            </File>
+            <File>
+              <FileName>current_sampling.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>../Modules/Current_Sampling/Inc/current_sampling.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>Modules/Encoder</GroupName>
+          <Files>
+            <File>
+              <FileName>spi1_encoder.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Modules/Encoder/Src/spi1_encoder.c</FilePath>
+            </File>
+            <File>
+              <FileName>spi1_encoder.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>../Modules/Encoder/Inc/spi1_encoder.h</FilePath>
+            </File>
+            <File>
+              <FileName>mt6835.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Modules/Encoder/Src/mt6835.c</FilePath>
+            </File>
+            <File>
+              <FileName>mt6835.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>../Modules/Encoder/Inc/mt6835.h</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>Modules/FOC</GroupName>
@@ -557,6 +589,26 @@
               <FileName>measurement_manager.h</FileName>
               <FileType>5</FileType>
               <FilePath>../Tests/Inc/measurement_manager.h</FilePath>
+            </File>
+            <File>
+              <FileName>waveform_generator.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Tests/Src/waveform_generator.c</FilePath>
+            </File>
+            <File>
+              <FileName>waveform_generator.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>../Tests/Inc/waveform_generator.h</FilePath>
+            </File>
+            <File>
+              <FileName>mt6835_verify.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Tests/Src/mt6835_verify.c</FilePath>
+            </File>
+            <File>
+              <FileName>mt6835_verify.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>../Tests/Inc/mt6835_verify.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -667,6 +719,26 @@
               <FileName>stm32g4xx_hal_opamp_ex.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_opamp_ex.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32g4xx_hal_uart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_uart.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32g4xx_hal_uart_ex.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_uart_ex.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32g4xx_hal_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32g4xx_hal_spi_ex.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_spi_ex.c</FilePath>
             </File>
           </Files>
         </Group>

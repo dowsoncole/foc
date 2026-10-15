@@ -36,6 +36,13 @@ typedef struct
   foc_port_t port;
   foc_input_t input;
   uint8_t running;
+  struct
+  {
+    /* 当前 PWM/电流环周期，PID 参数仍由 algorithm.parameters 统一管理。 */
+    float pwm_period_s;
+    uint32_t cycle_count;
+    uint32_t last_sample_sequence;
+  } timing;
 } foc_controller_t;
 
 /* --------------------------------------------------------------------------*/

@@ -12,7 +12,7 @@
 | 栅极驱动 | STSPIN32G4，I2C3 从机地址 `0x47` |
 | 功率级 PWM | TIM1 中央对齐 20 kHz，三相互补 + 500 ns 死区，PE8~PE13 |
 | 监控心跳 | TIM6，1 s |
-| 位置反馈 | MT6835 磁编码器（手册已备，**驱动未实现**） |
+| 位置反馈 | MT6835 磁编码器（SPI1，PA4~PA7；L1 配置 + L2 驱动 + 通讯验证已完成） |
 | 电流采样 | OPAMP1 / OPAMP3 跟随放大 + ADC1 注入组两通道、16 倍过采样，由 TIM1_CH4 触发（**配置层已完成，业务层未实现**） |
 | Keil 工程 | `software/servo_v1/MDK-ARM/servo_v1.uvprojx` |
 | CubeMX | `software/servo_v1/servo_v1.ioc` |
@@ -87,7 +87,7 @@ L0  中断向量：stm32g4xx_it.c（只做分发，不含业务）
 | D 测试验证 | `Tests/` | L5 | 无（借用模块 B） | ✅ **当前固件运行的就是它** |
 | E 板级支撑 | `Core/` | L0+L1+L6 | GPIO、中断向量、MSP、时钟 | ✅ 完成 |
 | F 电流采样 | `Modules/Current_Sampling/` | L1 | ADC1、OPAMP1、OPAMP3、PA1/PA2/PA3、PB0/PB1/PB2 | ⚠ 配置层完成，**业务层未实现** |
-| — 编码器 | *（待建）* | — | SPI/I2C | ❌ 空 Keil 分组 |
+| G 编码器 | `Modules/Encoder/` | L1+L2 | SPI1（PA4~PA7） | ✅ L1 配置 + L2 器件驱动完成 |
 | — 通讯协议栈 | *（待建）* | L5 | CAN/UART | ❌ 无源码 |
 
 ---
@@ -124,9 +124,14 @@ software/servo_v1/
 │   ├── Inc/foc_algorithm.h         参数、输入、输出、算法对象
 │   ├── Inc/foc_interface.h         算法控制器和硬件端口
 │   └── Src/
+├── Encoder/                                 模块 G：磁编码器（本轮新增）
+│   ├── Inc/spi1_encoder.h         SPI1 配置接口 ← L1
+│   ├── Inc/mt6835.h               MT6835 寄存器接口 ← L2
+│   └── Src/（同名两个 .c）
 ├── Tests/                                   模块 D：产线或调试验证，不属于算法层
 │   ├── Inc/tim1_pwm_verify.h · Inc/measurement_manager.h
-│   └── Src/tim1_pwm_verify.c
+│   ├── Inc/mt6835_verify.h                  编码器 SPI 通讯验证
+│   └── Src/tim1_pwm_verify.c · Src/mt6835_verify.c
 ├── Drivers/                                 第三方库（勿改，升级时整体替换）
 └── MDK-ARM/                                 Keil 工程与编译产物
 ```
@@ -139,14 +144,14 @@ Application/Core               → Core/
 Modules/Driver Communication   → Modules/Driver_Communication/
 Modules/Three-Phase Driver     → Modules/Three_Phase_Driver/
 Modules/Current Sampling       → Modules/Current_Sampling/
-Modules/Encoder                → 空分组（待建）
+Modules/Encoder                → Modules/Encoder/
 Modules/FOC                    → FOC/          ← 注意分组名带 Modules/ 前缀
 Tests                          → Tests/
 Drivers/STM32G4xx_HAL_Driver   → Drivers/STM32G4xx_HAL_Driver/
 Drivers/CMSIS · ::CMSIS        → Drivers/CMSIS/
 ```
 
-Include 路径：`../Core/Inc; ../FOC/Inc; ../Modules/Driver_Communication/Inc; ../Modules/Three_Phase_Driver/Inc; ../Modules/Current_Sampling/Inc; ../Tests/Inc; ../Drivers/STM32G4xx_HAL_Driver/Inc; .../Inc/Legacy; ../Drivers/CMSIS/Device/ST/STM32G4xx/Include; ../Drivers/CMSIS/Include`
+Include 路径：`../Core/Inc; ../FOC/Inc; ../Modules/Driver_Communication/Inc; ../Modules/Three_Phase_Driver/Inc; ../Modules/Current_Sampling/Inc; ../Modules/Encoder/Inc; ../Tests/Inc; ../Drivers/STM32G4xx_HAL_Driver/Inc; .../Inc/Legacy; ../Drivers/CMSIS/Device/ST/STM32G4xx/Include; ../Drivers/CMSIS/Include`
 
 每次新增或移动源文件时，必须同时更新 `servo_v1.uvprojx` 和 `servo_v1.cproject.yml`，再在 Keil 工程树中确认分组与文件路径一致。
 
@@ -557,9 +562,10 @@ TIM1_PWM_COMPARE_NEUTRAL    2100
 ```c
 /* TIM1 CH4 采样时刻回调 —— 未来的电流环就在这里运行。
    CC4 比较点位于更新事件前 TIM1_PWM_ADC_TRIGGER_LEAD_NS，ADC 应由 OC4REF 触发。
-   ADC1 注入组已由模块 F 配置完毕（当前为软件触发，尚未挂到 CC4），但还没有
-   消费者去读 JDR。当前故意为空桩：没有消费者，而以载波频率运行的空中断体
-   只花费一次中断进入的开销。
+   ADC1 注入组已由模块 F 配置完毕，并且已经挂在 CC4 上（MX_ADC1_Init(0U) +
+   CurrentSampling_Start()），硬件会在每个 OC4REF 边沿自动更新 JDR1/JDR2。
+   但还没有消费者去读 JDR，所以当前仍是空桩：没有消费者时，以载波频率运行的
+   空中断体只花费一次中断进入的开销。
    HAL_TIM_IRQHandler() 会无条件调用该回调，所以现在无需定义；等电流环需要时再加。
    注意：周期边界回调 HAL_TIM_PeriodElapsedCallback 已被 drv_monitor 为 TIM6 心跳
    占用，所以这里必须用 OC 回调（HAL_TIM_OC_DelayElapsedCallback），
@@ -698,7 +704,7 @@ typedef struct {
 | 端口回调 | 应绑定到 | 约束 |
 | --- | --- | --- |
 | `is_power_stage_safe` | `DrvMonitor_IsPowerStageSafeFast()` | **必须只读两个 GPIO、绝不走 I2C**，因为会在 20 kHz 中断里被调用，执行时间必须恒定 |
-| `read_feedback` | 电流采样层（⚠ 配置层已就绪，读码与换算未实现）+ 编码器层（❌ 未实现） | 填 ADC 电流（两相，来自 `hadc1` 的 JDR1/JDR2）、编码器角度（MT6835 机械角 × 极对数）、d/q 参考 |
+| `read_feedback` | 电流采样层（⚠ 配置层与启动编排已就绪，注入组正随 `TIM1_CH4` 更新 JDR1/JDR2；但读码与换算未实现）+ 编码器层（❌ 未实现） | 填 ADC 电流（两相，来自 `hadc1` 的 JDR1/JDR2）、编码器角度（MT6835 机械角 × 极对数）、d/q 参考 |
 | `write_voltage` | `Tim1Pwm_SetPhaseDuty()` × 3 | 先把三相电压换算为 0~1000 占空比 |
 | `disable_output` | `Tim1Pwm_EmergencyStop()` | 清除 TIM1 MOE，安全关断 |
 
@@ -782,6 +788,7 @@ static void foc_write_voltage(void *ctx, const foc_output_t *out)
 | --- | --- |
 | `Src/tim1_pwm_verify.c` | 产生单相验证波形 |
 | `Inc/measurement_manager.h` | 统一测量配置与运行状态对象（**纯头文件，无 .c**） |
+| `Src/mt6835_verify.c` · `Inc/mt6835_verify.h` | MT6835 SPI 通讯验证：角度帧 CRC-8 自洽（链路主判据）+ 传输返回码 + STATUS 报警 |
 
 ### 7.2 对上提供的接口
 
@@ -975,16 +982,11 @@ if (MX_ADC1_Init(1U) != HAL_OK) Error_Handler();  /* 软件触发，未挂 TIM1_
 if (DrvMonitor_Init() != HAL_OK) Error_Handler(); /* 清锁存故障 + 启动心跳 */
 ```
 
-> **两个运放必须先于 ADC 初始化。** ADC1 采的正是运放的输出脚"
-    "（PA2 = IN3，PB1 = IN12），运放没起来时那两个节点上没有有效信号，"
-    "先校准 ADC 只会把噪声当成基线记下来。
-"
-    ">
-"
-    "> `MX_ADC1_Init(1U)` 传软件触发也是刻意的：当前固件跑的是模块 D 的栅极"
-    "验证波形，TIM1_CH4 已在 20 kHz 运行，若让注入组跟随它触发，每个载波周期"
-    "都会多做一轮 11.43 µs 的过采样转换，而目前没有任何消费者读这些数据。"
-    "电流环上线时改传 `0`，见第 9 节与第 13 节待核对项 I。
+> **两个运放必须先于 ADC 初始化。** ADC1 采的正是运放的输出脚（PA2 = IN3，PB1 = IN12），运放没起来时那两个节点上没有有效信号，先校准 ADC 只会把噪声当成基线记下来。
+>
+> **`MX_ADC1_Init(0U)` 传 0 = 由 `TIM1_CH4` 上升沿触发**（非 0 才是软件触发，留给上电偏置标定用）。随后的 `CurrentSampling_Start()` 按「运放先启动、ADC 后武装触发器」的顺序接通信号链。
+>
+> ⚠ 代价是：`TIM1_CH4` 已在 20 kHz 运行，每个载波周期都会跑一轮 11.43 µs 的过采样转换，而目前还没有任何消费者读这些数据。这个耗时与 1 µs 触发提前量的余量问题见第 9.3 节与第 13 节待核对项 I。
 
 顺序有意义：GPIO/I2C/TIM6 必须先于依赖它们的业务模块。`SystemClock_Config()` 是 `main.c` 内**唯一**由业务文件实现的配置函数（CubeMX 生成，在 `USER CODE` 块外）。
 
@@ -1040,6 +1042,152 @@ measurement_manager_t g_measurement_manager = {
 
 ---
 
+## 9. 模块 F：电流采样（`Modules/Current_Sampling/`）— ⚠ 配置层与启动编排已完成，业务层未实现
+
+### 9.1 模块职责与拥有的外设资源
+
+一句话：**用 STM32G431VB 的片内运放把两路相电流采样信号放大，再用 ADC1 注入组数字化，交给电流环。**
+
+本轮实现的是**配置层（L1）+ 启动编排**：把运放和 ADC 准备好、校准好、按正确顺序接通信号链，然后交出句柄。**业务层（L4）尚未实现**——没有偏置标定、没有原始码到安培的换算、没有供 `foc_port_t.read_feedback` 调用的接口。
+
+模块采用第 12 节推荐的「配置/业务分文件」范式：
+
+```text
+Modules/Current_Sampling/
+├── Inc/adc1_current_sampling.h   ← L1：MX_*_Init() 与 CurrentSampling_Start() 声明
+│                                      + 句柄 extern + 硬件常量
+└── Src/adc1_current_sampling.c   ← L1 实现
+    （业务文件待建：Inc/current_sampling.h + Src/current_sampling.c）
+```
+
+| 外设 | 配置位置 | 作用 | 导出给上层的东西 |
+| --- | --- | --- | --- |
+| **OPAMP1**（片内）<br>PA1 / PA3 / PA2 | `Src/adc1_current_sampling.c` 的 `MX_OPAMP1_Init()` | 独立跟随模式放大一路相电流信号，输出到 PA2 | `extern OPAMP_HandleTypeDef hopamp1`<br>`HAL_StatusTypeDef MX_OPAMP1_Init(void)` |
+| **OPAMP3**（片内）<br>PB0 / PB2 / PB1 | 同上，`MX_OPAMP3_Init()` | 独立跟随模式放大另一路，输出到 PB1 | `extern OPAMP_HandleTypeDef hopamp3`<br>`HAL_StatusTypeDef MX_OPAMP3_Init(void)` |
+| **ADC1**（注入组）<br>IN3 = PA2<br>IN12 = PB1 | 同上，`MX_ADC1_Init()` | 把两路运放输出数字化，16 倍过采样，由 TIM1_CH4 触发；含上电自校准 | `extern ADC_HandleTypeDef hadc1`<br>`HAL_StatusTypeDef MX_ADC1_Init(uint8_t)` |
+| 信号链启动 | 同上，`CurrentSampling_Start()` | 按「运放先启动、ADC 后武装触发器」的顺序接通信号 | `HAL_StatusTypeDef CurrentSampling_Start(void)` |
+| 六个模拟脚的 GPIO | `Core/Src/stm32g4xx_hal_msp.c` 的 `HAL_OPAMP_MspInit()` | 配为 `GPIO_MODE_ANALOG` + `NOPULL` | 无（HAL 自动回调） |
+| ADC12 时钟 | 同上，`HAL_ADC_MspInit()` | 使能 `ADC12` 内核时钟 | 无 |
+
+**为什么只采两相：** FOC 的 Clarke 变换只需要 `ia` / `ib`，第三相由 `ia + ib + ic = 0` 推出（见第 6.3 节）。这是全工程里**算法需求反向约束配置层**的唯一例子。
+
+**为什么用注入组而不是规则组：** 注入组有独立的 `JDR1`~`JDR4` 数据寄存器，不会被规则组的 DMA 流覆盖；且注入转换可以由 `TIM1_CH4` 精确触发，保证采样点与 PWM 载波同步。电流环要的就是这个确定性。
+
+**为什么两路都走外部引脚而不用运放内部通道：**
+
+| 运放 | ADC1 上有内部通道吗 | 结论 |
+| --- | --- | --- |
+| OPAMP3 | ❌ 没有。`VOPAMP3` 只挂在 `ADC2_IN18` / `ADC3_IN13` | PB1 = `ADC1_IN12` 是**唯一**可选路径 |
+| OPAMP1 | ✅ 有，`ADC_CHANNEL_VOPAMP1` = `ADC1_IN13` | 参考配置取外部 PA2 = IN3，本文件与之一致 |
+
+### 9.2 L1 配置接口
+
+```c
+extern OPAMP_HandleTypeDef hopamp1;
+extern OPAMP_HandleTypeDef hopamp3;
+extern ADC_HandleTypeDef   hadc1;
+
+extern volatile uint32_t ia_offsets;   /* 零电流偏置，⚠ 当前无代码填充，恒为 0 */
+extern volatile uint32_t ib_offsets;
+
+HAL_StatusTypeDef MX_OPAMP1_Init(void);
+HAL_StatusTypeDef MX_OPAMP3_Init(void);
+HAL_StatusTypeDef MX_ADC1_Init(uint8_t software_trigger_flag);
+HAL_StatusTypeDef CurrentSampling_Start(void);
+```
+
+四个函数都遵循本工程 L1 层的既定约定：**不含 `main.h`、不调 `Error_Handler()`，失败一律返回 `HAL_ERROR` 交给 `main.c` 处理**。
+
+> 🔑 **这里与用户提供的参考配置有一处刻意差异。** 参考配置返回 `void` 且失败时直接调 `Error_Handler()`，那会让 L1 配置层反向依赖 L6 的入口文件，违反第 2 节的分层约束（`gpio.c` / `i2c3_bus.c` / `tim6_heartbeat.c` / `tim1_pwm.c` 都遵守「返回状态码、不碰 `Error_Handler()`」）。本文件已改写为返回 `HAL_StatusTypeDef`，由 `main.c` 决定如何处置。
+
+**`MX_ADC1_Init()` 的关键配置及其理由：**
+
+| 配置项 | 取值 | 为什么 |
+| --- | --- | --- |
+| `ClockPrescaler` | `ADC_CLOCK_SYNC_PCLK_DIV4` | ADC12 内核时钟 168 MHz → ADC 时钟 42 MHz（G431 同步模式上限 60 MHz，合规） |
+| `InjectedNbrOfConversion` | 2 | rank 1 = `ADC_CHANNEL_3`(PA2)，rank 2 = `ADC_CHANNEL_12`(PB1) |
+| `InjectedSamplingTime` | 2.5 cycles | 全表最短档。驱动源是片内运放输出、源阻抗低，短采样足够；⚠ 但与过采样叠加后的总耗时见 9.3 |
+| `InjecOversamplingMode` | `ENABLE`，比率 16，右移 `NONE` | 硬件累加 16 次转换后写 JDR 做噪声平均；**不移位**，所以读出的是 16 位累加值 |
+| `EOCSelection` | `ADC_EOC_SEQ_CONV` | 整个序列结束才置 EOC，因此读 JDR 时两个通道的数据必然同时有效，不会读到半更新序列 |
+| `Overrun` | `ADC_OVR_DATA_PRESERVED` | 溢出时保留旧数据。电流环宁可拿到略旧的一次采样，也不要撕裂的数据 |
+| `QueueInjectedContext` | `DISABLE` | 每个 TIM1_CH4 触发点都重新开跑固定序列，适合 20 kHz 等间隔触发 |
+| `OversamplingMode` | `DISABLE` | ⚠ 这一项关的是**规则组**过采样，与注入组的 `InjecOversamplingMode` 互不影响，别误读 |
+| `DataAlign` | `ADC_DATAALIGN_LEFT` | ⚠ **该赋值被硬件忽略**：过采样使能时 ALIGN 位不起作用，RM0440 §21.4.26 明确「过采样模式下不支持左对齐」。实际是右对齐，见待核对项 K |
+| `multimode.Mode` | `ADC_MODE_INDEPENDENT` | 不用 ADC1/ADC2 双模，两相由同一注入序列顺序转换 |
+
+**`software_trigger_flag` 参数的含义：**
+
+| 取值 | 触发源 | 用途 | 当前 `main.c` |
+| --- | --- | --- | --- |
+| 非 0 | `ADC_INJECTED_SOFTWARE_START` | 上电偏置标定。摘除 TIM1_CH4 触发，标定不受 PWM 时序干扰 | — |
+| 0 | `ADC_EXTERNALTRIGINJEC_T1_CC4` 上升沿 | 运行时的电流环，采样点跟随载波 | ✅ **传的是 `0U`** |
+
+> 🔑 边沿参数 `ADC_EXTERNALTRIGINJECCONV_EDGE_RISING` 在两个分支下都赋了值，这是安全的：HAL 在触发源为软件启动时会**跳过** `JEXTEN` 的写入（`stm32g4xx_hal_adc_ex.c` 里 `ExternalTrigInjecConv != ADC_INJECTED_SOFTWARE_START` 的判断，单通道与多通道两个分支都有），所以软件触发模式下这个赋值根本不落到寄存器。
+>
+> 🔑 **校准顺序有硬性前提：** `HAL_ADCEx_Calibration_Start()` 要求 ADC 处于关闭状态，所以前面显式调了一次 `HAL_ADC_Stop()`。而 `HAL_ADC_Init()` 已经自动完成「退出深掉电模式 → 使能内部稳压器 → 忙等稳压」，所以此处**不需要**额外延时。
+>
+> 🔑 **配置与启动分离**，与模块 B 的 `MX_TIM1_Init()` 刻意不清 MOE 是同一条分界原则：`MX_ADC1_Init()` 只配置和校准，`CurrentSampling_Start()` 才启动运放并武装注入触发器。
+
+**`CurrentSampling_Start()` 的顺序为什么重要：** 先 `HAL_OPAMP_Start()` 两路运放，再 `HAL_ADCEx_InjectedStart()`。反过来的话，ADC 会在运放尚未建立输出时就开始转换，把无效电平当成采样值。硬件触发模式下 `HAL_ADCEx_InjectedStart()` 只负责使能 ADC 并武装触发器，后续转换由 `TIM1_CH4` 自动发起，**不需要在 ISR 里手工启动**。
+
+**导出的硬件常量：**
+
+```c
+ADC1_CS_ADC_CLOCK_HZ        42000000  /* 168 MHz / 4，同步模式 */
+ADC1_CS_CYCLES_PER_CONV             15  /* 采样 2.5 + 逐次逼近 12.5 */
+ADC1_CS_OVERSAMPLING_RATIO          16
+ADC1_CS_OVERSAMPLED_CONV_NS       5714  /* 单通道一轮过采样 = 5.71 µs */
+ADC1_CS_SEQUENCE_CONV_NS         11428  /* 两通道序列 = 11.43 µs */
+ADC1_CS_TRIGGER_LEAD_NS           1000  /* 记录模块 B 的 CH4 提前量，仅备注 */
+```
+
+### 9.3 时序与数据换算（改参数必看）
+
+**时序：**
+
+```text
+ADC 时钟            = 168 MHz / 4                      = 42 MHz
+单次转换            = (2.5 + 12.5) cycles / 42 MHz     = 357 ns
+单通道过采样 16 倍   = 357 ns x 16                      = 5.71 µs
+注入序列两个通道     = 5.71 µs x 2                      = 11.43 µs
+PWM 周期（20 kHz）                                      = 50 µs
+TIM1_CH4 触发提前量（模块 B）                            = 1 µs
+```
+
+⚠ **序列耗时是触发提前量的 11 倍**，这是个必须决策的问题，详见第 13 节待核对项 I。
+
+**数据换算：**
+
+| 量 | 值 | 说明 |
+| --- | --- | --- |
+| 12 位满量程 | 4095 | `ADC_RESOLUTION_12B` |
+| JDR 满量程 | **65520** | 4095 × 16，过采样累加且**未右移**，占满 16 位 |
+| 12 位等效码 | `JDR / 16` | 业务层换算的第一步 |
+| 数据对齐 | **右对齐** | ⚠ 尽管配置写的是 `ADC_DATAALIGN_LEFT`，过采样使能时该位被硬件忽略（RM0440 §21.4.26）。**若误按左对齐理解会多移一次位，得到相差 16 倍的电流值** |
+| 零点 | `ia_offsets` / `ib_offsets` | 功率级关断时采到的运放中点偏置。**当前恒为 0**（业务层未实现） |
+
+> 换算成安培还需要采样电阻阻值与运放增益（由外部电阻网络决定）。这两个参数属于业务层，且相别归属尚未实测确认（待核对项 J），因此**没有写死进配置层代码**。
+
+### 9.4 尚未实现的业务层
+
+配置层交出了句柄、信号链也已接通，注入组正随载波持续更新 `JDR1` / `JDR2`。但**从原始码到可用电流值之间的所有环节都还不存在**：
+
+```text
+待实现（建议放 Modules/Current_Sampling/Src/current_sampling.c）
+├── 零电流偏置标定      上电、MOE=0 时采若干轮取均值，写入 ia_offsets / ib_offsets
+├── 原始码读取           HAL_ADCEx_InjectedGetValue(&hadc1, ADC_INJECTED_RANK_1/2)
+├── 单位换算             JDR → 减偏置 → /16 → ×(VREF / 4095) → /(Rshunt × Gain) → 安培
+└── 供 FOC 消费的接口    填 foc_input_t.phase_a / phase_b（见 6.5 节 read_feedback 行）
+```
+
+**上层是谁：** 未来的 FOC 端口胶水层（经 `foc_port_t.read_feedback`），以及 L6 `main.c`（标定编排）。
+
+**读取位置：** 必须在 `TIM1_CC` ISR（优先级 0）里，且要注意 11.43 µs 的序列耗时意味着**中断入口立即读 JDR 拿到的是滞后一个周期的数据**（见待核对项 I）。
+
+> ⚠ `ia_offsets` / `ib_offsets` 目前被链接器当作未使用符号移除（构建日志里可见 `Removing adc1_current_sampling.o(.bss.ia_offsets), (4 bytes)`），这是刻意的——它们是给业务层预留的落点，定义在配置层只是为了让调试器可见、并明确标定结果的归属。实现业务层后会自然被保留。
+
+---
+
 ## 10. 跨模块调用关系速查
 
 ### 10.1 「我要做 X，该调用谁？」
@@ -1060,6 +1208,10 @@ measurement_manager_t g_measurement_manager = {
 | 跑电流环 | `FOC_ControllerStep()` | C | L5 | ⚠ 需先实现四个端口回调；须放 `TIM1_CC` ISR |
 | 初始化 I2C / TIM6 / GPIO | `MX_I2C3_Init()` / `MX_TIM6_Init()` / `MX_GPIO_Init()` | A / E | L1 | **只由 `main()` 各调一次** |
 | 初始化 TIM1 PWM | `MX_TIM1_Init()` | B | L1/L4 | 同上 |
+| 初始化电流采样运放 | `MX_OPAMP1_Init()` / `MX_OPAMP3_Init()` | F | L1 | **只由 `main()` 各调一次，且必须先于 `MX_ADC1_Init()`** |
+| 初始化 ADC1 注入组 | `MX_ADC1_Init(software_trigger_flag)` | F | L1 | 同上；`0U` = TIM1_CH4 触发，非 0 = 软件触发（标定用） |
+| 接通电流采样信号链 | `CurrentSampling_Start()` | F | L1 | 必须在三个 `MX_*_Init()` 全部成功之后调用一次 |
+| 读相电流原始码 | `HAL_ADCEx_InjectedGetValue(&hadc1, rank)` | F | L1 | ⚠ 业务层未实现；须在 `TIM1_CC` ISR 内，且注意 9.3 的时序滞后 |
 
 ### 10.2 依赖矩阵（✅ = 允许调用）
 
@@ -1070,7 +1222,10 @@ measurement_manager_t g_measurement_manager = {
 | **L4 三相驱动**（B） | ✅ 句柄 | ❌ | ❌ | — | ❌ | ❌ |
 | **L5 FOC**（C） | ❌ | ❌ | 只读快照 / 快速安全门 | 经端口回调 | — | ❌ |
 | **L5 测试**（D） | ❌ | ❌ | 只读状态 | ✅ | ❌ | — |
+| **L1 配置**（F 电流采样） | — | ❌ | ❌ | ❌ | ❌ | ❌ |
 | **L6 入口**（E） | ✅ 全部 | ❌ 不直接调 | ✅ | ✅ | ✅ | ✅ |
+
+> 模块 F 目前**只有 L1 配置层**：它不调用任何其他层，只被 L6 `main.c` 在初始化阶段调用。将来的业务层（L4）可以读 L1 句柄，但同样不得反向调用 L5/L6。
 
 ### 10.3 禁止的调用方向
 
@@ -1083,6 +1238,9 @@ measurement_manager_t g_measurement_manager = {
 - ❌ **FOC 层 `#include` 硬件头文件**（必须经 `foc_port_t` 回调）
 - ❌ **重复定义 `HAL_TIM_PeriodElapsedCallback`**（已被 `drv_monitor.c` 占用；`USE_HAL_TIM_REGISTER_CALLBACKS = 0` 意味着全工程只能有一个定义）
 - ❌ **新增业务模块的头文件从 `main.h` 借用宏**（头文件只暴露业务接口）
+- ❌ **在注入序列完成前读 `JDR`**（`EOCSelection = ADC_EOC_SEQ_CONV` 只保证不读到半更新序列，不保证数据已就绪；序列耗时见 9.3）
+- ❌ **除 L1 配置层与未来业务层外的模块直接操作 `hadc1` / `hopamp1` / `hopamp3`**（采样外设必须单一持有者）
+- ❌ **把过采样后的 JDR 当作 12 位左对齐值处理**（实际是右对齐的 16 位累加值，见待核对项 K）
 
 ### 10.4 上下文（执行环境）契约
 
@@ -1094,7 +1252,9 @@ measurement_manager_t g_measurement_manager = {
 | `TIM1_UP` ISR（优先级 1） | 20 kHz | 未来周期边界状态机 | 同上 |
 | `TIM6_DAC` ISR（优先级 15） | 1 s | 置 tick 标志 | **任何 I2C**、状态机推进、`HAL_Delay()` |
 | 主循环（无优先级） | 无截止 | `DrvMonitor_Task()`（含全部 I2C）、`Tim1PwmVerify_Task()`、`DrvMonitor_PostRequest()`、跨层仲裁 | 长时间阻塞（会拖慢监控心跳） |
-| 初始化阶段 | 一次性 | 阻塞式 `STSPIN32G4_*`、`DrvMonitor_Init()`、`Tim1PwmVerify_Start()`（含 50 ms 延时） | —（此时无实时任务，阻塞无害） |
+| 初始化阶段 | 一次性 | 阻塞式 `STSPIN32G4_*`、`DrvMonitor_Init()`、`Tim1PwmVerify_Start()`（含 50 ms 延时）、`MX_OPAMP1/3_Init()`、`MX_ADC1_Init()`（含阻塞式自校准）、`CurrentSampling_Start()` | —（此时无实时任务，阻塞无害） |
+
+> ⚠ **模块 F 的注入组刻意不占用独立中断向量。** `HAL_ADC_MspInit()` 里没有配置任何 ADC NVIC——注入组由模块 B 已经拥有的 `TIM1_CC` ISR（优先级 0）消费。再加一个向量只会平白增加中断延迟，还会与第 8.1 节的优先级方案冲突。
 
 ---
 
@@ -1153,19 +1313,22 @@ Keil 中 **Debug**（Ctrl+F5）下载并调试；调试器配置在 `MDK-ARM/Deb
 | D 测试验证 | L5 | MOS 管驱动验证波形 | ✅ 完成，**当前固件运行的就是这个** |
 | C 控制算法 | L5 | FOC 电流环算法 + 端口调度 | ⚠ 算法已实现，**端口未接线，未被调用** |
 | F 电流采样 | L1 | OPAMP1 / OPAMP3 跟随放大 + ADC1 注入组两通道 + 16 倍过采样 + 上电自校准 | ✅ 完成 |
+| F 电流采样 | L1 | 信号链启动编排 `CurrentSampling_Start()`（运放先启动、ADC 后武装触发器） | ✅ 完成 |
 | F 电流采样 | L4 | 偏置标定 + 原始码到安培换算 + 供 `read_feedback` 使用 | ❌ 未实现 |
-| — | — | 编码器（MT6835） | ❌ 未实现（空 Keil 分组，手册已备） |
+| G 编码器 | L1 | SPI1 配置：PA4 软件 CSN / PA5 SCK / PA6 MISO / PA7 MOSI，模式 3，10.5 MHz | ✅ 完成 |
+| G 编码器 | L2 | MT6835 24 bit 帧读写 + 角度帧 CRC-8 + STATUS 解码 | ✅ 完成 |
+| D 测试验证 | L5 | MT6835 SPI 通讯验证（`mt6835_verify`，主循环非阻塞推进） | ✅ 完成 |
 | — | — | 对外协议栈（CAN/UART） | ❌ 未实现（原理图已有通讯电路） |
 | — | — | 速度环 / 位置环 | ❌ 未实现 |
 | — | — | 参数存储 / 温度记录 / 遥测 | ❌ 未实现 |
 
-**固件当前行为：** 上电 → 配置外设（MOE=0，功率级未接通）→ 配置两个电流放大运放与 ADC1 注入组（软件触发，只校准不启动转换）→ `DrvMonitor_Init()` 清除栅极驱动锁存故障并启动 1 s 心跳 → 若驱动 READY 则等 50 ms 自举预充电后输出 U 相 5% 验证波形（其余两相低侧导通钳到 PGND）→ 主循环跑驱动监控心跳 + 测量同步 + 故障仲裁。**不会转动电机，也不会产生任何电流采样数据。**
+**固件当前行为：** 上电 → 配置外设（MOE=0，功率级未接通）→ 配置两个片内运放与 ADC1 注入组并自校准 → `CurrentSampling_Start()` 启动运放、武装 `TIM1_CH4` 触发 → `DrvMonitor_Init()` 清除栅极驱动锁存故障并启动 1 s 心跳 → 若驱动 READY 则等 50 ms 自举预充电后输出 U 相 5% 验证波形（其余两相低侧导通钳到 PGND）→ 主循环跑驱动监控心跳 + 测量同步 + 故障仲裁。**不会转动电机；注入组虽已随载波持续转换并更新 JDR1/JDR2，但没有任何代码读取或换算这些数据。**
 
 **推荐的下一步实现顺序**（按依赖关系）：
 
 1. ~~**电流采样层（配置部分）**~~ → ✅ **本轮已完成**，见第 9 节。ADC1 + 两通道（算法只需两相）+ TIM1_CH4 触发已就绪
 2. **电流采样层（业务部分）** → 填 `Modules/Current_Sampling/` 的业务文件。零电流偏置标定（写入 `ia_offsets` / `ib_offsets`）+ JDR 原始码 → 安培换算，供 `foc_port_t.read_feedback` 消费。**上电前必须先解决第 13 节待核对项 I 的时序余量与 J 的相别归属**
-3. **编码器层** → 填 `Modules/Encoder`。配置部分：SPI 或 I2C；业务部分：MT6835 机械角 × 极对数 → 电角度
+3. ~~**编码器层（配置 + L2）**~~ → ✅ 本轮完成。剩余业务部分：机械角 × 极对数 → 电角度，接入 `foc_port_t.read_feedback`
 4. **FOC 端口接线** → 按 6.5 节对照表实现四个回调，把上面两层与模块 B 连起来
 5. **电流环上电** → 在 `TIM1_CC` ISR（优先级 0）中调 `FOC_ControllerStep()`，先低压限流空载验证。**务必保证单次迭代远小于 1 ms**（见 8.1 节的 SysTick 阻塞约束）
 6. **速度环 / 位置环** → 主循环或独立定时器，输出 `q_reference`
@@ -1292,22 +1455,19 @@ PWM 周期（20 kHz）                          = 50 µs
 
 > 方向 D 最贴合原设计意图，但会挤压同一周期内的电流环执行时间（50 µs 周期里已用掉 11.43 µs 采样 + 电流环本身），**必须实测确认单次 `FOC_ControllerStep()` 的耗时**（第 8.1 节已有 1 ms 的 SysTick 阻塞约束）。
 
-### J. ⚠ 两路采样各自对应哪一相尚未确认
+### J. ⚠ 两路采样各自对应哪一相（U / V / W）尚未实测确认
 
-原理图 `hardware/舵机原理图/主控板.pdf` 的网表里存在**互相矛盾**的相别线索：
+**已确定的部分**（依据数据手册与 HAL/器件头文件，无需再查）：片内 `OPAMP1` 输出在 PA2 = `ADC1_IN3` = 注入 rank 1；片内 `OPAMP3` 输出在 PB1 = `ADC1_IN12` = 注入 rank 2。
 
-| 线索 | 内容 | 指向 |
-| --- | --- | --- |
-| 两个反馈网络的标注文字 | 「电机U相电流反馈」「电机W相电流反馈」 | U 与 W |
-| 两个采样电阻的网络名 | `PDGND1U` / `PDGND1V` | U 与 V |
+**未确定的部分**：这两路各自采的是电机哪一相。原理图上存在互相矛盾的线索（两个反馈网络标注为「电机U相电流反馈」「电机W相电流反馈」，而两个采样电阻的网络名是 `PDGND1U` / `PDGND1V`），但**原理图不作为判据**——本项目原理图的规范性不足，据此推断容易得出错误结论。
 
-**两条线索不一致**，且无法从网表文本可靠判定 `ADC1_IN3`（rank 1）与 `ADC1_IN12`（rank 2）各自对应哪一相。因此：
+因此：
 
 - 代码注释里**只描述「通道 / 引脚 / rank」这些确定事实**，不断言相别。
 - `ia_offsets` / `ib_offsets` 的 `a` / `b` 只是沿用参考配置的命名，**不代表已确认的相别**。
 - 业务层做安培换算、以及 FOC 的 `foc_input_t.phase_a / phase_b` 接线之前，**必须先确认这个映射**。接错的后果是 Clarke 变换算出错误的 β 分量，电流环会朝错误方向调节。
 
-**确认方法：** 对照原理图 PDF 中「相电流采集」页的实际连线（网表文本提取不出引脚级连接关系），或在硬件上给单相通小电流、看哪一路 JDR 变化。
+**确认方法（实测，一次即可定论）：** 功率级保持关断（`MOE = 0`）先记录两路 JDR 的静态基线；然后只对单一相通一个小电流，看哪一路 JDR 偏离基线。两轮即可确定 rank 1 / rank 2 与相别的对应关系。
 
 ### K. 过采样模式下 `DataAlign` 被硬件忽略，但配置里仍写着左对齐
 
@@ -1348,7 +1508,7 @@ PWM 周期（20 kHz）                          = 50 µs
 | 6 | `TIM1_UP` 以 20 kHz 触发但无实际工作 | 为电流环预留骨架 | 刻意代价，源码注释已说明。实现电流环后应赋予其真实用途或关闭 |
 | 7 | 下次 CubeMX Generate Code 会重复生成 `i2c.c` / `tim.c` | 配置文件被移出默认输出位置 | 见 13.C |
 | 8 | 注入序列耗时 11.43 µs，是 1 µs 触发提前量的 11 倍 | 16 倍过采样把单通道耗时放大 16 倍 | 见 13.I，电流环上线前必须决策 |
-| 9 | 两路采样各自对应哪一相未确认 | 原理图反馈网络标注（U/W）与采样电阻网络名（U/V）矛盾 | 见 13.J，业务层换算前必须确认 |
+| 9 | 两路采样各自对应哪一相未确认 | 尚未做通电实测；原理图线索互相矛盾且不作为判据 | 见 13.J，业务层换算前必须实测确认 |
 | 10 | `ia_offsets` / `ib_offsets` 恒为 0，被链接器当未用符号移除 | 偏置标定属业务层，本轮只实现配置层 | 刻意如此，头文件注释已说明；实现业务层后自然消失 |
 
 ---

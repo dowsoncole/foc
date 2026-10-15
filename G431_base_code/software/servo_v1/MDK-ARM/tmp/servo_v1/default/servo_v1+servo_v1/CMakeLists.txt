@@ -63,6 +63,12 @@ target_include_directories(${CONTEXT} PUBLIC
   "${SOLUTION_ROOT}/RTE/_servo_v1"
   "${CMSIS_PACK_ROOT}/ARM/CMSIS/6.3.0/CMSIS/Core/Include"
   "${SOLUTION_ROOT}/../Core/Inc"
+  "${SOLUTION_ROOT}/../Modules/Driver_Communication/Inc"
+  "${SOLUTION_ROOT}/../Modules/Three_Phase_Driver/Inc"
+  "${SOLUTION_ROOT}/../Modules/Encoder/Inc"
+  "${SOLUTION_ROOT}/../Tests/Inc"
+  "${SOLUTION_ROOT}/../Modules/Current_Sampling/Inc"
+  "${SOLUTION_ROOT}/../FOC/Inc"
 )
 
 # Defines
@@ -128,8 +134,12 @@ include("components.cmake")
 target_link_libraries(${CONTEXT} PUBLIC
   Group_Application_Startup
   Group_Application_Core
-  Group_Modules_MOS_Driver
+  Group_Modules_Driver_Communication
   Group_Modules_Three-Phase_Driver
+  Group_Modules_Encoder
+  Group_Tests
+  Group_Modules_Current_Sampling
+  Group_Modules_FOC
   Group_Drivers_STM32G4xx_HAL_Driver
   Group_Drivers_CMSIS
   ARM_CMSIS_CORE_6_2_0

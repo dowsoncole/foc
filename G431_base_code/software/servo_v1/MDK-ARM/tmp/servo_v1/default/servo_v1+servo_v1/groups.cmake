@@ -63,7 +63,6 @@ add_library(Group_Modules_Driver_Communication OBJECT
 )
 target_include_directories(Group_Modules_Driver_Communication PUBLIC
   $<TARGET_PROPERTY:${CONTEXT},INTERFACE_INCLUDE_DIRECTORIES>
-  "${SOLUTION_ROOT}/../Core/Inc"
   "${SOLUTION_ROOT}/../Modules/Driver_Communication/Inc"
 )
 target_compile_definitions(Group_Modules_Driver_Communication PUBLIC
@@ -86,7 +85,6 @@ add_library(Group_Modules_Three-Phase_Driver OBJECT
 )
 target_include_directories(Group_Modules_Three-Phase_Driver PUBLIC
   $<TARGET_PROPERTY:${CONTEXT},INTERFACE_INCLUDE_DIRECTORIES>
-  "${SOLUTION_ROOT}/../Core/Inc"
   "${SOLUTION_ROOT}/../Modules/Three_Phase_Driver/Inc"
 )
 target_compile_definitions(Group_Modules_Three-Phase_Driver PUBLIC
@@ -103,13 +101,37 @@ target_link_libraries(Group_Modules_Three-Phase_Driver PUBLIC
   Group_Modules_Three-Phase_Driver_ABSTRACTIONS
 )
 
+# group Modules/Encoder
+add_library(Group_Modules_Encoder OBJECT
+  "${SOLUTION_ROOT}/../Modules/Encoder/Src/spi1_encoder.c"
+  "${SOLUTION_ROOT}/../Modules/Encoder/Src/mt6835.c"
+)
+target_include_directories(Group_Modules_Encoder PUBLIC
+  $<TARGET_PROPERTY:${CONTEXT},INTERFACE_INCLUDE_DIRECTORIES>
+  "${SOLUTION_ROOT}/../Modules/Encoder/Inc"
+)
+target_compile_definitions(Group_Modules_Encoder PUBLIC
+  $<TARGET_PROPERTY:${CONTEXT},INTERFACE_COMPILE_DEFINITIONS>
+)
+add_library(Group_Modules_Encoder_ABSTRACTIONS INTERFACE)
+target_link_libraries(Group_Modules_Encoder_ABSTRACTIONS INTERFACE
+  ${CONTEXT}_ABSTRACTIONS
+)
+target_compile_options(Group_Modules_Encoder PUBLIC
+  $<TARGET_PROPERTY:${CONTEXT},INTERFACE_COMPILE_OPTIONS>
+)
+target_link_libraries(Group_Modules_Encoder PUBLIC
+  Group_Modules_Encoder_ABSTRACTIONS
+)
+
 # group Tests
 add_library(Group_Tests OBJECT
   "${SOLUTION_ROOT}/../Tests/Src/tim1_pwm_verify.c"
+  "${SOLUTION_ROOT}/../Tests/Src/waveform_generator.c"
+  "${SOLUTION_ROOT}/../Tests/Src/mt6835_verify.c"
 )
 target_include_directories(Group_Tests PUBLIC
   $<TARGET_PROPERTY:${CONTEXT},INTERFACE_INCLUDE_DIRECTORIES>
-  "${SOLUTION_ROOT}/../Core/Inc"
   "${SOLUTION_ROOT}/../Tests/Inc"
 )
 target_compile_definitions(Group_Tests PUBLIC
@@ -126,6 +148,29 @@ target_link_libraries(Group_Tests PUBLIC
   Group_Tests_ABSTRACTIONS
 )
 
+# group Modules/Current Sampling
+add_library(Group_Modules_Current_Sampling OBJECT
+  "${SOLUTION_ROOT}/../Modules/Current_Sampling/Src/adc1_current_sampling.c"
+  "${SOLUTION_ROOT}/../Modules/Current_Sampling/Src/current_sampling.c"
+)
+target_include_directories(Group_Modules_Current_Sampling PUBLIC
+  $<TARGET_PROPERTY:${CONTEXT},INTERFACE_INCLUDE_DIRECTORIES>
+  "${SOLUTION_ROOT}/../Modules/Current_Sampling/Inc"
+)
+target_compile_definitions(Group_Modules_Current_Sampling PUBLIC
+  $<TARGET_PROPERTY:${CONTEXT},INTERFACE_COMPILE_DEFINITIONS>
+)
+add_library(Group_Modules_Current_Sampling_ABSTRACTIONS INTERFACE)
+target_link_libraries(Group_Modules_Current_Sampling_ABSTRACTIONS INTERFACE
+  ${CONTEXT}_ABSTRACTIONS
+)
+target_compile_options(Group_Modules_Current_Sampling PUBLIC
+  $<TARGET_PROPERTY:${CONTEXT},INTERFACE_COMPILE_OPTIONS>
+)
+target_link_libraries(Group_Modules_Current_Sampling PUBLIC
+  Group_Modules_Current_Sampling_ABSTRACTIONS
+)
+
 # group Modules/FOC
 add_library(Group_Modules_FOC OBJECT
   "${SOLUTION_ROOT}/../FOC/Src/foc_algorithm.c"
@@ -133,7 +178,6 @@ add_library(Group_Modules_FOC OBJECT
 )
 target_include_directories(Group_Modules_FOC PUBLIC
   $<TARGET_PROPERTY:${CONTEXT},INTERFACE_INCLUDE_DIRECTORIES>
-  "${SOLUTION_ROOT}/../Core/Inc"
   "${SOLUTION_ROOT}/../FOC/Inc"
 )
 target_compile_definitions(Group_Modules_FOC PUBLIC
@@ -169,6 +213,14 @@ add_library(Group_Drivers_STM32G4xx_HAL_Driver OBJECT
   "${SOLUTION_ROOT}/../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_i2c_ex.c"
   "${SOLUTION_ROOT}/../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_tim.c"
   "${SOLUTION_ROOT}/../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_tim_ex.c"
+  "${SOLUTION_ROOT}/../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_adc.c"
+  "${SOLUTION_ROOT}/../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_adc_ex.c"
+  "${SOLUTION_ROOT}/../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_opamp.c"
+  "${SOLUTION_ROOT}/../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_opamp_ex.c"
+  "${SOLUTION_ROOT}/../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_uart.c"
+  "${SOLUTION_ROOT}/../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_uart_ex.c"
+  "${SOLUTION_ROOT}/../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_spi.c"
+  "${SOLUTION_ROOT}/../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_spi_ex.c"
 )
 target_include_directories(Group_Drivers_STM32G4xx_HAL_Driver PUBLIC
   $<TARGET_PROPERTY:${CONTEXT},INTERFACE_INCLUDE_DIRECTORIES>

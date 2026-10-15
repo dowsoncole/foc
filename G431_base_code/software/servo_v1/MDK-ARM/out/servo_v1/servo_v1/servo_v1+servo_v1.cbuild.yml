@@ -94,6 +94,12 @@ build:
     - _RTE_
   add-path:
     - ../../../../Core/Inc
+    - ../../../../FOC/Inc
+    - ../../../../Modules/Driver_Communication/Inc
+    - ../../../../Modules/Three_Phase_Driver/Inc
+    - ../../../../Modules/Current_Sampling/Inc
+    - ../../../../Modules/Encoder/Inc
+    - ../../../../Tests/Inc
     - ../../../../Drivers/STM32G4xx_HAL_Driver/Inc
     - ../../../../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy
     - ../../../../Drivers/CMSIS/Device/ST/STM32G4xx/Include
@@ -166,36 +172,76 @@ build:
           category: sourceC
         - file: ../../../../Core/Inc/stm32g4xx_hal_conf.h
           category: header
-        - file: ../../../../Core/Src/readme.md
-          category: doc
-    - group: Modules/MOS Driver
+    - group: Modules/Driver Communication
       files:
-        - file: ../../../../Core/Src/i2c.c
+        - file: ../../../../Modules/Driver_Communication/Src/i2c3_bus.c
           category: sourceC
-        - file: ../../../../Core/Inc/i2c.h
+        - file: ../../../../Modules/Driver_Communication/Inc/i2c3_bus.h
           category: header
-        - file: ../../../../Core/Src/tim.c
+        - file: ../../../../Modules/Driver_Communication/Src/tim6_heartbeat.c
           category: sourceC
-        - file: ../../../../Core/Inc/tim.h
+        - file: ../../../../Modules/Driver_Communication/Inc/tim6_heartbeat.h
           category: header
-        - file: ../../../../Core/Src/stspin32g4.c
+        - file: ../../../../Modules/Driver_Communication/Src/stspin32g4.c
           category: sourceC
-        - file: ../../../../Core/Inc/stspin32g4.h
+        - file: ../../../../Modules/Driver_Communication/Inc/stspin32g4.h
           category: header
-        - file: ../../../../Core/Src/drv_monitor.c
+        - file: ../../../../Modules/Driver_Communication/Src/drv_monitor.c
           category: sourceC
-        - file: ../../../../Core/Inc/drv_monitor.h
+        - file: ../../../../Modules/Driver_Communication/Inc/drv_monitor.h
           category: header
     - group: Modules/Three-Phase Driver
       files:
-        - file: ../../../../Core/Src/tim1_pwm.c
+        - file: ../../../../Modules/Three_Phase_Driver/Src/tim1_pwm.c
           category: sourceC
-        - file: ../../../../Core/Inc/tim1_pwm.h
+        - file: ../../../../Modules/Three_Phase_Driver/Inc/tim1_pwm.h
           category: header
-        - file: ../../../../Core/Src/tim1_pwm_verify.c
+    - group: Modules/Encoder
+      files:
+        - file: ../../../../Modules/Encoder/Src/spi1_encoder.c
           category: sourceC
-        - file: ../../../../Core/Inc/tim1_pwm_verify.h
+        - file: ../../../../Modules/Encoder/Inc/spi1_encoder.h
           category: header
+        - file: ../../../../Modules/Encoder/Src/mt6835.c
+          category: sourceC
+        - file: ../../../../Modules/Encoder/Inc/mt6835.h
+          category: header
+    - group: Tests
+      files:
+        - file: ../../../../Tests/Src/tim1_pwm_verify.c
+          category: sourceC
+        - file: ../../../../Tests/Inc/tim1_pwm_verify.h
+          category: header
+        - file: ../../../../Tests/Inc/measurement_manager.h
+          category: header
+        - file: ../../../../Tests/Src/waveform_generator.c
+          category: sourceC
+        - file: ../../../../Tests/Inc/waveform_generator.h
+          category: header
+        - file: ../../../../Tests/Src/mt6835_verify.c
+          category: sourceC
+        - file: ../../../../Tests/Inc/mt6835_verify.h
+          category: header
+    - group: Modules/Current Sampling
+      files:
+        - file: ../../../../Modules/Current_Sampling/Src/adc1_current_sampling.c
+          category: sourceC
+        - file: ../../../../Modules/Current_Sampling/Inc/adc1_current_sampling.h
+          category: header
+        - file: ../../../../Modules/Current_Sampling/Src/current_sampling.c
+          category: sourceC
+        - file: ../../../../Modules/Current_Sampling/Inc/current_sampling.h
+          category: header
+    - group: Modules/FOC
+      files:
+        - file: ../../../../FOC/Inc/foc_algorithm.h
+          category: header
+        - file: ../../../../FOC/Src/foc_algorithm.c
+          category: sourceC
+        - file: ../../../../FOC/Inc/foc_interface.h
+          category: header
+        - file: ../../../../FOC/Src/foc_interface.c
+          category: sourceC
     - group: Drivers/STM32G4xx_HAL_Driver
       files:
         - file: ../../../../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_pwr_ex.c
@@ -231,6 +277,22 @@ build:
         - file: ../../../../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_tim.c
           category: sourceC
         - file: ../../../../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_tim_ex.c
+          category: sourceC
+        - file: ../../../../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_adc.c
+          category: sourceC
+        - file: ../../../../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_adc_ex.c
+          category: sourceC
+        - file: ../../../../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_opamp.c
+          category: sourceC
+        - file: ../../../../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_opamp_ex.c
+          category: sourceC
+        - file: ../../../../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_uart.c
+          category: sourceC
+        - file: ../../../../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_uart_ex.c
+          category: sourceC
+        - file: ../../../../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_spi.c
+          category: sourceC
+        - file: ../../../../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_spi_ex.c
           category: sourceC
     - group: Drivers/CMSIS
       files:

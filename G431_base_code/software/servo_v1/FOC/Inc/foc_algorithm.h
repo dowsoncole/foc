@@ -15,6 +15,8 @@ typedef struct
 typedef struct
 {
   float sample_period_s;
+  /* 与 PWM 同步的电流环周期；为 0 时兼容使用 sample_period_s。 */
+  float pwm_period_s;
   float voltage_limit;
   float current_limit;
   foc_pi_t d_controller;
