@@ -344,6 +344,10 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef *hadc)
 {
   if (hadc->Instance == ADC1)
   {
+    /* ADC12SEL 复位值为 NONE。即使 SystemClock_Config() 已配置过，
+       在 ADC 初始化入口再次明确选择 SYSCLK，保证 ADC 内核确实有时钟；
+       仅打开 ADC12 总线时钟不能完成转换。 */
+    __HAL_RCC_ADC12_CONFIG(RCC_ADC12CLKSOURCE_SYSCLK);
     __HAL_RCC_ADC12_CLK_ENABLE();
     HAL_NVIC_SetPriority(ADC1_2_IRQn, 1U, 0U);
     HAL_NVIC_EnableIRQ(ADC1_2_IRQn);

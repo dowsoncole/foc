@@ -62,6 +62,10 @@ extern "C" {
 #define TIM1_PWM_DUTY_SCALE         1000U
 #define TIM1_PWM_DUTY_NEUTRAL       (TIM1_PWM_DUTY_SCALE / 2U)
 
+/* MOE 打开后给 STSPIN32G4 输入级和功率级一个稳定窗口；只有窗口结束后
+   才允许把 CCR 从中性点改成下管校准值。该接口只在上电流程中调用。 */
+#define TIM1_PWM_MOE_SETTLE_MS      10U
+
 /* ADC 采样相对 20 kHz 更新事件提前的时间；一个计数是 5.952 ns。
 
    取值 = 模块 F 注入序列总耗时的一半（11.43 µs / 2 = 5.714 µs），
@@ -207,6 +211,15 @@ uint16_t Tim1Pwm_GetPhaseDuty(uint32_t channel);
   * 应在使能输出之前调用。
   */
 void     Tim1Pwm_SetNeutral(void);
+
+/**
+  * @brief  进入电流零点校准用的三相下管导通状态。
+  *
+  * TIM1 计数器和 CH4 触发保持运行，三相高侧比较值置零，释放 MOE 后由
+  * 互补输出驱动下管。调用者必须先确认驱动器 READY，校准结束后切回
+  * Tim1Pwm_SetNeutral()。
+  */
+void     Tim1Pwm_EnableCalibrationLowSide(void);
 
 /**
   * @brief  【业务线】释放 MOE，让六路栅极信号到达功率级。

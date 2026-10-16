@@ -11,10 +11,13 @@ dependencies = [
 build = [
     "pyinstaller>=6.11",
 ]
+serial = [
+    "pyserial>=3.5",
+]
 
 [build-system]
 requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-py-modules = ["main", "servo_ui", "servo_core", "servo_animations", "servo_visuals"]
+py-modules = ["main", "servo_ui", "servo_core", "servo_animations", "servo_visuals", "servo_transport"]

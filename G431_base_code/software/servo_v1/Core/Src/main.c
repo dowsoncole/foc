@@ -45,6 +45,14 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
+/* OPAMP/ADC 已启动后，给模拟信号链和驱动器状态一个独立稳定时间；
+   这段时间 TIM1/CH4/ADC 继续运行，但 MOE 仍保持关闭。 */
+#define CURRENT_SAMPLING_MOE_GUARD_MS  20U
+
+/* 三相下管校准会真正释放 MOE。当前硬件已经报告 VDS_P，必须先完成栅极
+   极性、死区和母线电流测量，默认保持关闭，避免上电反复触发驱动保护。 */
+#define CURRENT_SAMPLING_ENABLE_LOW_SIDE_CALIBRATION  0U
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -179,9 +187,8 @@ int main(void)
   {
     Error_Handler();
   }
-  /* 功率级保持硬件关断：TIM1 初始化默认清 MOE，这里再次显式清除，
-     并且本应用生命周期内不调用 Tim1Pwm_EnableOutputs()。比较寄存器和
-     ADC/FOC 时序仍可运行，但六路栅极信号不会送到 STSPIN32G4。 */
+  /* 上电先保持硬件关断。MOE 只在零点校准完成、驱动状态安全且 FOC
+     即将启动时释放，避免 ADC 偏置采集阶段把电压施加到电机。 */
   Tim1Pwm_EmergencyStop();
   /* USER CODE BEGIN 2 */
   /* ------------------------------------------------------------------------
@@ -256,8 +263,19 @@ int main(void)
     Error_Handler();
   }
 
-  /* 先采集零点，再允许 ADC 完成中断驱动 FOC，避免偏置被当成电流。 */
+  if (MainFoc_IsPowerStageSafe(NULL) == 0U)
+  {
+    Error_Handler();
+  }
+  /* 先等待更长的稳定时间，再进入校准。默认宏为 0U，校准不释放 MOE；
+     ADC 完成回调中的 FOC_ControllerStep() 会立即返回。 */
+  HAL_Delay(CURRENT_SAMPLING_MOE_GUARD_MS);
+  /* 先进入 SETTLING。默认校准保持 MOE=0，TIM1/CH4/ADC 仍然独立运行；
+     只有完成硬件测量并确认下管模式安全后，才允许打开下面的实验开关。 */
   CurrentSampling_RequestCalibration();
+#if (CURRENT_SAMPLING_ENABLE_LOW_SIDE_CALIBRATION != 0U)
+  Tim1Pwm_EnableCalibrationLowSide();
+#endif
 
   /* ------------------------------------------------------------------------
    * 编码器 SPI 配置与通讯验证（Modules/Encoder + Tests）
@@ -274,8 +292,6 @@ int main(void)
   MT6835_PowerUpWait();
   (void)Mt6835Verify_Start();
 
-  /* 当前版本只运行采样与 FOC 计算，功率级始终保持 MOE=0。 */
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -288,11 +304,6 @@ int main(void)
     CurrentSampling_Service();
     WaveformGenerator_Task();
     (void)Mt6835Verify_Task();
-    if ((CurrentSampling_GetCalibrationState() == CURRENT_SAMPLING_CAL_DONE) &&
-        (g_foc_controller.running == 0U))
-    {
-      FOC_ControllerStart(&g_foc_controller);
-    }
     /* --------------------------------------------------------------------
      * 后台任务层：无截止时间，可阻塞数十 µs
      * --------------------------------------------------------------------
@@ -300,6 +311,30 @@ int main(void)
      * 近乎为零。全工程的所有 I2C 通信都发生在这一次调用内部，绝不在中断里。
      */
     DrvMonitor_Task();
+
+    /* MOE 是 TIM1 高级定时器的最终输出门。FOC running 只代表算法允许运行，
+       两者必须分开管理：这里由应用层在校准完成且驱动 READY 后释放 MOE。 */
+    if ((g_foc_controller.running == 0U) &&
+        (CurrentSampling_GetCalibrationState() == CURRENT_SAMPLING_CAL_DONE) &&
+        (MainFoc_IsPowerStageSafe(NULL) != 0U))
+    {
+      Tim1Pwm_SetNeutral();
+//      Tim1Pwm_EnableOutputs();
+      FOC_ControllerStart(&g_foc_controller);
+    }
+    else if ((g_foc_controller.running == 0U) &&
+             (CurrentSampling_GetCalibrationState() == CURRENT_SAMPLING_CAL_ERROR))
+    {
+      Tim1Pwm_EmergencyStop();
+    }
+    else if ((g_foc_controller.running != 0U) &&
+             (MainFoc_IsPowerStageSafe(NULL) == 0U))
+    {
+      /* 驱动故障时先停止算法，再无条件清 MOE；重新启动必须重新校准并由
+         上层显式恢复，避免故障消失后自动重新上电。 */
+      FOC_ControllerStop(&g_foc_controller);
+      Tim1Pwm_EmergencyStop();
+    }
 
     /* TODO: 协议栈（CAN/UART）、参数存储、温度记录、上位机遥测 ……
      * 都属于这一层。 */
@@ -315,6 +350,7 @@ void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
 
   /** Configure the main internal regulator output voltage
   */
@@ -352,6 +388,17 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /* ADC12 的复位时钟源为 NONE。只打开 ADC12 总线时钟还不够，必须显式
+     选择内核时钟，否则 ADEN/JADSTART 可以置位，但转换永远不会完成，
+     表现为 JEOS 不置位、JDR 不更新、采样序号保持 0。ADC12 源为
+     SYSCLK=168 MHz，ADC 配置使用异步分频 4 得到 42 MHz。 */
+  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_ADC12;
+  PeriphClkInitStruct.Adc12ClockSelection = RCC_ADC12CLKSOURCE_SYSCLK;
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
   {
     Error_Handler();
   }

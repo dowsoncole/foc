@@ -97,8 +97,8 @@ HAL_StatusTypeDef MX_OPAMP3_Init(void)
   * @brief  配置 ADC1 注入组两个通道（rank 1 = 通道 3 / PA2 / U 相，rank 2 = 通道 12 / PB1 / V 相），
   *         16 倍过采样，随后执行一次上电自校准。
   *
-  * 时钟换算：ADC12 内核时钟 168 MHz，ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4
-  *   -> ADC 时钟 42 MHz（G431 同步模式上限 60 MHz，合规）。
+  * 时钟换算：RCC 把 ADC12 内核源选为 SYSCLK=168 MHz，因此必须走异步分频，
+  *   ClockPrescaler = ADC_CLOCK_ASYNC_DIV4 -> ADC 时钟 42 MHz（合规）。
   *   单次转换 = 采样 2.5 cycles + 12 位逐次逼近 12.5 cycles = 15 cycles
   *   -> 357 ns；过采样 16 倍 -> 5.71 µs / 通道，两通道序列 11.43 µs。
   *
@@ -123,7 +123,10 @@ HAL_StatusTypeDef MX_ADC1_Init(uint8_t software_trigger_flag)
   /** Common config
   */
   hadc1.Instance = ADC1;
-  hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
+  /* RCC_ADC12CLKSOURCE_SYSCLK 对应 ADC 的异步内核时钟路径；不能与
+     ADC_CLOCK_SYNC_PCLK_DIV4 混用。后者只适用于 PCLK 同步路径，会造成
+     ADEN/JADSTART 置位但注入转换不结束。SYSCLK/4 仍为 42 MHz。 */
+  hadc1.Init.ClockPrescaler = ADC_CLOCK_ASYNC_DIV4;
   hadc1.Init.Resolution = ADC_RESOLUTION_12B;
   /* ⚠ 左对齐在这里被硬件忽略：注入组过采样已使能，RM0440 §21.4.26 明确
      「过采样模式下不支持左对齐」，ALIGN 位不起作用，JDR 里是右对齐的
@@ -260,6 +263,15 @@ HAL_StatusTypeDef CurrentSampling_Start(void)
      放在该中断回调中，确保使用的是本周期刚完成的两相电流。 */
   if (HAL_ADCEx_InjectedStart_IT(&hadc1) != HAL_OK)
   {
+    return HAL_ERROR;
+  }
+
+  /* 启动 API 成功后必须同时满足 ADEN 和 JEOSIE。若任一条件不成立，
+     主循环继续运行也只会让校准窗口超时，无法得到可诊断的错误原因。 */
+  if (((ADC1->CR & ADC_CR_ADEN) == 0U) ||
+      ((ADC1->IER & ADC_IER_JEOSIE) == 0U))
+  {
+    (void)HAL_ADCEx_InjectedStop_IT(&hadc1);
     return HAL_ERROR;
   }
 

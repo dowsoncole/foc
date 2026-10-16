@@ -152,18 +152,18 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>74</LineNumber>
+          <LineNumber>133</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134221466</Address>
+          <Address>134248124</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>../FOC/Src/foc_algorithm.c</Filename>
+          <Filename>../Core/Src/main.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\servo_v1\../FOC/Src/foc_algorithm.c\74</Expression>
+          <Expression>\\servo_v1\../Core/Src/main.c\133</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -191,6 +191,16 @@
           <count>4</count>
           <WinNumber>1</WinNumber>
           <ItemText>g_mt6835_verify</ItemText>
+        </Ww>
+        <Ww>
+          <count>5</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>g_foc_controller</ItemText>
+        </Ww>
+        <Ww>
+          <count>6</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>g_current_sampling,0x0A</ItemText>
         </Ww>
       </WatchWindow1>
       <Tracepoint>
@@ -249,12 +259,20 @@
           <WinId>35901</WinId>
         </Entry>
         <Entry>
+          <Name>System Viewer\RCC</Name>
+          <WinId>35899</WinId>
+        </Entry>
+        <Entry>
           <Name>System Viewer\SPI1</Name>
           <WinId>35903</WinId>
         </Entry>
         <Entry>
           <Name>System Viewer\TIM1</Name>
           <WinId>35904</WinId>
+        </Entry>
+        <Entry>
+          <Name>System Viewer\USART1</Name>
+          <WinId>35900</WinId>
         </Entry>
       </SystemViewers>
       <DebugDescription>
@@ -641,7 +659,7 @@
 
   <Group>
     <GroupName>Modules/FOC</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>

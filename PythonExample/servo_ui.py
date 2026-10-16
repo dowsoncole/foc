@@ -7,6 +7,7 @@ import math
 import random
 import sys
 from collections import deque
+from collections.abc import Sequence
 from datetime import datetime
 from pathlib import Path
 
@@ -22,6 +23,15 @@ from PyQt5.QtWidgets import (
 
 from servo_animations import AnimatedStackedWidget
 from servo_core import PARAMETERS, ServoModel, clamp
+from servo_transport import (
+    SineWaveformSource,
+    SerialWaveformSource,
+    TransportError,
+    estimate_frequency,
+    list_serial_ports,
+    parse_baudrate,
+    to_scope_samples,
+)
 from servo_visuals import TechSchematic
 
 SHELL, PANEL, PANEL_ALT = "#0d0c10", "#151419", "#1c1b21"
@@ -138,14 +148,29 @@ class TitleBar(QFrame):
 class ScopeChart(QWidget):
     COLORS = (CYAN, BLUE, AMBER, "#b58cff")
 
+    DEFAULT_CAPACITY = 180
+
     def __init__(self) -> None:
         super().__init__()
-        self.data = [deque(maxlen=180) for _ in range(4)]
+        self.capacity = self.DEFAULT_CAPACITY
+        self.data = [deque(maxlen=self.capacity) for _ in range(4)]
         self.visible = [True, True, True, False]
         self.theme_name = "dark"
         self.dirty = True
         self.setMinimumHeight(270)
         self.setAttribute(Qt.WA_OpaquePaintEvent)
+
+    def set_capacity(self, capacity: int) -> None:
+        """Resize every channel buffer, keeping the most recent samples."""
+        capacity = max(8, int(capacity))
+        if capacity == self.capacity:
+            return
+        self.capacity = capacity
+        resized = [
+            deque(series, maxlen=capacity) for series in self.data
+        ]
+        self.data = resized
+        self.dirty = True
 
     def set_theme(self, theme_name: str) -> None:
         self.theme_name = theme_name
@@ -157,8 +182,16 @@ class ScopeChart(QWidget):
             series.append(value)
         self.dirty = True
 
+    def add_samples(self, samples: Sequence[tuple[float, float, float, float]]) -> None:
+        """Append a whole batch at once; the repaint flag is only set once."""
+        if not samples:
+            return
+        for channel, series in enumerate(self.data):
+            series.extend(values[channel] for values in samples)
+        self.dirty = True
+
     def clear(self) -> None:
-        self.data = [deque(maxlen=180) for _ in range(4)]
+        self.data = [deque(maxlen=self.capacity) for _ in range(4)]
         self.dirty = True
         self.update()
 
@@ -426,6 +459,10 @@ class ServoWindow(QMainWindow):
         self.scope_trigger_ready = True
         self.scope_clock = 0.0
         self.scope_last_trigger: float | None = None
+        self.waveform_source = None
+        self.waveform_source_rate = 1000
+        self.waveform_idle_ticks = 0
+        self.saved_channel_visibility: list[bool] = []
         self.fault_sequence = 0
         self.animation_frame = 0
         self.last_di_states: tuple[bool, ...] | None = None
@@ -782,14 +819,54 @@ class ServoWindow(QMainWindow):
         settings.addStretch()
         layout.addLayout(settings)
         channels = QHBoxLayout()
+        self.scope_channel_checks = []
         for i, text in enumerate(("CH1 单圈位置", "CH2 速度反馈", "CH3 Q轴电流", "CH4 命令误差")):
             check = QCheckBox(text)
             check.setChecked(self.scope.visible[i])
             check.setStyleSheet(f"color:{ScopeChart.COLORS[i]};font-weight:650;")
             check.toggled.connect(lambda value, idx=i: self.set_channel(idx, value))
             channels.addWidget(check)
+            self.scope_channel_checks.append(check)
         channels.addStretch()
         layout.addLayout(channels)
+        transport = QHBoxLayout()
+        transport.addWidget(self.label("数据源", "field-label"))
+        self.waveform_source_combo = QComboBox()
+        self.waveform_source_combo.addItems(("仿真模型", "RS485 串口", "内置正弦演示"))
+        self.waveform_source_combo.currentTextChanged.connect(self.on_waveform_source_changed)
+        transport.addWidget(self.waveform_source_combo)
+        transport.addSpacing(12)
+        transport.addWidget(self.label("串口号", "field-label"))
+        self.serial_port_combo = QComboBox()
+        self.serial_port_combo.setMinimumWidth(190)
+        transport.addWidget(self.serial_port_combo)
+        self.serial_refresh_button = QPushButton("刷新")
+        self.serial_refresh_button.clicked.connect(self.refresh_serial_ports)
+        transport.addWidget(self.serial_refresh_button)
+        transport.addSpacing(12)
+        transport.addWidget(self.label("波特率", "field-label"))
+        self.serial_baud_combo = QComboBox()
+        self.serial_baud_combo.addItems(("921600 bps", "460800 bps", "230400 bps", "115200 bps"))
+        transport.addWidget(self.serial_baud_combo)
+        self.serial_connect_button = QPushButton("打开串口")
+        self.serial_connect_button.setObjectName("primary-button")
+        self.serial_connect_button.clicked.connect(self.toggle_serial_capture)
+        transport.addWidget(self.serial_connect_button)
+        transport.addStretch()
+        layout.addLayout(transport)
+        self.waveform_status = StatusPill()
+        self.waveform_status.set_state("数据源：仿真模型", "off")
+        status_row = QHBoxLayout()
+        status_row.addWidget(self.label("链路统计", "field-label"))
+        self.waveform_stats_label = QLabel("尚未采集")
+        self.waveform_stats_label.setObjectName("field-label")
+        status_row.addWidget(self.waveform_stats_label)
+        status_row.addStretch()
+        status_row.addWidget(self.waveform_status)
+        layout.addLayout(status_row)
+        self.refresh_serial_ports()
+        self.sync_serial_controls()
+        self.sync_scope_controls()
         panel = self.panel("实时波形", "NORMALIZED SIGNAL / ±100")
         panel.layout().addWidget(self.scope)
         layout.addWidget(panel, 1)
@@ -1203,6 +1280,9 @@ class ServoWindow(QMainWindow):
                 light.style().polish(light)
             self.last_di_states = states
         if self.simulation_tick % 4 == 0:
+            if self.waveform_source is not None:
+                # Statistics belong to the live serial stream; leave them alone.
+                return
             values = list(self.scope.data[0])
             if values:
                 rms = math.sqrt(sum(value * value for value in values) / len(values))
@@ -1304,6 +1384,9 @@ class ServoWindow(QMainWindow):
 
     def sample_scope(self) -> None:
         self.scope_clock += self.scope_timer.interval() / 1000.0
+        if self.waveform_source is not None:
+            self.sample_from_transport()
+            return
         mode = self.mode_combo.currentText()
         if mode == "速度模式":
             command_error = self.model.target - self.model.speed
@@ -1364,6 +1447,196 @@ class ServoWindow(QMainWindow):
                     self.log("示波器单次采集完成。")
                 else:
                     self.scope_status.set_state(f"等待{self.scope_trigger_mode}触发", "warn")
+
+    # ------------------------------------------------------------------
+    # Real waveform sources (RS485 serial / built-in sine generator)
+    # ------------------------------------------------------------------
+
+    def refresh_serial_ports(self) -> None:
+        """Re-scan COM ports, keeping the current selection when possible."""
+        current = self.serial_port_combo.currentText()
+        ports = list_serial_ports()
+        self.serial_port_combo.blockSignals(True)
+        self.serial_port_combo.clear()
+        if ports:
+            self.serial_port_combo.addItems(ports)
+            if current in ports:
+                self.serial_port_combo.setCurrentText(current)
+        else:
+            self.serial_port_combo.addItem("未检测到串口设备")
+        self.serial_port_combo.blockSignals(False)
+        if ports:
+            self.log(f"检测到 {len(ports)} 个串口设备。")
+        else:
+            self.log("未检测到串口设备。真实采集需要安装 pyserial（pip install pyserial）。")
+
+    def sync_serial_controls(self) -> None:
+        """Only the RS485 source may touch the port widgets."""
+        enabled = self.waveform_source_combo.currentText() == "RS485 串口"
+        for widget in (
+            self.serial_port_combo,
+            self.serial_refresh_button,
+            self.serial_baud_combo,
+        ):
+            widget.setEnabled(enabled)
+        self.serial_connect_button.setEnabled(enabled)
+        self.serial_connect_button.setText(
+            "关闭串口" if self.waveform_source is not None else "打开串口"
+        )
+
+    def on_waveform_source_changed(self, name: str) -> None:
+        """Detach the previous source before the new selection takes effect."""
+        if self.waveform_source is not None:
+            self.detach_waveform_source(quiet=True)
+        self.sync_serial_controls()
+        if name == "仿真模型":
+            self.waveform_status.set_state("数据源：仿真模型", "off")
+            self.waveform_stats_label.setText("尚未采集")
+            self.sync_scope_controls()
+            self.log("已切回仿真模型数据源。")
+            return
+        self.sync_scope_controls()
+        if name == "RS485 串口":
+            self.waveform_status.set_state("等待打开串口", "warn")
+            self.log("已选择 RS485 数据源，请确认串口号与 921600 波特率后打开串口。")
+        else:
+            sine = SineWaveformSource()
+            sine.open()
+            self.attach_waveform_source(sine, "内置正弦演示")
+
+    def toggle_serial_capture(self) -> None:
+        """Open or close the real serial link."""
+        if self.waveform_source is not None:
+            self.detach_waveform_source()
+            return
+        selection = self.serial_port_combo.currentText()
+        port = selection.split(" - ")[0].strip()
+        if not port or port == "未检测到串口设备":
+            QMessageBox.warning(self, "串口未就绪", "没有可用的串口设备，请先插入 USB-RS485 适配器并点击刷新。")
+            return
+        try:
+            baudrate = parse_baudrate(self.serial_baud_combo.currentText())
+        except TransportError as exc:
+            QMessageBox.warning(self, "波特率无效", str(exc))
+            return
+        source = SerialWaveformSource(port, baudrate)
+        try:
+            source.open()
+        except TransportError as exc:
+            QMessageBox.warning(self, "无法打开串口", str(exc))
+            self.log(f"打开 {port} 失败：{exc}")
+            return
+        self.attach_waveform_source(source, f"RS485 {port} @{baudrate}")
+
+    def attach_waveform_source(self, source, description: str) -> None:
+        """Start streaming frames from ``source`` into the scope."""
+        self.waveform_source = source
+        self.waveform_source_rate = getattr(source, "rate_hz", 1000) or 1000
+        self.waveform_idle_ticks = 0
+        # About 2.5 firmware sine cycles on screen: one cycle alone leaves no
+        # complete rising-edge pair for the frequency estimate to measure.
+        self.scope.set_capacity(int(self.waveform_source_rate * 2.5))
+        self.saved_channel_visibility = list(self.scope.visible)
+        self.apply_channel_visibility((True, False, False, False))
+        self.scope.clear()
+        self.reset_scope_trigger_reference()
+        self.scope_running = True
+        self.scope_timer.setInterval(33)
+        self.waveform_status.set_state(f"采集中：{description}", "ok")
+        self.sync_serial_controls()
+        self.sync_scope_controls()
+        self.log(f"波形数据源已接入：{description}。")
+
+    def detach_waveform_source(self, quiet: bool = False) -> None:
+        """Stop the active source and restore the simulation view."""
+        source = self.waveform_source
+        self.waveform_source = None
+        if source is not None:
+            try:
+                source.close()
+            except Exception as exc:
+                self.log(f"关闭波形数据源时出错：{exc}")
+        self.waveform_idle_ticks = 0
+        self.scope.set_capacity(ScopeChart.DEFAULT_CAPACITY)
+        if self.saved_channel_visibility:
+            self.apply_channel_visibility(tuple(self.saved_channel_visibility))
+            self.saved_channel_visibility = []
+        self.scope_timer.setInterval(50)
+        if not quiet:
+            self.waveform_status.set_state("数据源：仿真模型", "off")
+            self.waveform_stats_label.setText("尚未采集")
+            self.log("波形数据源已断开，恢复仿真模型显示。")
+        self.sync_serial_controls()
+        self.sync_scope_controls()
+
+    def apply_channel_visibility(self, visibility: tuple[bool, ...]) -> None:
+        """Drive both the scope model and its checkboxes from one source."""
+        for index, check in enumerate(self.scope_channel_checks):
+            check.blockSignals(True)
+            check.setChecked(visibility[index])
+            check.blockSignals(False)
+            self.scope.visible[index] = visibility[index]
+        self.scope.update()
+
+    def sync_scope_controls(self) -> None:
+        """Trigger logic only applies to the simulated model."""
+        live = self.waveform_source is not None
+        for widget in (self.scope_trigger, self.scope_source, self.scope_trigger_level):
+            widget.setEnabled(not live)
+        for button in self.scope_action_buttons:
+            button.setEnabled(not live)
+        if live:
+            self.scope_status.set_state("实时串口采集", "run")
+        elif self.scope_running:
+            self.scope_status.set_state(
+                "自动采集中" if self.scope_trigger_mode == "自动"
+                else f"等待{self.scope_trigger_mode}触发",
+                "run" if self.scope_trigger_mode == "自动" else "warn",
+            )
+        else:
+            self.scope_status.set_state("采集已停止", "off")
+
+    def sample_from_transport(self) -> None:
+        """Push every buffered frame into the scope and refresh statistics."""
+        source = self.waveform_source
+        if source is None:
+            return
+        frames = source.drain()
+        if frames:
+            self.waveform_idle_ticks = 0
+            self.scope.add_samples(to_scope_samples(frames))
+            self.waveform_stats_label.setText(source.stats.summary())
+            self.update_scope_statistics()
+        else:
+            self.waveform_idle_ticks += 1
+            # About one second without data: the link is silent.
+            if self.waveform_idle_ticks == 30:
+                self.waveform_status.set_state("链路无数据，请检查接线", "warn")
+                self.log("串口链路约 1 秒没有收到有效帧，请检查 A/B 极性、共地与固件采样状态。")
+        if self.waveform_idle_ticks % 10 == 0:
+            self.waveform_stats_label.setText(source.stats.summary())
+
+    def update_scope_statistics(self) -> None:
+        """Peak/valley/RMS/frequency for whatever CH1 currently holds."""
+        values = list(self.scope.data[0])
+        if not values:
+            for label in self.scope_stats:
+                label.setText("--")
+            return
+        rms = math.sqrt(sum(value * value for value in values) / len(values))
+        rate = (
+            self.waveform_source_rate if self.waveform_source is not None
+            else 1000.0 / max(self.scope_timer.interval(), 1)
+        )
+        statistics = (max(values), min(values), rms, estimate_frequency(values, rate))
+        for label, value in zip(self.scope_stats, statistics):
+            label.setText(f"{value:.1f}")
+
+    def closeEvent(self, event) -> None:
+        """Never leave the serial worker thread behind."""
+        if self.waveform_source is not None:
+            self.detach_waveform_source(quiet=True)
+        super().closeEvent(event)
 
     def set_channel(self, index: int, visible: bool) -> None:
         self.scope.visible[index] = visible

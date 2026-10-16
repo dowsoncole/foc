@@ -406,6 +406,26 @@ void Tim1Pwm_SetNeutral(void)
   }
 }
 
+void Tim1Pwm_EnableCalibrationLowSide(void)
+{
+  uint32_t phase;
+
+  /* 先确保 MOE 打开时看到的是已经准备好的三相中性点，而不是刚写入的
+     duty=0。复位/驱动器唤醒阶段如果同时改变 MOE 和 CCR，输出级可能在
+     输入滤波和自举电容尚未稳定时产生一个非对称脉冲，表现为复位电流尖峰。 */
+  Tim1Pwm_SetNeutral();
+  __HAL_TIM_MOE_ENABLE(&htim1);
+  HAL_Delay(TIM1_PWM_MOE_SETTLE_MS);
+
+  /* 只有 MOE 稳定后才切到下管校准：duty=0 对应高侧关闭、互补低侧导通，
+     死区由 TIM1 硬件保证。该函数只允许在启动上下文调用，不能放入 ISR。 */
+  for (phase = 0U; phase < 3U; phase++)
+  {
+    s_phase_duty[phase] = 0U;
+    Tim1Pwm_WriteCompare(s_phase_channel[phase], 0U);
+  }
+}
+
 /**
   * @brief  释放 MOE，让六路栅极信号到达功率级。
   */

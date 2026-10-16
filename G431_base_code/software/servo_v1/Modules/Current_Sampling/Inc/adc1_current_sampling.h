@@ -49,7 +49,7 @@ extern "C" {
 /* --------------------------------------------------------------------------*/
 
 /* ADC1 走同步时钟：ADC12 内核时钟 168 MHz（RCC.ADC12Freq_Value），
-   ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4 -> ADC 时钟 42 MHz。
+   RCC ADC12 源为 SYSCLK 时使用 ADC_CLOCK_ASYNC_DIV4 -> ADC 时钟 42 MHz。
    G431 同步模式下 ADC 时钟上限 60 MHz，42 MHz 合规。 */
 #define ADC1_CS_ADC_CLOCK_HZ        42000000UL
 
