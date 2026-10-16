@@ -2,14 +2,14 @@
 /**
   ******************************************************************************
   * @file    spi1_encoder.h
-  * @brief   MT6835 磁编码器的 SPI1 外设配置（L1 配置层）。
+ * @brief   MT6835 磁编码器 SPI 配置及收发抽象（L1 配置层）。
   *
   *          引脚映射（STM32G431VB，LQFP100；数据手册 DS12589 Table 13，
   *          四脚的 SPI1 复用全部在 AF5，无歧义）：
   *            PA4 -> 软件片选 CSN（普通推挽输出，不用硬件 NSS）
   *            PA5 -> SPI1_SCK
-  *            PA6 -> SPI1_MISO（MCU 数据输入，接 MT6835 的 DO 输出）
-  *            PA7 -> SPI1_MOSI（MCU 数据输出，接 MT6835 的 DI 输入）
+ *            硬件 SPI 模式：PA6 -> MISO，PA7 -> MOSI
+ *            软件 SPI 模式：当前交叉接线时 PA6 -> MT6835 DI，PA7 <- MT6835 DO
   *
   *          为什么片选用软件 GPIO 而不用硬件 NSS：
   *            1. MT6835 的一帧是 24 bit（4 bit 命令 + 12 bit 地址 + 8 bit 数据），
@@ -44,6 +44,10 @@ extern "C" {
 /* 硬件常量                                                                  */
 /* --------------------------------------------------------------------------*/
 
+/* 1：使用 GPIO 模拟 SPI，适配 PA6/PA7 交叉接线；
+   0：使用 SPI1 外设，硬件连线应为 PA6=MISO、PA7=MOSI。 */
+#define MT6835_USE_SOFTWARE_SPI       0U
+
 /* SPI1 挂在 APB2；APB2 不分频时 SPI1 内核时钟 = SYSCLK = 168 MHz。 */
 #define SPI1_ENC_PERIPHERAL_CLOCK_HZ   168000000UL
 
@@ -55,12 +59,28 @@ extern "C" {
 /* 软件片选引脚。空闲必须为高（手册：非通信状态 SCK 保持高、CSN 释放）。 */
 #define MT6835_CSN_Pin                 GPIO_PIN_4
 #define MT6835_CSN_GPIO_Port           GPIOA
-#define MT6835_CSN_SELECT()            HAL_GPIO_WritePin(MT6835_CSN_GPIO_Port, \
-                                                          MT6835_CSN_Pin, \
+#define MT6835_CAL_EN_Pin              GPIO_PIN_4
+#define MT6835_CAL_EN_GPIO_Port        GPIOC
+#define MT6835_SCK_Pin                 GPIO_PIN_5
+#define MT6835_SCK_GPIO_Port           GPIOA
+#if (MT6835_USE_SOFTWARE_SPI != 0U)
+/* 当前 PCB 交叉接线：PA6 实际连接编码器 DI，PA7 实际连接编码器 DO。 */
+#define MT6835_SOFT_MOSI_Pin           GPIO_PIN_6
+#define MT6835_SOFT_MOSI_GPIO_Port     GPIOA
+#define MT6835_SOFT_MISO_Pin           GPIO_PIN_7
+#define MT6835_SOFT_MISO_GPIO_Port     GPIOA
+#else
+#define MT6835_SOFT_MOSI_Pin           GPIO_PIN_7
+#define MT6835_SOFT_MOSI_GPIO_Port     GPIOA
+#define MT6835_SOFT_MISO_Pin           GPIO_PIN_6
+#define MT6835_SOFT_MISO_GPIO_Port     GPIOA
+#endif
+#define MT6835_CSN_SELECT()            (MT6835_CSN_GPIO_Port->BSRR = \
+                                        ((uint32_t)MT6835_CSN_Pin << 16U))
+#define MT6835_CSN_RELEASE()           (MT6835_CSN_GPIO_Port->BSRR = MT6835_CSN_Pin)
+#define MT6835_CAL_EN_DISABLE()        HAL_GPIO_WritePin(MT6835_CAL_EN_GPIO_Port, \
+                                                          MT6835_CAL_EN_Pin, \
                                                           GPIO_PIN_RESET)
-#define MT6835_CSN_RELEASE()           HAL_GPIO_WritePin(MT6835_CSN_GPIO_Port, \
-                                                          MT6835_CSN_Pin, \
-                                                          GPIO_PIN_SET)
 
 /* --------------------------------------------------------------------------*/
 /* 导出变量与函数                                                            */
@@ -82,6 +102,12 @@ extern SPI_HandleTypeDef hspi1;
   * @retval HAL_OK；HAL_SPI_Init 失败时返回 HAL_ERROR。
   */
 HAL_StatusTypeDef MX_SPI1_Encoder_Init(void);
+
+/**
+  * @brief  编码器 SPI 收发抽象。上层不关心当前使用 SPI1 外设还是 GPIO 模拟。
+  */
+HAL_StatusTypeDef MT6835_SPI_TransmitReceive(const uint8_t *tx, uint8_t *rx,
+                                             uint16_t size, uint32_t timeout);
 
 #ifdef __cplusplus
 }

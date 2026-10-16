@@ -58,7 +58,7 @@ HAL_StatusTypeDef MT6835_ReadRegister(uint16_t reg, uint8_t *value,
   tx[2] = 0x00U;
 
   MT6835_CSN_SELECT();
-  HAL_StatusTypeDef st = HAL_SPI_TransmitReceive(&hspi1, tx, rx, 3U, timeout);
+  HAL_StatusTypeDef st = MT6835_SPI_TransmitReceive(tx, rx, 3U, timeout);
   MT6835_CSN_RELEASE();
 
   if (st != HAL_OK)
@@ -86,7 +86,7 @@ HAL_StatusTypeDef MT6835_WriteRegister(uint16_t reg, uint8_t value,
   tx[2] = value;
 
   MT6835_CSN_SELECT();
-  HAL_StatusTypeDef st = HAL_SPI_TransmitReceive(&hspi1, tx, rx, 3U, timeout);
+  HAL_StatusTypeDef st = MT6835_SPI_TransmitReceive(tx, rx, 3U, timeout);
   MT6835_CSN_RELEASE();
 
   return st;
@@ -112,15 +112,15 @@ HAL_StatusTypeDef MT6835_ReadStatus(mt6835_status_t *status, uint32_t timeout)
 
 HAL_StatusTypeDef MT6835_ReadAngle(mt6835_angle_t *frame, uint32_t timeout)
 {
-  /* 连读命令（1010 + 起始地址 0x003）：发完 16 bit 命令段后，MISO 从第 17
-     拍开始连续吐 0x003~0x006 的数据（手册 §7.6.9 图-25）。整段事务保持
-     CSN 拉低，四个字节来自同一次锁存，STATUS 与 ANGLE 不会错位。
-     tx 前两个字节 = 命令 + 地址，后四个是占位（读模式下 MOSI 内容无意义，
-     发 0x00 便于示波器/逻辑分析仪辨认）。 */
-  uint8_t tx[6] = { MT6835_FRAME_BYTE0(MT6835_CMD_BURST_READ_ANGLE,
-                                       MT6835_REG_ANGLE_H),
-                    MT6835_FRAME_BYTE1(MT6835_REG_ANGLE_H),
-                    0x00U, 0x00U, 0x00U, 0x00U };
+  /* MT6835 §7.6.9 burst angle read：一个 CSN 事务内先发 16 bit 的
+     1010 + 地址 0x003（即 A0 03），随后连续读出 0x003~0x006 四个字节。
+     因此完整事务是 6 字节、48 个 SCK，不能拆成四个独立 CSN。 */
+  uint8_t tx[6] =
+  {
+    MT6835_FRAME_BYTE0(MT6835_CMD_BURST_READ_ANGLE, MT6835_REG_ANGLE_H),
+    MT6835_FRAME_BYTE1(MT6835_REG_ANGLE_H),
+    0x00U, 0x00U, 0x00U, 0x00U
+  };
   uint8_t rx[6] = {0U};
 
   if (frame == NULL)
@@ -129,7 +129,7 @@ HAL_StatusTypeDef MT6835_ReadAngle(mt6835_angle_t *frame, uint32_t timeout)
   }
 
   MT6835_CSN_SELECT();
-  HAL_StatusTypeDef st = HAL_SPI_TransmitReceive(&hspi1, tx, rx, 6U, timeout);
+  HAL_StatusTypeDef st = MT6835_SPI_TransmitReceive(tx, rx, 6U, timeout);
   MT6835_CSN_RELEASE();
 
   if (st != HAL_OK)
