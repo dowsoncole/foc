@@ -66,16 +66,30 @@ extern "C" {
    才允许把 CCR 从中性点改成下管校准值。该接口只在上电流程中调用。 */
 #define TIM1_PWM_MOE_SETTLE_MS      10U
 
-/* ADC 采样相对 20 kHz 更新事件提前的时间；一个计数是 5.952 ns。
-
-   取值 = 模块 F 注入序列总耗时的一半（11.43 µs / 2 = 5.714 µs），
-   即 959 个计数，CH4 比较值 = 4199 - 959 = 3240。这样注入序列正好以更新
-   事件为中心：T - 5.71 µs 触发、T + 5.71 µs 结束，两个通道的采样点分别
-   落在更新事件两侧对称位置。
-
-   ⚠ 本值与模块 F 的 ADC1_CS_SEQUENCE_CONV_NS 强耦合。改动过采样倍率、
-   采样时间或注入通道数时，必须同步这里（见 README 第 14 节规则 9）。 */
+/* 启动阶段 CCR4 初值相对载波峰值的提前量（不是谷值 UEV 的提前量）。
+   ADC 启动之前，应用会将完整序列耗时交给 ConfigureCurrentSampling；之后
+   CCR4 每周期动态规划，此初值不再用于运行中的采样位置计算。 */
 #define TIM1_PWM_ADC_TRIGGER_LEAD_NS 5714U
+
+/* FOC 的最小高侧脉宽与低侧采样建立时间。后者另加实际死区。
+   500 ns 是板级调试起点，必须由电流放大器的实测建立时间复核。 */
+#define TIM1_PWM_FOC_MIN_PULSE_NS    1000U
+#define TIM1_PWM_CURRENT_SETTLE_NS    500U
+#define TIM1_PWM_COMMIT_GUARD_NS     2000U
+
+typedef struct
+{
+  uint32_t planned_trigger;
+  uint32_t planned_sequence_end;
+  uint32_t low_window_start;
+  uint32_t low_window_end;
+  uint32_t sampled_trigger;
+  uint32_t window_rejections;
+  uint32_t deadline_rejections;
+  float sample_period_s;
+} tim1_pwm_sampling_status_t;
+
+extern volatile tim1_pwm_sampling_status_t g_tim1_pwm_sampling;
 
 /* 提前量换算成计数，公式与 tim1_pwm.c 的 Tim1Pwm_NsToCounts() 一致。
    5714 ns * 168 / 1000 = 959 计数。 */
@@ -191,11 +205,30 @@ HAL_StatusTypeDef Tim1Pwm_SetPhaseDuty(uint32_t channel, uint16_t duty);
 /**
   * @brief  将 FOC 已计算好的三相归一化占空比写入 TIM1 CCR。
   * @note   SPWM/SVPWM、零序注入和 α/β 到三相的计算属于 FOC 算法层；
-  *         本函数只做 0..1 占空比到驱动层标度及 CCR 写入。
+  *         本函数把 0..1 占空比直接量化成 CCR，不经过整数 duty 标度。
+  *         全部参数必须有限且在 0..1，否则返回 HAL_ERROR，不写任何一相。
+  *         还必须先配置采样规划器；无完整有效窗口或提交过晚均返回失败。
+  *         U/V 不接受持续高侧导通；W 可写 ARR+1，但仍须满足采样窗口与供电条件。
   */
 HAL_StatusTypeDef Tim1Pwm_SetPhaseVoltage(float phase_a_duty,
                                           float phase_b_duty,
                                           float phase_c_duty);
+
+/* 用 ARR 和 ADC 完整序列耗时计算保留低侧采样窗口的统一 duty 范围。
+   不改变 ADC/TIM 配置。由应用层在初始化时把范围交给纯调制模块。
+   不再受旧的固定 CCR4 限制；最高范围仍由窗口长度决定。 */
+HAL_StatusTypeDef Tim1Pwm_GetCurrentSamplingDutyBounds(uint32_t sequence_ns,
+                                                       float *minimum,
+                                                       float *maximum);
+
+/* ADC 尚未启动且 MOE=0 时由应用初始化一次。之后浮点 PWM 写入会同步规划
+   CCR4；窗口不足/更新过晚均返回 HAL_ERROR，由 FOC 故障链路关闭输出。 */
+HAL_StatusTypeDef Tim1Pwm_ConfigureCurrentSampling(uint32_t sequence_ns,
+                                                   float *minimum, float *maximum);
+
+/* 在 ADC 序列完成回调里、下次写 PWM 之前调用。返回两次实际触发间隔，
+   抵消动态触发位置造成的电流 PI 积分周期变化；不是 ISR 执行耗时。 */
+float Tim1Pwm_OnCurrentSample(uint32_t sample_sequence);
 
 /**
   * @brief  【业务线】读回某一相最后写入的占空比。

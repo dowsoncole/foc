@@ -222,10 +222,8 @@ void TIM6_DAC_IRQHandler(void)
 /**
   * @brief This function handles TIM1 capture/compare interrupt.
   *
- * Reached from the channel 4 compare, which MX_TIM1_Init() places just before
- * the update event. The OC4REF hardware trigger starts the injected ADC
- * sequence; the ADC1_2_IRQHandler runs the current loop only after JEOS.
- * Nothing else may be added to this path - it runs at the PWM frequency.
+ * Reserved vector. CC4 interrupt is disabled: OC4REF through TRGO2 triggers
+ * the injected ADC in hardware. Only ADC1_2_IRQHandler schedules FOC after JEOS.
   */
 void TIM1_CC_IRQHandler(void)
 {

@@ -30,6 +30,7 @@
 #include "stspin32g4.h"
 #include "drv_monitor.h"
 #include "foc_interface.h"
+#include "servo_manager.h"
 #include "waveform_generator.h"
 #include "spi1_encoder.h"
 #include "mt6835.h"
@@ -52,6 +53,10 @@
 /* 三相下管校准会真正释放 MOE。当前硬件已经报告 VDS_P，必须先完成栅极
    极性、死区和母线电流测量，默认保持关闭，避免上电反复触发驱动保护。 */
 #define CURRENT_SAMPLING_ENABLE_LOW_SIDE_CALIBRATION  0U
+
+/* 量产语义下 Servo ON 必须来自 CAN/UART/状态机等上层命令。
+   仅在台架调试时才可改为 1U，禁止上电默认输出转矩。 */
+#define FOC_DEMO_AUTO_SERVO_ON  0U
 
 /* USER CODE END PD */
 
@@ -78,6 +83,7 @@ void SystemClock_Config(void);
 /* ADC JEOS 回调使用的唯一 FOC 控制器实例。PID 参数、限幅和 PWM 周期均由
    该实例的 algorithm.parameters/timing 管理，避免在中断中散落全局变量。 */
 foc_controller_t g_foc_controller;
+servo_manager_t g_servo_manager;
 UART_HandleTypeDef huart1;
 
 static uint8_t MainFoc_IsPowerStageSafe(void *context)
@@ -93,6 +99,12 @@ static void MainFoc_ReadFeedback(void *context, foc_input_t *input)
   {
     return;
   }
+
+  /* 每个 ADC 周期重新判定，禁止沿用上一周期的有效标志。 */
+  input->current_valid = 0U;
+  input->angle_valid = 0U;
+  input->reference_valid = 0U;
+
   {
     int16_t phase_u_s16;
     int16_t phase_v_s16;
@@ -101,22 +113,31 @@ static void MainFoc_ReadFeedback(void *context, foc_input_t *input)
                                      &phase_w_s16);
     input->phase_a = phase_u_s16;
     input->phase_b = phase_v_s16;
+    input->current_valid =
+        (CurrentSampling_GetCalibrationState() == CURRENT_SAMPLING_CAL_DONE) ?
+        1U : 0U;
   }
-  /* 当前工程尚未接入编码器；角度和电流给定由上层后续更新。 */
-  input->electrical_angle_rad = 0.0f;
+
+  /* 零电流给定是当前上层明确发布的安全参考值。 */
   input->d_reference = 0.0f;
   input->q_reference = 0.0f;
+  input->reference_valid = 1U;
+
+  /* 尚未有“同步角度快照 + 极对数 + 电角度零位”的正式业务层。
+     在该链路接入前必须保持 angle_valid=0，防止以假的 0 角度开 MOE。 */
+  input->electrical_angle_rad = 0.0f;
 }
 
-static void MainFoc_WriteVoltage(void *context, const foc_output_t *output)
+static uint8_t MainFoc_WriteVoltage(void *context, const foc_output_t *output)
 {
   (void)context;
   if (output != NULL)
   {
-    (void)Tim1Pwm_SetPhaseVoltage(output->phase_a_duty,
-                                  output->phase_b_duty,
-                                  output->phase_c_duty);
+    return (Tim1Pwm_SetPhaseVoltage(output->phase_a_duty,
+                                     output->phase_b_duty,
+                                     output->phase_c_duty) == HAL_OK) ? 1U : 0U;
   }
+  return 0U;
 }
 
 static void MainFoc_DisableOutput(void *context)
@@ -125,14 +146,78 @@ static void MainFoc_DisableOutput(void *context)
   Tim1Pwm_EmergencyStop();
 }
 
+static uint8_t MainServo_IsCalibrationDone(void *context)
+{
+  (void)context;
+  return (CurrentSampling_GetCalibrationState() == CURRENT_SAMPLING_CAL_DONE) ?
+      1U : 0U;
+}
+
+static uint8_t MainServo_IsCalibrationError(void *context)
+{
+  (void)context;
+  return (CurrentSampling_GetCalibrationState() == CURRENT_SAMPLING_CAL_ERROR) ?
+      1U : 0U;
+}
+
+static uint8_t MainServo_IsOutputEnabled(void *context)
+{
+  (void)context;
+  return Tim1Pwm_IsOutputEnabled();
+}
+
+static void MainServo_PrepareOutput(void *context)
+{
+  (void)context;
+  Tim1Pwm_SetNeutral();
+}
+
+static void MainServo_EnableOutput(void *context)
+{
+  uint32_t interrupt_mask = __get_PRIMASK();
+
+  (void)context;
+
+  /* Servo Manager 是正常打开 MOE 的唯一入口。临界区防止在
+     “检查 feedback_ready”和“置 MOE”之间被 ADC ISR 打断。
+     临界区内只读内存/引脚并写一个寄存器，不做通讯或等待。 */
+  __disable_irq();
+  if ((g_foc_controller.running != 0U) &&
+      (g_foc_controller.feedback_ready != 0U) &&
+      (MainFoc_IsPowerStageSafe(NULL) != 0U) &&
+      (Tim1Pwm_IsOutputEnabled() == 0U))
+  {
+    Tim1Pwm_EnableOutputs();
+  }
+  if (interrupt_mask == 0U)
+  {
+    __enable_irq();
+  }
+}
+
+static void MainServo_NotifyFault(void *context,
+                                  servo_fault_mask_t active_faults,
+                                  servo_fault_mask_t latched_faults)
+{
+  (void)context;
+  (void)active_faults;
+  (void)latched_faults;
+  /* 故障已保存在 g_servo_manager 中。未来 CAN/UART 协议层在此
+     发布事件，禁止在 ADC ISR 中直接发送或打印。 */
+}
+
 static void MainFoc_OnAdcConversion(void *context)
 {
   WaveformGenerator_SampleTick();
   if (context != NULL)
   {
-    FOC_ControllerStep((foc_controller_t *)context);
-    ((foc_controller_t *)context)->timing.last_sample_sequence =
-        g_current_sampling.sample_sequence;
+    foc_controller_t *controller = (foc_controller_t *)context;
+    /* 动态触发使两次电流快照的间隔略有变化，积分必须用实际间隔。
+       读取本次触发位置必须先于下一周期 CCR1..4 的写入。 */
+    controller->algorithm.parameters.sample_period_s =
+        Tim1Pwm_OnCurrentSample(g_current_sampling.sample_sequence);
+    FOC_ControllerStep(controller);
+    controller->timing.last_sample_sequence = g_current_sampling.sample_sequence;
   }
 }
 
@@ -234,11 +319,13 @@ int main(void)
   }
 
   {
-    const foc_parameters_t foc_parameters =
+    foc_parameters_t foc_parameters =
     {
       .sample_period_s = 1.0f / 20000.0f,
       .pwm_period_s = 1.0f / 20000.0f,
-      .voltage_limit = 0.95f,
+      .voltage_limit = FOC_MODULATION_SIX_STEP_MAX,
+      .modulation = { .mode = FOC_MODULATION_OVERMODULATION,
+                      .duty_min = 0.0f, .duty_max = 1.0f },
       .current_limit = 10.0f,
       .d_controller = { .kp = 0.1f, .ki = 5.0f,
                         .integral_min = -0.95f, .integral_max = 0.95f },
@@ -253,7 +340,28 @@ int main(void)
       .disable_output = MainFoc_DisableOutput,
       .context = NULL
     };
+    const servo_manager_port_t servo_port =
+    {
+      .is_calibration_done = MainServo_IsCalibrationDone,
+      .is_calibration_error = MainServo_IsCalibrationError,
+      .is_power_stage_safe = MainFoc_IsPowerStageSafe,
+      .is_output_enabled = MainServo_IsOutputEnabled,
+      .prepare_output = MainServo_PrepareOutput,
+      .enable_output = MainServo_EnableOutput,
+      .disable_output = MainFoc_DisableOutput,
+      .notify_fault = MainServo_NotifyFault,
+      .context = NULL
+    };
+    /* 保留 16 倍过采样；每周期根据下一组 duty 同步规划 CCR4。
+       完整序列窗口仍需保留；不能仅因触发点可移动就开放全母线六步。 */
+    if (Tim1Pwm_ConfigureCurrentSampling(ADC1_CS_SEQUENCE_CONV_NS,
+          &foc_parameters.modulation.duty_min,
+          &foc_parameters.modulation.duty_max) != HAL_OK)
+    {
+      Error_Handler();
+    }
     FOC_ControllerInit(&g_foc_controller, &foc_parameters, &foc_port);
+    ServoManager_Init(&g_servo_manager, &g_foc_controller, &servo_port);
     CurrentSampling_SetConversionCallback(MainFoc_OnAdcConversion,
                                            &g_foc_controller);
   }
@@ -292,6 +400,10 @@ int main(void)
   MT6835_PowerUpWait();
   (void)Mt6835Verify_Start();
 
+#if (FOC_DEMO_AUTO_SERVO_ON != 0U)
+  ServoManager_RequestOn(&g_servo_manager);
+#endif
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -312,29 +424,8 @@ int main(void)
      */
     DrvMonitor_Task();
 
-    /* MOE 是 TIM1 高级定时器的最终输出门。FOC running 只代表算法允许运行，
-       两者必须分开管理：这里由应用层在校准完成且驱动 READY 后释放 MOE。 */
-    if ((g_foc_controller.running == 0U) &&
-        (CurrentSampling_GetCalibrationState() == CURRENT_SAMPLING_CAL_DONE) &&
-        (MainFoc_IsPowerStageSafe(NULL) != 0U))
-    {
-      Tim1Pwm_SetNeutral();
-//      Tim1Pwm_EnableOutputs();
-      FOC_ControllerStart(&g_foc_controller);
-    }
-    else if ((g_foc_controller.running == 0U) &&
-             (CurrentSampling_GetCalibrationState() == CURRENT_SAMPLING_CAL_ERROR))
-    {
-      Tim1Pwm_EmergencyStop();
-    }
-    else if ((g_foc_controller.running != 0U) &&
-             (MainFoc_IsPowerStageSafe(NULL) == 0U))
-    {
-      /* 驱动故障时先停止算法，再无条件清 MOE；重新启动必须重新校准并由
-         上层显式恢复，避免故障消失后自动重新上电。 */
-      FOC_ControllerStop(&g_foc_controller);
-      Tim1Pwm_EmergencyStop();
-    }
+    /* 状态转换、Servo ON/OFF、MOE 和故障锁存统一在此模块内。 */
+    ServoManager_Service(&g_servo_manager);
 
     /* TODO: 协议栈（CAN/UART）、参数存储、温度记录、上位机遥测 ……
      * 都属于这一层。 */

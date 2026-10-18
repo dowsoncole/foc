@@ -4,6 +4,12 @@
 
 Keil 工程入口：`MDK-ARM/servo_v1.uvprojx`
 
+FOC 现有独立调制模块，支持线性 SVPWM、两段过调制与六步极限，基波增益补偿、
+板级采样降额和测试方式见 [FOC/README.md](FOC/README.md)。
+
+当天需求、代码、数学推导、测试证据及遗留项详见
+[2026-10-18 详细开发记录](MDK-ARM/docs/daily_changes_2026-10-18.md)。
+
 工程分组必须与磁盘目录一致：
 
 ```text

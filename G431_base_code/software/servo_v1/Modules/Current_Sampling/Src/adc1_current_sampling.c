@@ -103,7 +103,7 @@ HAL_StatusTypeDef MX_OPAMP3_Init(void)
   *   -> 357 ns；过采样 16 倍 -> 5.71 µs / 通道，两通道序列 11.43 µs。
   *
   * 触发时序：TIM1_CH4 的提前量取本序列耗时的一半（5.714 µs），使序列正好以
-  *   更新事件为中心——T - 5.71 µs 触发、T + 5.71 µs 结束。详见 README 9.3。
+  *   载波峰值附近。运行时由 PWM 规划器根据下一组三相 duty 动态设置 CCR4。
   */
 HAL_StatusTypeDef MX_ADC1_Init(uint8_t software_trigger_flag)
 {
@@ -191,18 +191,20 @@ HAL_StatusTypeDef MX_ADC1_Init(uint8_t software_trigger_flag)
   sConfigInjected.QueueInjectedContext = DISABLE;
   /* 2.5 cycles 是采样时间最短档。驱动源是片内运放输出，源阻抗低，短采样
      时间足够；过采样 16 倍本身也提供了额外的噪声平均。
-     ⚠ 提前量取序列耗时的一半，见 TIM1_PWM_ADC_TRIGGER_LEAD_NS。 */
+     完整 16 倍序列耗时交给 PWM 规划器，不能只检查第一个采样瞬间。 */
   sConfigInjected.InjectedSamplingTime = ADC_SAMPLETIME_2CYCLES_5;
 
   /* 软件触发用于上电偏置标定：此时 TIM1_CH4 的触发被摘除，标定不受 PWM
-     时序干扰。运行时改为 T1_CC4 上升沿，让采样点跟随载波。 */
+     时序干扰。运行时使用 T1_TRGO2=OC4REF 上升沿，让采样点跟随载波。 */
   if (software_trigger_flag != 0U)
   {
     sConfigInjected.ExternalTrigInjecConv = ADC_INJECTED_SOFTWARE_START;
   }
   else
   {
-    sConfigInjected.ExternalTrigInjecConv = ADC_EXTERNALTRIGINJEC_T1_CC4;
+    /* 明确选择 TRGO2=OC4REF 上升沿，每个中心对齐周期只触发一次。
+       CC4 比较事件不能当作 REF 电平的上升沿使用。 */
+    sConfigInjected.ExternalTrigInjecConv = ADC_EXTERNALTRIGINJEC_T1_TRGO2;
   }
   /* ⚠ 该边沿参数只在外部触发分支下真正写入 JSQR：HAL 在触发源为软件启动时
      会跳过 JEXTEN 写入（见 stm32g4xx_hal_adc_ex.c 的

@@ -10,8 +10,8 @@
   *                           每个载波周期恰好产生一次更新事件
   *            通道 1..3 ：PWM 模式 1，主输出（INH）+ 互补输出（INL），
   *                        死区 500 ns，由 TIM_BDTR 配置
-  *            通道 4    ：OC4REF 上用 PWM 模式 2，作为「更新事件之后不久采样」
-  *                        的触发源，供 ADC / 电流环使用
+  *            通道 4    ：PWM 模式 2，经 TRGO2 的 OC4REF 上升沿触发 ADC，
+  *                        CCR4 与三相 duty 一起逐周期更新
   *            MOE       ：保持清零，栅极输出在显式调用
   *                        Tim1Pwm_EnableOutputs() 之前一直处于无效状态
   *
@@ -25,12 +25,13 @@
   *            端点分别意味着高侧「常通」和低侧「常通」。一个不需要被驱动的相，
   *            绝不能装载比较带顶端的值（那会让高侧整个周期都导通）；应当使用
   *            中性点模式，它让两个开关都保持动作。
-  *            Tim1Pwm_SetPhaseDuty() 是唯一入口，它按正确方向映射占空比。
+  *            整数验证接口与浮点 FOC 接口都按高侧占空比映射，后者直接量化 CCR。
   ******************************************************************************
   */
 /* USER CODE END Header */
 
 #include "tim1_pwm.h"
+#include "pwm_sampling.h"
 #include "stm32g4xx_ll_tim.h"
 
 #include <float.h>
@@ -53,7 +54,6 @@
 static void Tim1Pwm_WriteCompare(uint32_t channel, uint32_t compare);
 static uint32_t Tim1Pwm_NsToCounts(uint32_t nanoseconds);
 static int32_t  Tim1Pwm_FindPhase(uint32_t channel);
-static uint16_t Tim1Pwm_DutyToScale(float duty);
 
 /* 每一相的指令占空比，与已装载的比较值保持同步，这样 Tim1Pwm_SetNeutral()
    和验证模块都能恢复到一个已知状态，而不必反读定时器。
@@ -68,6 +68,13 @@ static volatile uint16_t s_phase_duty[3] = {TIM1_PWM_DUTY_NEUTRAL,
 static const uint32_t s_phase_channel[3] = {TIM_CHANNEL_1,
                                             TIM_CHANNEL_2,
                                             TIM_CHANNEL_3};
+
+static pwm_sampling_parameters_t s_sampling_parameters;
+static uint8_t s_sampling_configured;
+static uint8_t s_previous_sample_valid;
+static uint32_t s_previous_sample_trigger;
+static uint32_t s_previous_sample_sequence;
+volatile tim1_pwm_sampling_status_t g_tim1_pwm_sampling;
 
 /* USER CODE END 0 */
 
@@ -135,44 +142,164 @@ static uint32_t Tim1Pwm_NsToCounts(uint32_t nanoseconds)
   return ((nanoseconds * (TIM1_PWM_TIMER_CLOCK_HZ / 1000000UL)) / 1000UL);
 }
 
-/* 把已经归一化到 0..1 的相占空比转换成驱动层标度。 */
-static uint16_t Tim1Pwm_DutyToScale(float duty)
+/* FOC 直接换算 CCR，避免先量化成 1000 级再损失定时器分辨率。
+   保留原有 SetPhaseDuty 的整数标度，供独立 PWM 验证业务使用。 */
+static uint32_t Tim1Pwm_FloatDutyCompare(float duty)
 {
-  float scaled = duty * (float)TIM1_PWM_DUTY_SCALE;
+  uint32_t compare = (uint32_t)(duty * (float)TIM1_PWM_COMPARE_FULL_SCALE + 0.5f);
 
-  if (scaled <= 0.0f)
-  {
-    return 0U;
-  }
-  if (scaled >= (float)TIM1_PWM_DUTY_SCALE)
-  {
-    return TIM1_PWM_DUTY_SCALE;
-  }
-  return (uint16_t)(scaled + 0.5f);
+  /* duty=1 显式允许 CCR=ARR+1，表示静态高侧；只有具有合适采样和
+     栅极供电条件的调用方才可请求。正常 FOC 使用板级采样上限。 */
+  if (compare > TIM1_PWM_COMPARE_FULL_SCALE) compare = TIM1_PWM_COMPARE_FULL_SCALE;
+  return compare;
+}
+
+/* 连续三次读取处理峰/谷折返点，执行次数有界。返回距离谷值的时间计数。 */
+static uint32_t Tim1Pwm_CyclePosition(void)
+{
+  uint32_t direction = TIM1->CR1 & TIM_CR1_DIR;
+  uint32_t count = TIM1->CNT;
+  uint32_t final_direction = TIM1->CR1 & TIM_CR1_DIR;
+  if (direction != final_direction) count = TIM1->CNT;
+  return (final_direction != 0U) ? 2U * TIM1_PWM_COUNTER_PERIOD - count : count;
 }
 
 HAL_StatusTypeDef Tim1Pwm_SetPhaseVoltage(float phase_a_duty,
                                           float phase_b_duty,
                                           float phase_c_duty)
 {
+  uint32_t compare[3], interrupt_mask, before, after, commit_guard;
+  pwm_sampling_plan_t plan;
   if (!isfinite(phase_a_duty) || !isfinite(phase_b_duty) ||
-      !isfinite(phase_c_duty))
+      !isfinite(phase_c_duty) ||
+      (phase_a_duty < 0.0f) || (phase_a_duty > 1.0f) ||
+      (phase_b_duty < 0.0f) || (phase_b_duty > 1.0f) ||
+      (phase_c_duty < 0.0f) || (phase_c_duty > 1.0f))
   {
     return HAL_ERROR;
   }
 
-  if (Tim1Pwm_SetPhaseDuty(TIM_CHANNEL_1,
-                           Tim1Pwm_DutyToScale(phase_a_duty)) != HAL_OK)
+  compare[0] = Tim1Pwm_FloatDutyCompare(phase_a_duty);
+  compare[1] = Tim1Pwm_FloatDutyCompare(phase_b_duty);
+  compare[2] = Tim1Pwm_FloatDutyCompare(phase_c_duty);
+  if ((s_sampling_configured == 0U) ||
+      (PwmSampling_Plan(&s_sampling_parameters, compare[0], compare[1], compare[2],
+                          &plan) == 0U))
+  {
+    g_tim1_pwm_sampling.window_rejections++;
+    return HAL_ERROR;
+  }
+
+  /* CCR1..4 一起预装载，在 CNT=0 的同一个 UEV 生效。短临界区中暂禁更新，
+     防止新三相 PWM 配到旧触发点。跨过截止点则拒绝，并保持硬件关断。
+     不产生 UG（UG 会打乱载波/重复计数器相位）。 */
+  interrupt_mask = __get_PRIMASK();
+  __disable_irq();
+  before = Tim1Pwm_CyclePosition();
+  commit_guard = Tim1Pwm_NsToCounts(TIM1_PWM_COMMIT_GUARD_NS) + 1U;
+  if (((TIM1->CR1 & TIM_CR1_UDIS) != 0U) ||
+      ((2U * TIM1_PWM_COUNTER_PERIOD - before) <= commit_guard))
+  {
+    g_tim1_pwm_sampling.deadline_rejections++;
+    if (interrupt_mask == 0U) __enable_irq();
+    return HAL_ERROR;
+  }
+  SET_BIT(TIM1->CR1, TIM_CR1_UDIS);
+  TIM1->CCR1 = compare[0];
+  TIM1->CCR2 = compare[1];
+  TIM1->CCR3 = compare[2];
+  TIM1->CCR4 = plan.trigger;
+  after = Tim1Pwm_CyclePosition();
+  CLEAR_BIT(TIM1->CR1, TIM_CR1_UDIS);
+  if ((after < before) ||
+      ((2U * TIM1_PWM_COUNTER_PERIOD - after) <= commit_guard))
+  {
+    __HAL_TIM_MOE_DISABLE_UNCONDITIONALLY(&htim1);
+    g_tim1_pwm_sampling.deadline_rejections++;
+    if (interrupt_mask == 0U) __enable_irq();
+    return HAL_ERROR;
+  }
+  if (interrupt_mask == 0U) __enable_irq();
+  s_phase_duty[0] = (uint16_t)(phase_a_duty * (float)TIM1_PWM_DUTY_SCALE + 0.5f);
+  s_phase_duty[1] = (uint16_t)(phase_b_duty * (float)TIM1_PWM_DUTY_SCALE + 0.5f);
+  s_phase_duty[2] = (uint16_t)(phase_c_duty * (float)TIM1_PWM_DUTY_SCALE + 0.5f);
+  g_tim1_pwm_sampling.planned_trigger = plan.trigger;
+  g_tim1_pwm_sampling.planned_sequence_end = plan.sequence_end;
+  g_tim1_pwm_sampling.low_window_start = plan.low_window_start;
+  g_tim1_pwm_sampling.low_window_end = plan.low_window_end;
+  return HAL_OK;
+}
+
+static pwm_sampling_parameters_t Tim1Pwm_SamplingParameters(uint32_t sequence_ns)
+{
+  pwm_sampling_parameters_t parameters;
+  parameters.peak = TIM1_PWM_COUNTER_PERIOD;
+  parameters.sequence_ticks = Tim1Pwm_NsToCounts(sequence_ns) + 1U;
+  parameters.guard_ticks = Tim1Pwm_NsToCounts(TIM1_PWM_DEADTIME_NS +
+                                              TIM1_PWM_CURRENT_SETTLE_NS) + 1U;
+  return parameters;
+}
+
+HAL_StatusTypeDef Tim1Pwm_GetCurrentSamplingDutyBounds(uint32_t sequence_ns,
+                                                       float *minimum,
+                                                       float *maximum)
+{
+  uint32_t peak = __HAL_TIM_GET_AUTORELOAD(&htim1);
+  uint32_t upper, min_compare;
+  pwm_sampling_parameters_t parameters;
+
+  if ((minimum == NULL) || (maximum == NULL) || (peak == 0U) ||
+      (peak != TIM1_PWM_COUNTER_PERIOD) ||
+      (sequence_ns == 0U) || (sequence_ns >= (1000000000UL / TIM1_PWM_FREQUENCY_HZ)))
   {
     return HAL_ERROR;
   }
-  if (Tim1Pwm_SetPhaseDuty(TIM_CHANNEL_2,
-                           Tim1Pwm_DutyToScale(phase_b_duty)) != HAL_OK)
-  {
+  parameters = Tim1Pwm_SamplingParameters(sequence_ns);
+  if (PwmSampling_UniformLimit(&parameters, &upper) == 0U) return HAL_ERROR;
+  min_compare = (Tim1Pwm_NsToCounts(TIM1_PWM_FOC_MIN_PULSE_NS) + 1U) / 2U + 1U;
+  if (upper <= min_compare) return HAL_ERROR;
+  *minimum = (float)min_compare / (float)TIM1_PWM_COMPARE_FULL_SCALE;
+  *maximum = (float)upper / (float)TIM1_PWM_COMPARE_FULL_SCALE;
+  return HAL_OK;
+}
+
+HAL_StatusTypeDef Tim1Pwm_ConfigureCurrentSampling(uint32_t sequence_ns,
+                                                   float *minimum, float *maximum)
+{
+  pwm_sampling_plan_t plan;
+  pwm_sampling_parameters_t parameters;
+  /* 调用方保证 ADC 尚未启动；这里额外拒绝任何仍使能功率级的配置请求。 */
+  if (Tim1Pwm_IsOutputEnabled() != 0U) return HAL_ERROR;
+  if (Tim1Pwm_GetCurrentSamplingDutyBounds(sequence_ns, minimum, maximum) != HAL_OK)
     return HAL_ERROR;
-  }
-  return Tim1Pwm_SetPhaseDuty(TIM_CHANNEL_3,
-                              Tim1Pwm_DutyToScale(phase_c_duty));
+  parameters = Tim1Pwm_SamplingParameters(sequence_ns);
+  if (PwmSampling_Plan(&parameters, TIM1->CCR1, TIM1->CCR2, TIM1->CCR3,
+                        &plan) == 0U) return HAL_ERROR;
+  s_sampling_parameters = parameters;
+  TIM1->CCR4 = plan.trigger;
+  s_sampling_configured = 1U;
+  s_previous_sample_valid = 0U;
+  g_tim1_pwm_sampling.planned_trigger = plan.trigger;
+  g_tim1_pwm_sampling.planned_sequence_end = plan.sequence_end;
+  g_tim1_pwm_sampling.low_window_start = plan.low_window_start;
+  g_tim1_pwm_sampling.low_window_end = plan.low_window_end;
+  return HAL_OK;
+}
+
+float Tim1Pwm_OnCurrentSample(uint32_t sample_sequence)
+{
+  uint32_t trigger = TIM1->CCR4;
+  int32_t ticks = (int32_t)(2U * TIM1_PWM_COUNTER_PERIOD);
+  /* 校准阶段暂停 FOC 回调；恢复后的首个控制周期用名义周期重新起算。 */
+  if ((s_previous_sample_valid != 0U) &&
+      ((sample_sequence - s_previous_sample_sequence) == 1U))
+    ticks += (int32_t)trigger - (int32_t)s_previous_sample_trigger;
+  s_previous_sample_trigger = trigger;
+  s_previous_sample_sequence = sample_sequence;
+  s_previous_sample_valid = 1U;
+  g_tim1_pwm_sampling.sampled_trigger = trigger;
+  g_tim1_pwm_sampling.sample_period_s = (float)ticks / (float)TIM1_PWM_TIMER_CLOCK_HZ;
+  return g_tim1_pwm_sampling.sample_period_s;
 }
 
 /* USER CODE END 1 */
@@ -226,7 +353,8 @@ HAL_StatusTypeDef MX_TIM1_Init(void)
   }
 
   sMasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
-  sMasterConfig.MasterOutputTrigger2 = TIM_TRGO2_RESET;
+  /* OC4REF 上升沿只在上数比较点产生一次；直接 CC4 事件与 REF 边沿不同。 */
+  sMasterConfig.MasterOutputTrigger2 = TIM_TRGO2_OC4REF;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
 
   if (HAL_TIMEx_MasterConfigSynchronization(&htim1, &sMasterConfig) != HAL_OK)
@@ -282,9 +410,8 @@ HAL_StatusTypeDef MX_TIM1_Init(void)
     }
   }
 
-  /* 通道 4 只用于产生 ADC 触发，它的引脚并不接到栅极驱动。
-     PWM 模式 2 加上一个刚好低于峰值的比较值，会使 OC4REF 在更新事件产生之前
-     TIM1_PWM_ADC_TRIGGER_LEAD_NS 就置起，这正是电流环想要的采样时刻。 */
+  /* 通道 4 通过 TRGO2 的 OC4REF 触发 ADC；初值用于启动，随后与三相 duty
+     同步预装载。RCR=1 在启动前写入，周期更新在谷值，而非峰值。 */
   sOcConfig.OCMode = TIM_OCMODE_PWM2;
   sOcConfig.Pulse = (uint32_t)TIM1_PWM_COUNTER_PERIOD -
                     Tim1Pwm_NsToCounts(TIM1_PWM_ADC_TRIGGER_LEAD_NS);
@@ -299,6 +426,11 @@ HAL_StatusTypeDef MX_TIM1_Init(void)
   /* USER CODE BEGIN TIM1_Init 2 */
 
   /* USER CODE END TIM1_Init 2 */
+
+  /* CCR1..4 必须一起在谷值更新，不能让新触发点提前作用于旧 PWM。 */
+  __HAL_TIM_ENABLE_OCxPRELOAD(&htim1, TIM_CHANNEL_4);
+  s_sampling_configured = 0U;
+  s_previous_sample_valid = 0U;
 
   /* 外设时钟和 NVIC 优先级已由 HAL_TIM_PWM_MspInit() 设置好，
      那个函数是上面 HAL_TIM_PWM_Init() 调用的。此刻只剩下引脚配置，
@@ -318,8 +450,8 @@ HAL_StatusTypeDef MX_TIM1_Init(void)
                                  LL_TIM_CHANNEL_CH3 | LL_TIM_CHANNEL_CH3N);
   LL_TIM_CC_EnableChannel(TIM1, LL_TIM_CHANNEL_CH4);
 
-  /* CC4 在采样时刻触发；它的处理入口就是电流环的入口。 */
-  LL_TIM_EnableIT_CC4(TIM1);
+  /* ADC 由硬件 REF 边沿触发，电流环由 JEOS 调度，无需空的 CC4 ISR。 */
+  LL_TIM_DisableIT_CC4(TIM1);
 
   /* 中性点 50 % 模式：每个半桥的两个开关都被驱动，栅极驱动的自举电容得以
      保持电荷，而电机上看不到净电压。 */

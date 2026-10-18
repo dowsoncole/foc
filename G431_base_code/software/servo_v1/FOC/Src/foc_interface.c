@@ -43,8 +43,13 @@ void FOC_ControllerInit(foc_controller_t *controller,
   */
 void FOC_ControllerStart(foc_controller_t *controller)
 {
-  if (controller != 0)
+  if ((controller != 0) && (controller->fault_flags == FOC_FAULT_NONE))
   {
+    /* 新的 Servo ON 必须等待一个全新的有效反馈周期。 */
+    controller->feedback_ready = 0U;
+    controller->input.current_valid = 0U;
+    controller->input.angle_valid = 0U;
+    controller->input.reference_valid = 0U;
     controller->running = 1U;
   }
 }
@@ -61,16 +66,22 @@ void FOC_ControllerStop(foc_controller_t *controller)
     return;
   }
 
-  controller->running = 0U;
-  FOC_AlgorithmReset(&controller->algorithm);
-  if (controller->port.write_voltage != 0)
-  {
-    controller->port.write_voltage(controller->port.context,
-                                    &controller->algorithm.output);
-  }
+  /* 先关硬件闸门，再清软件状态。 */
   if (controller->port.disable_output != 0)
   {
     controller->port.disable_output(controller->port.context);
+  }
+
+  controller->running = 0U;
+  controller->feedback_ready = 0U;
+  controller->input.current_valid = 0U;
+  controller->input.angle_valid = 0U;
+  controller->input.reference_valid = 0U;
+  FOC_AlgorithmReset(&controller->algorithm);
+  if (controller->port.write_voltage != 0)
+  {
+    (void)controller->port.write_voltage(controller->port.context,
+                                          &controller->algorithm.output);
   }
 }
 
@@ -90,15 +101,18 @@ void FOC_ControllerStep(foc_controller_t *controller)
     return;
   }
 
-  /* 四个回调缺一不可，短路求值保证：只要有一个为空，就不会执行到最后一个
-     条件里的 is_power_stage_safe() 调用。 */
+  /* 端口配置错误与功率级故障分开编码，便于上层精确上报。 */
   if ((controller->port.is_power_stage_safe == 0) ||
       (controller->port.read_feedback == 0) ||
       (controller->port.write_voltage == 0) ||
-      (controller->port.disable_output == 0) ||
-      (controller->port.is_power_stage_safe(controller->port.context) == 0U))
+      (controller->port.disable_output == 0))
   {
     controller->running = 0U;
+    controller->feedback_ready = 0U;
+    controller->fault_flags |= FOC_FAULT_PORT_CONFIG;
+    controller->input.current_valid = 0U;
+    controller->input.angle_valid = 0U;
+    controller->input.reference_valid = 0U;
     FOC_AlgorithmReset(&controller->algorithm);
 
     /* 修复：进入本分支的原因之一可能就是 disable_output 为空指针，
@@ -111,12 +125,91 @@ void FOC_ControllerStep(foc_controller_t *controller)
     return;
   }
 
+  if (controller->port.is_power_stage_safe(controller->port.context) == 0U)
+  {
+    controller->running = 0U;
+    controller->feedback_ready = 0U;
+    controller->fault_flags |= FOC_FAULT_POWER_STAGE;
+    controller->input.current_valid = 0U;
+    controller->input.angle_valid = 0U;
+    controller->input.reference_valid = 0U;
+    FOC_AlgorithmReset(&controller->algorithm);
+    controller->port.disable_output(controller->port.context);
+    return;
+  }
+
+  /* 新周期开始后先撤销就绪握手，再重新发布各类有效性。 */
+  controller->feedback_ready = 0U;
+  controller->input.current_valid = 0U;
+  controller->input.angle_valid = 0U;
+  controller->input.reference_valid = 0U;
   controller->port.read_feedback(controller->port.context, &controller->input);
-  controller->input.enabled = 1U;
+
+  if (FOC_InputIsValid(&controller->input) == 0U)
+  {
+    if (controller->input.current_valid == 0U)
+    {
+      controller->fault_flags |= FOC_FAULT_CURRENT_INVALID;
+    }
+    if (controller->input.angle_valid == 0U)
+    {
+      controller->fault_flags |= FOC_FAULT_ANGLE_INVALID;
+    }
+    if (controller->input.reference_valid == 0U)
+    {
+      controller->fault_flags |= FOC_FAULT_REFERENCE_INVALID;
+    }
+    if ((controller->input.current_valid != 0U) &&
+        (controller->input.angle_valid != 0U) &&
+        (controller->input.reference_valid != 0U))
+    {
+      controller->fault_flags |= FOC_FAULT_ALGORITHM;
+    }
+    controller->running = 0U;
+    FOC_AlgorithmReset(&controller->algorithm);
+    controller->port.disable_output(controller->port.context);
+    return;
+  }
+
   FOC_AlgorithmStep(&controller->algorithm, &controller->input);
+  if (controller->algorithm.output.valid == 0U)
+  {
+    controller->fault_flags |= FOC_FAULT_ALGORITHM;
+    controller->running = 0U;
+    controller->port.disable_output(controller->port.context);
+    return;
+  }
   controller->timing.cycle_count++;
-  controller->port.write_voltage(controller->port.context,
-                                  &controller->algorithm.output);
+  if (controller->port.write_voltage(controller->port.context,
+                                      &controller->algorithm.output) == 0U)
+  {
+    controller->fault_flags |= FOC_FAULT_PWM_WRITE;
+    controller->running = 0U;
+    controller->port.disable_output(controller->port.context);
+    FOC_AlgorithmReset(&controller->algorithm);
+    return;
+  }
+  /* 必须放在 write_voltage 之后：此时 MOE 打开才不会暴露旧 CCR。 */
+  controller->feedback_ready = 1U;
+}
+
+void FOC_ControllerClearFaults(foc_controller_t *controller)
+{
+  if ((controller == 0) || (controller->running != 0U))
+  {
+    return;
+  }
+
+  controller->fault_flags = FOC_FAULT_NONE;
+  controller->feedback_ready = 0U;
+  controller->input.current_valid = 0U;
+  controller->input.angle_valid = 0U;
+  controller->input.reference_valid = 0U;
+}
+
+foc_fault_flags_t FOC_ControllerGetFaults(const foc_controller_t *controller)
+{
+  return (controller != 0) ? controller->fault_flags : FOC_FAULT_PORT_CONFIG;
 }
 
 /**

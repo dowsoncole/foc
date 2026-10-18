@@ -24,54 +24,26 @@ static float foc_pi_step(foc_pi_t *controller, float error, float period)
   controller->integral = foc_clamp(integral, controller->integral_min,
                                    controller->integral_max);
   output = controller->kp * error + controller->integral;
-  return foc_clamp(output, controller->integral_min, controller->integral_max);
+  /* 积分限幅与输出能力分开；最终基波限幅由调制模块负责。 */
+  return output;
 }
 
-static void foc_limit_voltage(float *d_voltage, float *q_voltage, float limit,
-                              uint8_t *saturated)
+static uint8_t foc_pi_valid(const foc_pi_t *controller)
 {
-  float magnitude = sqrtf((*d_voltage * *d_voltage) +
-                          (*q_voltage * *q_voltage));
-  float scale;
-
-  if (magnitude <= limit || magnitude <= 0.0f)
-  {
-    return;
-  }
-
-  scale = limit / magnitude;
-  *d_voltage *= scale;
-  *q_voltage *= scale;
-  *saturated = 1U;
+  return (isfinite(controller->kp) && isfinite(controller->ki) &&
+          isfinite(controller->integral) && isfinite(controller->integral_min) &&
+          isfinite(controller->integral_max) &&
+          (controller->integral_min <= 0.0f) && (controller->integral_max >= 0.0f)) ? 1U : 0U;
 }
 
-static float foc_clamp_duty(float duty)
+static uint8_t foc_modulate(foc_algorithm_t *algorithm, float d, float q,
+                            float sin_angle, float cos_angle,
+                            foc_modulation_output_t *modulation)
 {
-  return foc_clamp(duty, 0.0f, 1.0f);
-}
-
-/* FOC 数学层：将三相相电压做零序平移，得到对称 PWM 占空比。
-   定时器层只接收 0..1 占空比并完成 CCR 写入。 */
-static void foc_phase_voltage_to_duty(float phase_a,
-                                      float phase_b,
-                                      float phase_c,
-                                      float *duty_a,
-                                      float *duty_b,
-                                      float *duty_c)
-{
-  float maximum = phase_a;
-  float minimum = phase_a;
-  float zero_sequence;
-
-  if (phase_b > maximum) maximum = phase_b;
-  if (phase_c > maximum) maximum = phase_c;
-  if (phase_b < minimum) minimum = phase_b;
-  if (phase_c < minimum) minimum = phase_c;
-
-  zero_sequence = 0.5f - 0.5f * (maximum + minimum);
-  *duty_a = foc_clamp_duty(phase_a + zero_sequence);
-  *duty_b = foc_clamp_duty(phase_b + zero_sequence);
-  *duty_c = foc_clamp_duty(phase_c + zero_sequence);
+  return FOC_ModulationCompute(&algorithm->parameters.modulation,
+                                algorithm->parameters.voltage_limit,
+                                d * cos_angle - q * sin_angle,
+                                d * sin_angle + q * cos_angle, modulation);
 }
 
 void FOC_AlgorithmInit(foc_algorithm_t *algorithm,
@@ -98,6 +70,20 @@ void FOC_AlgorithmReset(foc_algorithm_t *algorithm)
   (void)memset(&algorithm->output, 0, sizeof(algorithm->output));
 }
 
+uint8_t FOC_InputIsValid(const foc_input_t *input)
+{
+  if (input == 0)
+  {
+    return 0U;
+  }
+
+  return ((input->current_valid != 0U) &&
+          (input->angle_valid != 0U) &&
+          (input->reference_valid != 0U) &&
+          isfinite(input->electrical_angle_rad) &&
+          isfinite(input->d_reference) && isfinite(input->q_reference)) ? 1U : 0U;
+}
+
 void FOC_AlgorithmStep(foc_algorithm_t *algorithm,
                        const foc_input_t *input)
 {
@@ -108,12 +94,73 @@ void FOC_AlgorithmStep(foc_algorithm_t *algorithm,
   float d_voltage;
   float q_voltage;
   float control_period_s;
+  float d_error, q_error, old_d_integral, old_q_integral;
+  float fundamental_d, fundamental_q;
+  foc_modulation_output_t modulation;
 
   if ((algorithm == 0) || (input == 0))
   {
     return;
   }
 
+  /* 反馈无效时不进行坐标变换和 PI 计算，同时清除历史积分。 */
+  if (FOC_InputIsValid(input) == 0U)
+  {
+    FOC_AlgorithmReset(algorithm);
+    return;
+  }
+
+  control_period_s = (algorithm->parameters.sample_period_s > 0.0f) ?
+                     algorithm->parameters.sample_period_s :
+                     algorithm->parameters.pwm_period_s;
+  if (!isfinite(control_period_s) || (control_period_s <= 0.0f) ||
+      !isfinite(algorithm->parameters.current_limit) ||
+      (algorithm->parameters.current_limit < 0.0f) ||
+      (foc_pi_valid(&algorithm->parameters.d_controller) == 0U) ||
+      (foc_pi_valid(&algorithm->parameters.q_controller) == 0U))
+  {
+    FOC_AlgorithmReset(algorithm);
+    return;
+  }
+
+  /*
+   * Clarke 变换：三相静止坐标系 (a,b,c) → 二相静止坐标系 (α,β)。
+   *
+   * 本工程采用两相电流采样，并假设无零序电流：
+   *
+   *     ia + ib + ic = 0
+   *     ic = -(ia + ib)
+   *
+   * 令 α 轴与 a 相轴重合，三相轴之间相差 120°，则等幅值形式为：
+   *
+   *     iα = (2/3)*(ia - 0.5*ib - 0.5*ic)
+   *        = ia
+   *
+   *     iβ = (2/3)*(sqrt(3)/2)*(ib - ic)
+   *        = (ia + 2*ib) / sqrt(3)
+   *
+   * 因此：
+   *     alpha_current = ia
+   *     beta_current  = (ia + 2*ib) / sqrt(3)
+   *
+   * 0.5773502692f = 1/sqrt(3)。这里的 phase_a/phase_b 是标定后的 S16 值，
+   * 只要两相使用同一比例尺度，变换结果就保持同一比例。
+   *
+   * 归一化注意：
+   * - 当前是“等幅值”形式，使基波空间电流矢量的幅值与相电流幅值保持一致。
+   * - 常见的 (2/3) 形式是另一种写法：
+   *       iα = (2/3)*(ia - 0.5*ib - 0.5*ic)
+   *       iβ = (2/3)*(sqrt(3)/2)*(ib - ic)
+   *   在 ia+ib+ic=0 时与当前公式完全等价，仍属于等幅值归一化。
+   * - 真正的“等功率”形式常写为：
+   *       iα = sqrt(2/3)*(ia - 0.5*ib - 0.5*ic)
+   *       iβ = sqrt(2/3)*(sqrt(3)/2)*(ib - ic)
+   *   它使 α/β 坐标中的平方和与 abc 坐标中的平方和保持能量/功率一致，但在无零序时，电流矢量数值会比当前等幅值形式放大 sqrt(3/2)。
+   *
+   * 两种形式都可用，但必须与后续 Park 变换、反变换、PI 参数、
+   * 电流限幅和功率计算使用同一套归一化。切换归一化时，电流参考和
+   * 反馈、PI 增益、限幅阈值都要同比换算，不能只改这里的一个系数。
+   */
   alpha_current = (float)input->phase_a;
   beta_current = ((float)input->phase_a +
                   (2.0f * (float)input->phase_b)) * 0.5773502692f;
@@ -126,46 +173,70 @@ void FOC_AlgorithmStep(foc_algorithm_t *algorithm,
                                 (beta_current * cos_angle);
   algorithm->output.saturated = 0U;
 
-  if (input->enabled == 0U)
+  old_d_integral = algorithm->parameters.d_controller.integral;
+  old_q_integral = algorithm->parameters.q_controller.integral;
+  d_error = foc_clamp(input->d_reference, -algorithm->parameters.current_limit,
+                       algorithm->parameters.current_limit) - algorithm->output.d_current;
+  q_error = foc_clamp(input->q_reference, -algorithm->parameters.current_limit,
+                       algorithm->parameters.current_limit) - algorithm->output.q_current;
+  d_voltage = foc_pi_step(&algorithm->parameters.d_controller,
+                          d_error, control_period_s);
+  q_voltage = foc_pi_step(&algorithm->parameters.q_controller,
+                          q_error, control_period_s);
+  if (foc_modulate(algorithm, d_voltage, q_voltage, sin_angle, cos_angle,
+                    &modulation) == 0U)
   {
     FOC_AlgorithmReset(algorithm);
     return;
   }
+  fundamental_d = modulation.fundamental_alpha * cos_angle +
+                    modulation.fundamental_beta * sin_angle;
+  fundamental_q = -modulation.fundamental_alpha * sin_angle +
+                    modulation.fundamental_beta * cos_angle;
 
-  control_period_s = (algorithm->parameters.pwm_period_s > 0.0f) ?
-                     algorithm->parameters.pwm_period_s :
-                     algorithm->parameters.sample_period_s;
-  d_voltage = foc_pi_step(&algorithm->parameters.d_controller,
-                          foc_clamp(input->d_reference,
-                                    -algorithm->parameters.current_limit,
-                                    algorithm->parameters.current_limit) -
-                          algorithm->output.d_current,
-                          control_period_s);
-  q_voltage = foc_pi_step(&algorithm->parameters.q_controller,
-                          foc_clamp(input->q_reference,
-                                    -algorithm->parameters.current_limit,
-                                    algorithm->parameters.current_limit) -
-                          algorithm->output.q_current,
-                          control_period_s);
-  foc_limit_voltage(&d_voltage, &q_voltage,
-                    algorithm->parameters.voltage_limit,
-                    &algorithm->output.saturated);
+  /* 条件积分：若本次积分增量把目标推向基波能力之外，撤销本次积分。
+     不能用每周期的畸变电压回算积分，否则会抵消 OVM 需要的谐波。
+     向饱和区内回退的积分仍允许；积分自身的上下限继续有效。 */
+  if ((modulation.limited != 0U) &&
+      (((algorithm->parameters.d_controller.integral - old_d_integral) *
+          (d_voltage - fundamental_d) +
+        (algorithm->parameters.q_controller.integral - old_q_integral) *
+          (q_voltage - fundamental_q)) > 0.0f))
+  {
+    algorithm->parameters.d_controller.integral = old_d_integral;
+    algorithm->parameters.q_controller.integral = old_q_integral;
+    d_voltage = algorithm->parameters.d_controller.kp * d_error + old_d_integral;
+    q_voltage = algorithm->parameters.q_controller.kp * q_error + old_q_integral;
+    if (foc_modulate(algorithm, d_voltage, q_voltage, sin_angle, cos_angle,
+                      &modulation) == 0U)
+    {
+      FOC_AlgorithmReset(algorithm);
+      return;
+    }
+  }
 
-  algorithm->output.d_voltage = d_voltage;
-  algorithm->output.q_voltage = q_voltage;
-  algorithm->output.alpha_voltage = (d_voltage * cos_angle) -
-                                    (q_voltage * sin_angle);
-  algorithm->output.beta_voltage = (d_voltage * sin_angle) +
-                                   (q_voltage * cos_angle);
-  algorithm->output.phase_a_voltage = algorithm->output.alpha_voltage;
-  algorithm->output.phase_b_voltage = (-0.5f * algorithm->output.alpha_voltage) +
-                                      (0.8660254038f * algorithm->output.beta_voltage);
-  algorithm->output.phase_c_voltage = (-0.5f * algorithm->output.alpha_voltage) -
-                                      (0.8660254038f * algorithm->output.beta_voltage);
-  foc_phase_voltage_to_duty(algorithm->output.phase_a_voltage,
-                            algorithm->output.phase_b_voltage,
-                            algorithm->output.phase_c_voltage,
-                            &algorithm->output.phase_a_duty,
-                            &algorithm->output.phase_b_duty,
-                            &algorithm->output.phase_c_duty);
+  algorithm->output.fundamental_d_voltage = modulation.fundamental_alpha * cos_angle +
+                                             modulation.fundamental_beta * sin_angle;
+  algorithm->output.fundamental_q_voltage = -modulation.fundamental_alpha * sin_angle +
+                                             modulation.fundamental_beta * cos_angle;
+  algorithm->output.alpha_voltage = modulation.alpha_voltage;
+  algorithm->output.beta_voltage = modulation.beta_voltage;
+  algorithm->output.d_voltage = modulation.alpha_voltage * cos_angle +
+                                 modulation.beta_voltage * sin_angle;
+  algorithm->output.q_voltage = -modulation.alpha_voltage * sin_angle +
+                                 modulation.beta_voltage * cos_angle;
+  algorithm->output.phase_a_voltage = modulation.alpha_voltage;
+  algorithm->output.phase_b_voltage = -0.5f * modulation.alpha_voltage +
+                                       0.8660254038f * modulation.beta_voltage;
+  algorithm->output.phase_c_voltage = -0.5f * modulation.alpha_voltage -
+                                       0.8660254038f * modulation.beta_voltage;
+  algorithm->output.phase_a_duty = modulation.phase_a_duty;
+  algorithm->output.phase_b_duty = modulation.phase_b_duty;
+  algorithm->output.phase_c_duty = modulation.phase_c_duty;
+  algorithm->output.fundamental_voltage_limit = modulation.fundamental_limit;
+  algorithm->output.modulation_region = modulation.region;
+  algorithm->output.sector = modulation.sector;
+  algorithm->output.saturated = ((modulation.limited != 0U) ||
+      (modulation.region != FOC_MODULATION_REGION_LINEAR)) ? 1U : 0U;
+  algorithm->output.valid = 1U;
 }

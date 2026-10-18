@@ -216,7 +216,7 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim)
     __HAL_RCC_TIM1_CLK_ENABLE();
 
     /* Current-loop class timing, split across the two TIM1 vectors:
-         TIM1_CC_IRQn          channel 4 compare -> sampling instant
+         TIM1_CC_IRQn          reserved (CC4IE disabled; ADC uses TRGO2 hardware)
          TIM1_UP_TIM16_IRQn    period boundary    -> state machine
        Both are one step above the TIM6 heartbeat, and they are the only
        interrupts allowed to preempt each other. */

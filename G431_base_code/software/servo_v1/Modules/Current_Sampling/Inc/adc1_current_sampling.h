@@ -68,16 +68,9 @@ extern "C" {
 /* 注入序列共两个通道，顺序转换，全部就绪需要约 11.43 µs。 */
 #define ADC1_CS_SEQUENCE_CONV_NS    (ADC1_CS_OVERSAMPLED_CONV_NS * 2UL)
 
-/* 触发提前量：TIM1_CH4 比较点比更新事件早 5.714 µs，即本序列耗时的一半
-   （实际写入 CCR4 的值由模块 B 的 TIM1_PWM_ADC_TRIGGER_LEAD_NS 决定，
-   此处只做记录，便于两边对照）。
-
-   取一半是让注入序列正好以更新事件为中心：T - 5.71 µs 触发、T + 5.71 µs
-   结束，两个通道的采样点分别落在更新事件两侧对称位置。
-
-   ⚠ 改动过采样倍率、采样时间或通道数会改变 ADC1_CS_SEQUENCE_CONV_NS，
-   届时必须同步模块 B 的 TIM1_PWM_ADC_TRIGGER_LEAD_NS（见 README 第 14 节
-   规则 9）。两边不一致不会报错，只会让采样点偏离载波的预期位置。 */
+/* 序列居中时相对载波峰值的提前量，仅供诊断参考。
+   运行时由应用传入 ADC1_CS_SEQUENCE_CONV_NS，PWM 规划器逐周期设置 CCR4。
+   峰值不是 RCR=1 的谷值更新事件；不再维护两个重复的运行采样时间常量。 */
 #define ADC1_CS_TRIGGER_LEAD_NS     (ADC1_CS_SEQUENCE_CONV_NS / 2UL)
 
 /* --------------------------------------------------------------------------*/
@@ -158,7 +151,7 @@ HAL_StatusTypeDef MX_OPAMP3_Init(void);
   *
   * @param  software_trigger_flag 非 0 = 注入组由软件触发（用于上电偏置标定，
   *         此时 TIM1_CH4 的触发被摘除，标定不受 PWM 时序干扰）；
-  *         0 = 由 ADC_EXTERNALTRIGINJEC_T1_CC4 上升沿触发（运行时的电流环）。
+  *         0 = 由 TIM1_TRGO2=OC4REF 上升沿触发（运行时的电流环），CCR4 动态规划。
   * @retval HAL_OK；任一步 HAL 调用失败时返回 HAL_ERROR。
    * @note   本函数只配置与校准，不启动注入转换。启动由
    *         CurrentSampling_Start() 独立完成。

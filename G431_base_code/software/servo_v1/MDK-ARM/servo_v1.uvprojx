@@ -341,7 +341,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32G431xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../FOC/Inc;../Modules/Driver_Communication/Inc;../Modules/Three_Phase_Driver/Inc;../Modules/Current_Sampling/Inc;../Modules/Encoder/Inc;../Tests/Inc;../Drivers/STM32G4xx_HAL_Driver/Inc;../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32G4xx/Include;../Drivers/CMSIS/Include</IncludePath>
+              <IncludePath>../Core/Inc;../FOC/Inc;../Servo/Inc;../Modules/Driver_Communication/Inc;../Modules/Three_Phase_Driver/Inc;../Modules/Current_Sampling/Inc;../Modules/Encoder/Inc;../Tests/Inc;../Drivers/STM32G4xx_HAL_Driver/Inc;../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32G4xx/Include;../Drivers/CMSIS/Include</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -486,6 +486,16 @@
           <GroupName>Modules/Three-Phase Driver</GroupName>
           <Files>
             <File>
+              <FileName>pwm_sampling.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Modules/Three_Phase_Driver/Src/pwm_sampling.c</FilePath>
+            </File>
+            <File>
+              <FileName>pwm_sampling.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>../Modules/Three_Phase_Driver/Inc/pwm_sampling.h</FilePath>
+            </File>
+            <File>
               <FileName>tim1_pwm.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Modules/Three_Phase_Driver/Src/tim1_pwm.c</FilePath>
@@ -551,6 +561,21 @@
           <GroupName>Modules/FOC</GroupName>
           <Files>
             <File>
+              <FileName>foc_modulation.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../FOC/Src/foc_modulation.c</FilePath>
+            </File>
+            <File>
+              <FileName>foc_modulation.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>../FOC/Inc/foc_modulation.h</FilePath>
+            </File>
+            <File>
+              <FileName>foc_modulation_lut.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>../FOC/Src/foc_modulation_lut.h</FilePath>
+            </File>
+            <File>
               <FileName>foc_algorithm.c</FileName>
               <FileType>1</FileType>
               <FilePath>../FOC/Src/foc_algorithm.c</FilePath>
@@ -569,6 +594,21 @@
               <FileName>foc_interface.h</FileName>
               <FileType>5</FileType>
               <FilePath>../FOC/Inc/foc_interface.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Application/Servo Manager</GroupName>
+          <Files>
+            <File>
+              <FileName>servo_manager.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Servo/Src/servo_manager.c</FilePath>
+            </File>
+            <File>
+              <FileName>servo_manager.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>../Servo/Inc/servo_manager.h</FilePath>
             </File>
           </Files>
         </Group>
