@@ -204,7 +204,12 @@ void SysTick_Handler(void)
 /* USER CODE BEGIN 1 */
 void ADC1_2_IRQHandler(void)
 {
+  /* Timing probe: JEOS has asserted when this vector is entered.  The HAL
+     handler dispatches the injected conversion callback, which runs FOC and
+     commits the new CCR values before returning. */
+  GPIOA->BSRR = GPIO_PIN_0;
   HAL_ADC_IRQHandler(&hadc1);
+  GPIOA->BSRR = ((uint32_t)GPIO_PIN_0 << 16U);
 }
 
 /**

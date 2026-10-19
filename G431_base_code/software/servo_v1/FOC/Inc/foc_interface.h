@@ -25,8 +25,9 @@ typedef uint32_t foc_fault_flags_t;
      is_power_stage_safe : 绑定 DrvMonitor_IsPowerStageSafeFast()。
                            必须只读引脚、绝不走 I2C，因为它会在 20 kHz
                            电流环里被调用，执行时间必须恒定。
-     read_feedback       : 每周期先填 phase_a / phase_b、electrical_angle_rad、
-                           d_reference / q_reference，再分别设置 current_valid、
+     read_feedback       : 每周期先填安培单位的 phase_a / phase_b、
+                           electrical_angle_rad、安培单位的 d_reference /
+                           q_reference，再分别设置 current_valid、
                            angle_valid、reference_valid。任一无效都禁止输出。
      write_voltage       : 把 foc_output_t 已计算好的三相占空比交给
                            定时器层；成功返回 1，失败返回 0 并锁存故障。

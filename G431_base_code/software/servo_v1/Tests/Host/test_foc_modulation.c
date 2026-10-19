@@ -180,6 +180,19 @@ static void test_foc_and_faults(void)
 {
   foc_parameters_t p = parameters();
   foc_algorithm_t algorithm;
+  foc_voltage_open_loop_t open_loop =
+  {
+    .d_voltage_v = 0.2f,
+    .q_voltage_v = 0.0f,
+    .dc_bus_voltage_v = 1.0f,
+    .electrical_frequency_hz = 2.0f,
+    .electrical_angle_rad = 0.0f,
+    .cycle_count = 0U,
+    .applied_d_voltage_v = 0.0f,
+    .applied_q_voltage_v = 0.0f,
+    .voltage_ramp_rate_v_per_s = 0.0f,
+    .voltage_ramp_complete = 0U
+  };
   foc_controller_t controller;
   foc_port_t port = { is_safe, read_feedback, write_voltage, disable_output, NULL };
   int i;
@@ -187,6 +200,20 @@ static void test_foc_and_faults(void)
   feedback.current_valid = feedback.angle_valid = feedback.reference_valid = 1U;
   feedback.q_reference = 100.0f;
   FOC_AlgorithmInit(&algorithm, &p);
+  CHECK(FOC_AlgorithmVoltageStep(&algorithm, &open_loop, 0.00005f) != 0U);
+  CHECK(algorithm.output.valid != 0U);
+  CHECK(fabs(algorithm.output.fundamental_d_voltage - 0.2f) < 1.0e-6);
+  CHECK(fabs(algorithm.output.fundamental_q_voltage) < 1.0e-6);
+  CHECK(fabs(algorithm.output.phase_a_duty - 0.65f) < 1.0e-6);
+  CHECK(fabs(algorithm.output.phase_b_duty - 0.35f) < 1.0e-6);
+  CHECK(fabs(algorithm.output.phase_c_duty - 0.35f) < 1.0e-6);
+  open_loop.electrical_angle_rad = (float)(PI / 2.0);
+  CHECK(FOC_AlgorithmVoltageStep(&algorithm, &open_loop, 0.00005f) != 0U);
+  CHECK(fabs(algorithm.output.fundamental_d_voltage - 0.2f) < 1.0e-6);
+  CHECK(fabs(algorithm.output.fundamental_q_voltage) < 1.0e-6);
+  open_loop.d_voltage_v = NAN;
+  CHECK(FOC_AlgorithmVoltageStep(&algorithm, &open_loop, 0.00005f) == 0U);
+  CHECK(algorithm.output.valid == 0U);
   for (i = 0; i < 10000; ++i) FOC_AlgorithmStep(&algorithm, &feedback);
   CHECK(algorithm.output.valid && algorithm.output.saturated);
   CHECK(fabs(algorithm.parameters.q_controller.integral) < 1.0e-7);

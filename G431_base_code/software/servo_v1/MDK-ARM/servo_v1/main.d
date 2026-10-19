@@ -43,6 +43,8 @@ servo_v1/main.o: ..\Core\Src\main.c ..\Core\Inc\main.h \
   ..\Modules\Driver_Communication\Inc\stspin32g4.h \
   ..\Modules\Driver_Communication\Inc\drv_monitor.h \
   ..\FOC\Inc\foc_interface.h ..\FOC\Inc\foc_algorithm.h \
-  ..\Tests\Inc\waveform_generator.h \
+  ..\FOC\Inc\foc_modulation.h ..\FOC\Inc\foc_control_manager.h \
+  ..\Servo\Inc\servo_manager.h ..\Tests\Inc\waveform_generator.h \
+  ..\Tests\Inc\waveform_uart1_port.h \
   ..\Modules\Encoder\Inc\spi1_encoder.h ..\Modules\Encoder\Inc\mt6835.h \
   ..\Tests\Inc\mt6835_verify.h

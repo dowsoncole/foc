@@ -29,8 +29,9 @@ typedef struct
 
 typedef struct
 {
-  int16_t phase_a;
-  int16_t phase_b;
+  /* 两相反馈使用物理安培，必须与 d/q 电流给定和 current_limit 同量纲。 */
+  float phase_a;
+  float phase_b;
   float electrical_angle_rad;
   float d_reference;
   float q_reference;
@@ -71,11 +72,56 @@ typedef struct
   foc_output_t output;
 } foc_algorithm_t;
 
+/* 开环电压算法的给定与运行状态。给定和斜坡状态使用物理伏特；算法内部
+   除以 dc_bus_voltage_v 后才进入标幺调制。频率为电角频率；
+   electrical_angle_rad 和 cycle_count 由 VoltageStep 自动更新。 */
+typedef struct
+{
+  /* Command values.  The algorithm slews applied_* toward these targets so
+     the first enabled PWM frame never contains a full voltage step. */
+  float d_voltage_v;
+  float q_voltage_v;
+  float dc_bus_voltage_v;
+  float electrical_frequency_hz;
+  float electrical_angle_rad;
+  uint32_t cycle_count;
+  float applied_d_voltage_v;
+  float applied_q_voltage_v;
+  /* Per-axis voltage slew in V/s.  Zero keeps the legacy immediate-step
+     behaviour, which is useful for deterministic host tests. */
+  float voltage_ramp_rate_v_per_s;
+  uint8_t voltage_ramp_complete;
+} foc_voltage_open_loop_t;
+
+/* 电流环台架测试参数与遥测。电流闭环使用真实 ADC 反馈，但电角度由本对象
+   自行推进，因此它是“开环角度 + 闭环电流”，不依赖编码器。PI 输出仍为
+   相对母线电压的标幺值，下面的 output_*_voltage_v 仅用于物理量观察。 */
+typedef struct
+{
+  float d_current_reference_a;
+  float q_current_reference_a;
+  float dc_bus_voltage_v;
+  float electrical_frequency_hz;
+  float electrical_angle_rad;
+  uint32_t cycle_count;
+  float measured_d_current_a;
+  float measured_q_current_a;
+  float output_d_voltage_v;
+  float output_q_voltage_v;
+} foc_current_test_t;
+
 void FOC_AlgorithmInit(foc_algorithm_t *algorithm,
                        const foc_parameters_t *parameters);
 void FOC_AlgorithmReset(foc_algorithm_t *algorithm);
 uint8_t FOC_InputIsValid(const foc_input_t *input);
 void FOC_AlgorithmStep(foc_algorithm_t *algorithm,
                        const foc_input_t *input);
+
+/* 开环电压测试入口：跳过电流采样、Park 反馈和 PI，把伏特给定除以母线电压
+   得到标幺D/Q电压，再按电角度变换到 alpha/beta 并生成三相 duty。
+   voltage_limit 仍是相对母线电压 Vdc 的标幺限制。 */
+uint8_t FOC_AlgorithmVoltageStep(foc_algorithm_t *algorithm,
+                                 foc_voltage_open_loop_t *open_loop,
+                                 float sample_period_s);
 
 #endif

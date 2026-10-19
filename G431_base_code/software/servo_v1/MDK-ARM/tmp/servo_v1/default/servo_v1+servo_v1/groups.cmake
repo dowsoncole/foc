@@ -81,6 +81,7 @@ target_link_libraries(Group_Modules_Driver_Communication PUBLIC
 
 # group Modules/Three-Phase Driver
 add_library(Group_Modules_Three-Phase_Driver OBJECT
+  "${SOLUTION_ROOT}/../Modules/Three_Phase_Driver/Src/pwm_sampling.c"
   "${SOLUTION_ROOT}/../Modules/Three_Phase_Driver/Src/tim1_pwm.c"
 )
 target_include_directories(Group_Modules_Three-Phase_Driver PUBLIC
@@ -173,12 +174,14 @@ target_link_libraries(Group_Modules_Current_Sampling PUBLIC
 
 # group Modules/FOC
 add_library(Group_Modules_FOC OBJECT
+  "${SOLUTION_ROOT}/../FOC/Src/foc_modulation.c"
   "${SOLUTION_ROOT}/../FOC/Src/foc_algorithm.c"
   "${SOLUTION_ROOT}/../FOC/Src/foc_interface.c"
 )
 target_include_directories(Group_Modules_FOC PUBLIC
   $<TARGET_PROPERTY:${CONTEXT},INTERFACE_INCLUDE_DIRECTORIES>
   "${SOLUTION_ROOT}/../FOC/Inc"
+  "${SOLUTION_ROOT}/../FOC/Src"
 )
 target_compile_definitions(Group_Modules_FOC PUBLIC
   $<TARGET_PROPERTY:${CONTEXT},INTERFACE_COMPILE_DEFINITIONS>
@@ -192,6 +195,28 @@ target_compile_options(Group_Modules_FOC PUBLIC
 )
 target_link_libraries(Group_Modules_FOC PUBLIC
   Group_Modules_FOC_ABSTRACTIONS
+)
+
+# group Application/Servo Manager
+add_library(Group_Application_Servo_Manager OBJECT
+  "${SOLUTION_ROOT}/../Servo/Src/servo_manager.c"
+)
+target_include_directories(Group_Application_Servo_Manager PUBLIC
+  $<TARGET_PROPERTY:${CONTEXT},INTERFACE_INCLUDE_DIRECTORIES>
+  "${SOLUTION_ROOT}/../Servo/Inc"
+)
+target_compile_definitions(Group_Application_Servo_Manager PUBLIC
+  $<TARGET_PROPERTY:${CONTEXT},INTERFACE_COMPILE_DEFINITIONS>
+)
+add_library(Group_Application_Servo_Manager_ABSTRACTIONS INTERFACE)
+target_link_libraries(Group_Application_Servo_Manager_ABSTRACTIONS INTERFACE
+  ${CONTEXT}_ABSTRACTIONS
+)
+target_compile_options(Group_Application_Servo_Manager PUBLIC
+  $<TARGET_PROPERTY:${CONTEXT},INTERFACE_COMPILE_OPTIONS>
+)
+target_link_libraries(Group_Application_Servo_Manager PUBLIC
+  Group_Application_Servo_Manager_ABSTRACTIONS
 )
 
 # group Drivers/STM32G4xx_HAL_Driver

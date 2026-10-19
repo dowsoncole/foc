@@ -30,8 +30,10 @@
 #include "stspin32g4.h"
 #include "drv_monitor.h"
 #include "foc_interface.h"
+#include "foc_control_manager.h"
 #include "servo_manager.h"
 #include "waveform_generator.h"
+#include "waveform_uart1_port.h"
 #include "spi1_encoder.h"
 #include "mt6835.h"
 #include "mt6835_verify.h"
@@ -50,13 +52,12 @@
    这段时间 TIM1/CH4/ADC 继续运行，但 MOE 仍保持关闭。 */
 #define CURRENT_SAMPLING_MOE_GUARD_MS  20U
 
-/* 三相下管校准会真正释放 MOE。当前硬件已经报告 VDS_P，必须先完成栅极
-   极性、死区和母线电流测量，默认保持关闭，避免上电反复触发驱动保护。 */
-#define CURRENT_SAMPLING_ENABLE_LOW_SIDE_CALIBRATION  0U
+#define FOC_TWO_PI                            6.2831853072f
 
-/* 量产语义下 Servo ON 必须来自 CAN/UART/状态机等上层命令。
-   仅在台架调试时才可改为 1U，禁止上电默认输出转矩。 */
-#define FOC_DEMO_AUTO_SERVO_ON  0U
+/* Bootstrap precharge is followed by a neutral-vector soak.  During this
+   window ADC/algorithm interrupts keep running, but precharge_in_progress
+   prevents them from overwriting the startup CCR vector. */
+#define FOC_TEST_NEUTRAL_SETTLE_MS             20U
 
 /* USER CODE END PD */
 
@@ -85,6 +86,30 @@ void SystemClock_Config(void);
 foc_controller_t g_foc_controller;
 servo_manager_t g_servo_manager;
 UART_HandleTypeDef huart1;
+foc_control_manager_t g_foc_control =
+{
+  .requested_mode = FOC_CONTROL_MODE_CURRENT_OPEN_LOOP,
+  .active_mode = FOC_CONTROL_MODE_CURRENT_OPEN_LOOP,
+  .switch_count = 0UL,
+  .voltage_open_loop =
+  {
+    .d_voltage_v = 0.20f, .q_voltage_v = 0.0f,
+    .dc_bus_voltage_v = 24.0f, .electrical_frequency_hz = 2.0f,
+    .voltage_ramp_rate_v_per_s = 0.5f
+  },
+  .current_open_loop =
+  {
+    .d_current_reference_a = 0.10f, .q_current_reference_a = 0.0f,
+    .dc_bus_voltage_v = 24.0f, .electrical_frequency_hz = 2.0f
+  },
+  .normal_loop =
+  {
+    .d_current_reference_a = 0.0f, .q_current_reference_a = 0.0f,
+    .electrical_angle_rad = 0.0f,
+    .angle_valid = 0U, .reference_valid = 0U
+  },
+  .runtime = { .fault_flags = FOC_FAULT_NONE }
+};
 
 static uint8_t MainFoc_IsPowerStageSafe(void *context)
 {
@@ -106,26 +131,37 @@ static void MainFoc_ReadFeedback(void *context, foc_input_t *input)
   input->reference_valid = 0U;
 
   {
-    int16_t phase_u_s16;
-    int16_t phase_v_s16;
-    int16_t phase_w_s16;
-    CurrentSampling_ReadFeedback_s16(&phase_u_s16, &phase_v_s16,
-                                     &phase_w_s16);
-    input->phase_a = phase_u_s16;
-    input->phase_b = phase_v_s16;
+    float phase_u_a;
+    float phase_v_a;
+    float phase_w_a;
+    CurrentSampling_ReadFeedback_A(&phase_u_a, &phase_v_a, &phase_w_a);
+    input->phase_a = phase_u_a;
+    input->phase_b = phase_v_a;
     input->current_valid =
         (CurrentSampling_GetCalibrationState() == CURRENT_SAMPLING_CAL_DONE) ?
         1U : 0U;
   }
 
-  /* 零电流给定是当前上层明确发布的安全参考值。 */
-  input->d_reference = 0.0f;
-  input->q_reference = 0.0f;
-  input->reference_valid = 1U;
-
-  /* 尚未有“同步角度快照 + 极对数 + 电角度零位”的正式业务层。
-     在该链路接入前必须保持 angle_valid=0，防止以假的 0 角度开 MOE。 */
-  input->electrical_angle_rad = 0.0f;
+  if (g_foc_control.active_mode == FOC_CONTROL_MODE_CURRENT_OPEN_LOOP)
+  {
+    input->d_reference =
+        g_foc_control.current_open_loop.d_current_reference_a;
+    input->q_reference =
+        g_foc_control.current_open_loop.q_current_reference_a;
+    input->electrical_angle_rad =
+        g_foc_control.current_open_loop.electrical_angle_rad;
+    input->reference_valid = 1U;
+    input->angle_valid = 1U;
+  }
+  else if (g_foc_control.active_mode == FOC_CONTROL_MODE_NORMAL)
+  {
+    input->d_reference = g_foc_control.normal_loop.d_current_reference_a;
+    input->q_reference = g_foc_control.normal_loop.q_current_reference_a;
+    input->electrical_angle_rad =
+        g_foc_control.normal_loop.electrical_angle_rad;
+    input->reference_valid = g_foc_control.normal_loop.reference_valid;
+    input->angle_valid = g_foc_control.normal_loop.angle_valid;
+  }
 }
 
 static uint8_t MainFoc_WriteVoltage(void *context, const foc_output_t *output)
@@ -206,16 +242,232 @@ static void MainServo_NotifyFault(void *context,
      发布事件，禁止在 ADC ISR 中直接发送或打印。 */
 }
 
+static void MainFoc_ConfigureModeParameters(foc_control_mode_t mode)
+{
+  foc_parameters_t *parameters = &g_foc_controller.algorithm.parameters;
+
+  parameters->d_controller.integral = 0.0f;
+  parameters->q_controller.integral = 0.0f;
+  if (mode == FOC_CONTROL_MODE_CURRENT_OPEN_LOOP)
+  {
+    parameters->voltage_limit = 0.02f;
+    parameters->modulation.mode = FOC_MODULATION_LINEAR_ONLY;
+    parameters->current_limit = 0.5f;
+    parameters->d_controller.kp = 0.05f;
+    parameters->d_controller.ki = 2.0f;
+    parameters->d_controller.integral_min = -0.02f;
+    parameters->d_controller.integral_max = 0.02f;
+    parameters->q_controller = parameters->d_controller;
+  }
+  else
+  {
+    parameters->voltage_limit = FOC_MODULATION_SIX_STEP_MAX;
+    parameters->modulation.mode = FOC_MODULATION_OVERMODULATION;
+    parameters->current_limit = 10.0f;
+    parameters->d_controller.kp = 0.1f;
+    parameters->d_controller.ki = 5.0f;
+    parameters->d_controller.integral_min = -0.95f;
+    parameters->d_controller.integral_max = 0.95f;
+    parameters->q_controller = parameters->d_controller;
+  }
+  FOC_AlgorithmReset(&g_foc_controller.algorithm);
+}
+
+/* 模式切换只在主循环执行，并强制经过 MOE=0、控制器停止、PI 清零的边界。
+   requested_mode 可由协议或调试器动态写入，禁止直接改 active_mode。 */
+static void MainFoc_ServiceModeSwitch(void)
+{
+  foc_control_mode_t requested = g_foc_control.requested_mode;
+  foc_control_runtime_t *runtime = &g_foc_control.runtime;
+  uint32_t interrupt_mask;
+
+  if ((requested >= FOC_CONTROL_MODE_COUNT) ||
+      (requested == g_foc_control.active_mode))
+  {
+    if (requested >= FOC_CONTROL_MODE_COUNT)
+    {
+      g_foc_control.requested_mode = g_foc_control.active_mode;
+    }
+    return;
+  }
+
+  runtime->output_request = 0U;
+  runtime->output_armed = 0U;
+  runtime->precharge_in_progress = 1U;
+  ServoManager_RequestOff(&g_servo_manager);
+  if (g_foc_control.active_mode == FOC_CONTROL_MODE_NORMAL)
+  {
+    ServoManager_Service(&g_servo_manager);
+  }
+  FOC_ControllerStop(&g_foc_controller);
+  Tim1Pwm_EmergencyStop();
+
+  interrupt_mask = __get_PRIMASK();
+  __disable_irq();
+  FOC_ControllerClearFaults(&g_foc_controller);
+  MainFoc_ConfigureModeParameters(requested);
+  g_foc_control.voltage_open_loop.applied_d_voltage_v = 0.0f;
+  g_foc_control.voltage_open_loop.applied_q_voltage_v = 0.0f;
+  g_foc_control.voltage_open_loop.voltage_ramp_complete = 0U;
+  g_foc_control.current_open_loop.electrical_angle_rad = 0.0f;
+  g_foc_control.current_open_loop.cycle_count = 0UL;
+  runtime->running = 0U;
+  runtime->output_enabled = 0U;
+  runtime->fault_flags = FOC_FAULT_NONE;
+  g_foc_control.active_mode = requested;
+  g_foc_control.switch_count++;
+  if (interrupt_mask == 0U)
+  {
+    __enable_irq();
+  }
+  runtime->precharge_in_progress = 0U;
+}
+
 static void MainFoc_OnAdcConversion(void *context)
 {
-  WaveformGenerator_SampleTick();
-  if (context != NULL)
+  foc_controller_t *controller = (foc_controller_t *)context;
+  foc_control_runtime_t *runtime = &g_foc_control.runtime;
+  float phase_u_a;
+  float phase_v_a;
+  float phase_w_a;
+
+  CurrentSampling_ReadFeedback_A(&phase_u_a, &phase_v_a, &phase_w_a);
+  WaveformGenerator_Publish3FromIsr(g_current_sampling.sample_sequence,
+                                     phase_u_a, phase_v_a, phase_w_a);
+  if (controller == NULL)
   {
-    foc_controller_t *controller = (foc_controller_t *)context;
-    /* 动态触发使两次电流快照的间隔略有变化，积分必须用实际间隔。
-       读取本次触发位置必须先于下一周期 CCR1..4 的写入。 */
-    controller->algorithm.parameters.sample_period_s =
-        Tim1Pwm_OnCurrentSample(g_current_sampling.sample_sequence);
+    return;
+  }
+
+  if (g_foc_control.active_mode != FOC_CONTROL_MODE_NORMAL)
+  {
+    uint32_t pin_levels;
+    pin_levels = GD_READY_GPIO_Port->IDR;
+    runtime->power_stage_pin_levels = pin_levels;
+    runtime->power_stage_safe =
+        (((pin_levels & GD_READY_Pin) != 0U) &&
+         ((pin_levels & GD_NFAULT_Pin) != 0U)) ? 1U : 0U;
+    if (runtime->power_stage_safe == 0U)
+    {
+      if (runtime->unsafe_sample_count == 0UL)
+      {
+        runtime->first_unsafe_pin_levels = pin_levels;
+        runtime->fault_status_capture_pending = 1U;
+      }
+      runtime->unsafe_sample_count++;
+      if ((pin_levels & GD_READY_Pin) == 0U)
+      {
+        runtime->ready_low_count++;
+      }
+      if ((pin_levels & GD_NFAULT_Pin) == 0U)
+      {
+        runtime->nfault_low_count++;
+      }
+    }
+  }
+
+  if (g_foc_control.active_mode == FOC_CONTROL_MODE_VOLTAGE_OPEN_LOOP)
+  {
+    /* 纯算法测试不能被功率级状态冻结：即使 READY/nFAULT 不允许打开 MOE，
+       仍持续计算角度、SVPWM 和 CCR。硬件安全门只控制引脚是否真正输出。 */
+    if (FOC_AlgorithmVoltageStep(&controller->algorithm,
+          &g_foc_control.voltage_open_loop,
+          controller->timing.pwm_period_s) == 0U)
+    {
+      runtime->fault_flags |= FOC_FAULT_ALGORITHM;
+      runtime->running = 0U;
+      runtime->output_enabled = 0U;
+      Tim1Pwm_EmergencyStop();
+      return;
+    }
+
+    runtime->running = 1U;
+    if ((runtime->output_armed == 0U) ||
+        (runtime->precharge_in_progress != 0U))
+    {
+      runtime->output_enabled = Tim1Pwm_IsOutputEnabled();
+      return;
+    }
+
+    if (MainFoc_WriteVoltage(NULL, &controller->algorithm.output) == 0U)
+    {
+      runtime->fault_flags |= FOC_FAULT_PWM_WRITE;
+      runtime->running = 0U;
+      runtime->output_enabled = 0U;
+      Tim1Pwm_EmergencyStop();
+      return;
+    }
+
+    if (runtime->power_stage_safe == 0U)
+    {
+      runtime->fault_flags |= FOC_FAULT_POWER_STAGE;
+      runtime->output_enabled = 0U;
+      Tim1Pwm_EmergencyStop();
+      return;
+    }
+
+    if ((runtime->fault_flags == FOC_FAULT_NONE) &&
+        (Tim1Pwm_IsOutputEnabled() == 0U))
+    {
+      Tim1Pwm_EnableOutputs();
+    }
+    runtime->output_enabled = Tim1Pwm_IsOutputEnabled();
+    return;
+  }
+
+  controller->algorithm.parameters.sample_period_s =
+      Tim1Pwm_OnCurrentSample(g_current_sampling.sample_sequence);
+  if (g_foc_control.active_mode == FOC_CONTROL_MODE_CURRENT_OPEN_LOOP)
+  {
+    /* 电流测试环：采样真实相电流，Park 后进行 dq PI；角度由测试对象推进。
+       预充电阶段不允许 PI 积分，避免 MOE 打开前积分器积累到限幅。 */
+    if ((runtime->output_armed == 0U) ||
+        (runtime->precharge_in_progress != 0U))
+    {
+      runtime->running = controller->running;
+      runtime->output_enabled = Tim1Pwm_IsOutputEnabled();
+      return;
+    }
+
+    FOC_ControllerStep(controller);
+    controller->timing.last_sample_sequence = g_current_sampling.sample_sequence;
+    runtime->fault_flags = controller->fault_flags;
+    runtime->running = controller->running;
+    runtime->output_enabled = Tim1Pwm_IsOutputEnabled();
+    if ((controller->running == 0U) ||
+        (controller->algorithm.output.valid == 0U))
+    {
+      runtime->output_armed = 0U;
+      return;
+    }
+
+    g_foc_control.current_open_loop.measured_d_current_a =
+        controller->algorithm.output.d_current;
+    g_foc_control.current_open_loop.measured_q_current_a =
+        controller->algorithm.output.q_current;
+    g_foc_control.current_open_loop.output_d_voltage_v =
+        controller->algorithm.output.d_voltage *
+        g_foc_control.current_open_loop.dc_bus_voltage_v;
+    g_foc_control.current_open_loop.output_q_voltage_v =
+        controller->algorithm.output.q_voltage *
+        g_foc_control.current_open_loop.dc_bus_voltage_v;
+    g_foc_control.current_open_loop.electrical_angle_rad += FOC_TWO_PI *
+        g_foc_control.current_open_loop.electrical_frequency_hz *
+        controller->algorithm.parameters.sample_period_s;
+    if (g_foc_control.current_open_loop.electrical_angle_rad >= FOC_TWO_PI)
+    {
+      g_foc_control.current_open_loop.electrical_angle_rad -= FOC_TWO_PI;
+    }
+    else if (g_foc_control.current_open_loop.electrical_angle_rad < 0.0f)
+    {
+      g_foc_control.current_open_loop.electrical_angle_rad += FOC_TWO_PI;
+    }
+    g_foc_control.current_open_loop.cycle_count++;
+    return;
+  }
+
+  if (g_foc_control.active_mode == FOC_CONTROL_MODE_NORMAL)
+  {
     FOC_ControllerStep(controller);
     controller->timing.last_sample_sequence = g_current_sampling.sample_sequence;
   }
@@ -231,6 +483,7 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
+  uint32_t neutral_settle_start;
 
   /* USER CODE END 1 */
 
@@ -264,13 +517,22 @@ int main(void)
   {
     Error_Handler();
   }
-  if (WaveformGenerator_PortInit(&huart1) != HAL_OK)
   {
-    Error_Handler();
-  }
-  if (WaveformGenerator_Init(&huart1) != HAL_OK)
-  {
-    Error_Handler();
+    waveform_transport_t waveform_transport;
+    const waveform_generator_config_t waveform_config =
+    {
+      .source_rate_hz = 20000UL,
+      .output_rate_hz = 1000UL,
+      .signal_group = WAVEFORM_SIGNAL_THREE_PHASE_CURRENT_A
+    };
+    if (WaveformUart1Port_Init(&waveform_transport, &huart1) != HAL_OK)
+    {
+      Error_Handler();
+    }
+    if (WaveformGenerator_Init(&waveform_transport, &waveform_config) == 0U)
+    {
+      Error_Handler();
+    }
   }
   /* 上电先保持硬件关断。MOE 只在零点校准完成、驱动状态安全且 FOC
      即将启动时释放，避免 ADC 偏置采集阶段把电压施加到电机。 */
@@ -304,7 +566,7 @@ int main(void)
    * foc_input_t.phase_b，W 相由 -(ia + ib) 推出。
    * CH4 提前量已改为注入序列耗时的一半（5.714 µs），使序列以更新事件为中心。
    *
-   * 零电流偏置标定和 JDR 到安培的换算仍属于业务层，尚未实现。 */
+    * 零电流偏置由异步校准状态机完成，FOC 输入统一换算成物理安培。 */
   if (MX_OPAMP1_Init() != HAL_OK)
   {
     Error_Handler();
@@ -323,14 +585,16 @@ int main(void)
     {
       .sample_period_s = 1.0f / 20000.0f,
       .pwm_period_s = 1.0f / 20000.0f,
-      .voltage_limit = FOC_MODULATION_SIX_STEP_MAX,
-      .modulation = { .mode = FOC_MODULATION_OVERMODULATION,
+      /* 首次闭环试验限制为 2 % 母线电压和 0.5 A，避免极性或参数错误时
+         PI 直接把桥臂推到高占空比。 */
+      .voltage_limit = 0.02f,
+      .modulation = { .mode = FOC_MODULATION_LINEAR_ONLY,
                       .duty_min = 0.0f, .duty_max = 1.0f },
-      .current_limit = 10.0f,
-      .d_controller = { .kp = 0.1f, .ki = 5.0f,
-                        .integral_min = -0.95f, .integral_max = 0.95f },
-      .q_controller = { .kp = 0.1f, .ki = 5.0f,
-                        .integral_min = -0.95f, .integral_max = 0.95f }
+      .current_limit = 0.5f,
+      .d_controller = { .kp = 0.05f, .ki = 2.0f,
+                        .integral_min = -0.02f, .integral_max = 0.02f },
+      .q_controller = { .kp = 0.05f, .ki = 2.0f,
+                        .integral_min = -0.02f, .integral_max = 0.02f }
     };
     const foc_port_t foc_port =
     {
@@ -375,15 +639,9 @@ int main(void)
   {
     Error_Handler();
   }
-  /* 先等待更长的稳定时间，再进入校准。默认宏为 0U，校准不释放 MOE；
-     ADC 完成回调中的 FOC_ControllerStep() 会立即返回。 */
+  /* 所有模式都常驻固件，启动时统一完成零点校准，之后可安全动态切换。 */
   HAL_Delay(CURRENT_SAMPLING_MOE_GUARD_MS);
-  /* 先进入 SETTLING。默认校准保持 MOE=0，TIM1/CH4/ADC 仍然独立运行；
-     只有完成硬件测量并确认下管模式安全后，才允许打开下面的实验开关。 */
   CurrentSampling_RequestCalibration();
-#if (CURRENT_SAMPLING_ENABLE_LOW_SIDE_CALIBRATION != 0U)
-  Tim1Pwm_EnableCalibrationLowSide();
-#endif
 
   /* ------------------------------------------------------------------------
    * 编码器 SPI 配置与通讯验证（Modules/Encoder + Tests）
@@ -400,10 +658,6 @@ int main(void)
   MT6835_PowerUpWait();
   (void)Mt6835Verify_Start();
 
-#if (FOC_DEMO_AUTO_SERVO_ON != 0U)
-  ServoManager_RequestOn(&g_servo_manager);
-#endif
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -413,7 +667,109 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    foc_control_runtime_t *runtime = &g_foc_control.runtime;
     CurrentSampling_Service();
+    MainFoc_ServiceModeSwitch();
+
+    if ((g_foc_control.active_mode != FOC_CONTROL_MODE_NORMAL) &&
+        (runtime->output_request != 0U) &&
+        (CurrentSampling_GetCalibrationState() == CURRENT_SAMPLING_CAL_ERROR))
+    {
+      runtime->output_request = 0U;
+      runtime->fault_flags |= FOC_FAULT_CURRENT_INVALID;
+    }
+    if ((g_foc_control.active_mode != FOC_CONTROL_MODE_NORMAL) &&
+        (runtime->output_request == 0U) &&
+        ((runtime->output_armed != 0U) ||
+         (Tim1Pwm_IsOutputEnabled() != 0U)))
+    {
+      if (g_foc_control.active_mode == FOC_CONTROL_MODE_CURRENT_OPEN_LOOP)
+      {
+        FOC_ControllerStop(&g_foc_controller);
+        runtime->running = 0U;
+        g_foc_control.current_open_loop.output_d_voltage_v = 0.0f;
+        g_foc_control.current_open_loop.output_q_voltage_v = 0.0f;
+      }
+      else
+      {
+        Tim1Pwm_EmergencyStop();
+        g_foc_control.voltage_open_loop.applied_d_voltage_v = 0.0f;
+        g_foc_control.voltage_open_loop.applied_q_voltage_v = 0.0f;
+        g_foc_control.voltage_open_loop.voltage_ramp_complete = 0U;
+      }
+      runtime->output_armed = 0U;
+      runtime->output_enabled = 0U;
+    }
+    else if ((g_foc_control.active_mode != FOC_CONTROL_MODE_NORMAL) &&
+             (runtime->output_request != 0U) &&
+             (runtime->output_armed == 0U) &&
+             (runtime->precharge_in_progress == 0U) &&
+             (runtime->fault_flags == FOC_FAULT_NONE) &&
+             ((g_foc_control.active_mode ==
+               FOC_CONTROL_MODE_VOLTAGE_OPEN_LOOP) ||
+              (CurrentSampling_GetCalibrationState() ==
+               CURRENT_SAMPLING_CAL_DONE)))
+    {
+      uint8_t startup_safe = 1U;
+      runtime->precharge_in_progress = 1U;
+      if (MainFoc_IsPowerStageSafe(NULL) == 0U)
+      {
+        startup_safe = 0U;
+      }
+      else
+      {
+        Tim1Pwm_BootstrapPrecharge();
+      }
+      neutral_settle_start = HAL_GetTick();
+      while ((startup_safe != 0U) &&
+             ((HAL_GetTick() - neutral_settle_start) <
+              FOC_TEST_NEUTRAL_SETTLE_MS))
+      {
+        if (MainFoc_IsPowerStageSafe(NULL) == 0U)
+        {
+          startup_safe = 0U;
+          break;
+        }
+      }
+
+      if (startup_safe != 0U)
+      {
+        if (g_foc_control.active_mode == FOC_CONTROL_MODE_CURRENT_OPEN_LOOP)
+        {
+          g_foc_control.current_open_loop.electrical_angle_rad = 0.0f;
+          g_foc_control.current_open_loop.cycle_count = 0UL;
+          FOC_ControllerClearFaults(&g_foc_controller);
+          runtime->output_armed = 1U;
+          FOC_ControllerStart(&g_foc_controller);
+        }
+        else
+        {
+          runtime->output_armed = 1U;
+        }
+      }
+      else
+      {
+        Tim1Pwm_EmergencyStop();
+        runtime->output_request = 0U;
+        runtime->output_enabled = 0U;
+        runtime->fault_flags |= FOC_FAULT_POWER_STAGE;
+      }
+      runtime->precharge_in_progress = 0U;
+    }
+
+    if ((g_foc_control.active_mode != FOC_CONTROL_MODE_NORMAL) &&
+        (runtime->fault_status_capture_pending != 0U) &&
+        (runtime->fault_status_valid == 0U))
+    {
+      uint8_t status_raw;
+      if (STSPIN32G4_ReadRegister(STSPIN32G4_REG_STATUS, &status_raw, 10U) ==
+          HAL_OK)
+      {
+        runtime->first_fault_status_raw = status_raw;
+        runtime->fault_status_valid = 1U;
+        runtime->fault_status_capture_pending = 0U;
+      }
+    }
     WaveformGenerator_Task();
     (void)Mt6835Verify_Task();
     /* --------------------------------------------------------------------
@@ -424,8 +780,12 @@ int main(void)
      */
     DrvMonitor_Task();
 
-    /* 状态转换、Servo ON/OFF、MOE 和故障锁存统一在此模块内。 */
-    ServoManager_Service(&g_servo_manager);
+    /* 正式模式下，状态转换、Servo ON/OFF、MOE 和故障锁存由状态机管理；
+       开环测试模式在 ADC 回调中直接运行算法与 PWM，不进入状态管理。 */
+    if (g_foc_control.active_mode == FOC_CONTROL_MODE_NORMAL)
+    {
+      ServoManager_Service(&g_servo_manager);
+    }
 
     /* TODO: 协议栈（CAN/UART）、参数存储、温度记录、上位机遥测 ……
      * 都属于这一层。 */

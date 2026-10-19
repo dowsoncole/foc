@@ -91,6 +91,8 @@ typedef struct
 
 extern volatile tim1_pwm_sampling_status_t g_tim1_pwm_sampling;
 
+typedef void (*tim1_pwm_period_callback_t)(void *context);
+
 /* 提前量换算成计数，公式与 tim1_pwm.c 的 Tim1Pwm_NsToCounts() 一致。
    5714 ns * 168 / 1000 = 959 计数。 */
 #define TIM1_PWM_ADC_LEAD_COUNTS \
@@ -230,6 +232,12 @@ HAL_StatusTypeDef Tim1Pwm_ConfigureCurrentSampling(uint32_t sequence_ns,
    抵消动态触发位置造成的电流 PI 积分周期变化；不是 ISR 执行耗时。 */
 float Tim1Pwm_OnCurrentSample(uint32_t sample_sequence);
 
+/* 注册 TIM1 载波周期回调。context 先写、callback 后写，允许在定时器已经
+   运行时一次性注册。PeriodElapsed 由共享 HAL 回调分发。 */
+void Tim1Pwm_SetPeriodCallback(tim1_pwm_period_callback_t callback,
+                               void *context);
+void Tim1Pwm_DispatchPeriodElapsed(void);
+
 /**
   * @brief  【业务线】读回某一相最后写入的占空比。
   * @retval 0..TIM1_PWM_DUTY_SCALE 内的占空比；channel 非法时返回 0。
@@ -253,6 +261,15 @@ void     Tim1Pwm_SetNeutral(void);
   * Tim1Pwm_SetNeutral()。
   */
 void     Tim1Pwm_EnableCalibrationLowSide(void);
+
+/**
+  * @brief  Before the first normal PWM pulse, hold all three low-side MOSFETs
+  *         on long enough to charge the high-side bootstrap capacitors, then
+  *         return to the 50 percent neutral vector.
+  * @note   This blocking startup-only call leaves MOE enabled.  The caller
+  *         must verify READY/nFAULT before and after it.
+  */
+void     Tim1Pwm_BootstrapPrecharge(void);
 
 /**
   * @brief  【业务线】释放 MOE，让六路栅极信号到达功率级。

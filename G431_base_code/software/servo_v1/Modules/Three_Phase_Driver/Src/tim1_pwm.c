@@ -74,6 +74,8 @@ static uint8_t s_sampling_configured;
 static uint8_t s_previous_sample_valid;
 static uint32_t s_previous_sample_trigger;
 static uint32_t s_previous_sample_sequence;
+static tim1_pwm_period_callback_t volatile s_period_callback;
+static void * volatile s_period_context;
 volatile tim1_pwm_sampling_status_t g_tim1_pwm_sampling;
 
 /* USER CODE END 0 */
@@ -300,6 +302,23 @@ float Tim1Pwm_OnCurrentSample(uint32_t sample_sequence)
   g_tim1_pwm_sampling.sampled_trigger = trigger;
   g_tim1_pwm_sampling.sample_period_s = (float)ticks / (float)TIM1_PWM_TIMER_CLOCK_HZ;
   return g_tim1_pwm_sampling.sample_period_s;
+}
+
+void Tim1Pwm_SetPeriodCallback(tim1_pwm_period_callback_t callback,
+                               void *context)
+{
+  /* 发布函数指针之前先发布上下文；注册只在启动阶段执行一次。 */
+  s_period_context = context;
+  s_period_callback = callback;
+}
+
+void Tim1Pwm_DispatchPeriodElapsed(void)
+{
+  tim1_pwm_period_callback_t callback = s_period_callback;
+  if (callback != NULL)
+  {
+    callback(s_period_context);
+  }
 }
 
 /* USER CODE END 1 */
@@ -556,6 +575,31 @@ void Tim1Pwm_EnableCalibrationLowSide(void)
     s_phase_duty[phase] = 0U;
     Tim1Pwm_WriteCompare(s_phase_channel[phase], 0U);
   }
+}
+
+void Tim1Pwm_BootstrapPrecharge(void)
+{
+  uint32_t phase;
+
+  /* Program the low-side vector while the bridge is still disabled.  CCR1..3
+     are preloaded, so wait for at least one 20 kHz update before releasing
+     MOE; otherwise the old neutral vector could become the first live pulse. */
+  Tim1Pwm_EmergencyStop();
+  for (phase = 0U; phase < 3U; phase++)
+  {
+    s_phase_duty[phase] = 0U;
+    Tim1Pwm_WriteCompare(s_phase_channel[phase], 0U);
+  }
+  HAL_Delay(1U);
+
+  __HAL_TIM_MOE_ENABLE(&htim1);
+  HAL_Delay(TIM1_PWM_MOE_SETTLE_MS);
+
+  /* Return to a zero-voltage switching vector before the first FOC update.
+     Waiting one millisecond guarantees that the preloaded neutral CCR values
+     reached the active registers while MOE remains enabled. */
+  Tim1Pwm_SetNeutral();
+  HAL_Delay(1U);
 }
 
 /**

@@ -3,6 +3,8 @@
 #include <math.h>
 #include <string.h>
 
+#define FOC_TWO_PI  6.2831853072f
+
 static float foc_clamp(float value, float minimum, float maximum)
 {
   if (value < minimum)
@@ -80,8 +82,133 @@ uint8_t FOC_InputIsValid(const foc_input_t *input)
   return ((input->current_valid != 0U) &&
           (input->angle_valid != 0U) &&
           (input->reference_valid != 0U) &&
+          isfinite(input->phase_a) && isfinite(input->phase_b) &&
           isfinite(input->electrical_angle_rad) &&
           isfinite(input->d_reference) && isfinite(input->q_reference)) ? 1U : 0U;
+}
+
+uint8_t FOC_AlgorithmVoltageStep(foc_algorithm_t *algorithm,
+                                 foc_voltage_open_loop_t *open_loop,
+                                 float sample_period_s)
+{
+  float voltage_step;
+  float d_voltage_pu;
+  float q_voltage_pu;
+  float sin_angle;
+  float cos_angle;
+  foc_modulation_output_t modulation;
+
+  if ((algorithm == 0) || (open_loop == 0))
+  {
+    return 0U;
+  }
+
+  (void)memset(&algorithm->output, 0, sizeof(algorithm->output));
+  if (!isfinite(open_loop->d_voltage_v) ||
+      !isfinite(open_loop->q_voltage_v) ||
+      !isfinite(open_loop->dc_bus_voltage_v) ||
+      (open_loop->dc_bus_voltage_v <= 0.0f) ||
+      !isfinite(open_loop->applied_d_voltage_v) ||
+      !isfinite(open_loop->applied_q_voltage_v) ||
+      !isfinite(open_loop->voltage_ramp_rate_v_per_s) ||
+      (open_loop->voltage_ramp_rate_v_per_s < 0.0f) ||
+      !isfinite(open_loop->electrical_frequency_hz) ||
+      !isfinite(open_loop->electrical_angle_rad) ||
+      !isfinite(sample_period_s) || (sample_period_s <= 0.0f))
+  {
+    return 0U;
+  }
+
+  if (open_loop->voltage_ramp_rate_v_per_s == 0.0f)
+  {
+    open_loop->applied_d_voltage_v = open_loop->d_voltage_v;
+    open_loop->applied_q_voltage_v = open_loop->q_voltage_v;
+  }
+  else
+  {
+    voltage_step = open_loop->voltage_ramp_rate_v_per_s * sample_period_s;
+    if (open_loop->applied_d_voltage_v < open_loop->d_voltage_v)
+    {
+      open_loop->applied_d_voltage_v = foc_clamp(
+          open_loop->applied_d_voltage_v + voltage_step,
+          open_loop->applied_d_voltage_v, open_loop->d_voltage_v);
+    }
+    else if (open_loop->applied_d_voltage_v > open_loop->d_voltage_v)
+    {
+      open_loop->applied_d_voltage_v = foc_clamp(
+          open_loop->applied_d_voltage_v - voltage_step,
+          open_loop->d_voltage_v, open_loop->applied_d_voltage_v);
+    }
+
+    if (open_loop->applied_q_voltage_v < open_loop->q_voltage_v)
+    {
+      open_loop->applied_q_voltage_v = foc_clamp(
+          open_loop->applied_q_voltage_v + voltage_step,
+          open_loop->applied_q_voltage_v, open_loop->q_voltage_v);
+    }
+    else if (open_loop->applied_q_voltage_v > open_loop->q_voltage_v)
+    {
+      open_loop->applied_q_voltage_v = foc_clamp(
+          open_loop->applied_q_voltage_v - voltage_step,
+          open_loop->q_voltage_v, open_loop->applied_q_voltage_v);
+    }
+  }
+  open_loop->voltage_ramp_complete =
+      ((open_loop->applied_d_voltage_v == open_loop->d_voltage_v) &&
+       (open_loop->applied_q_voltage_v == open_loop->q_voltage_v)) ? 1U : 0U;
+
+  d_voltage_pu = open_loop->applied_d_voltage_v /
+                 open_loop->dc_bus_voltage_v;
+  q_voltage_pu = open_loop->applied_q_voltage_v /
+                 open_loop->dc_bus_voltage_v;
+
+  sin_angle = sinf(open_loop->electrical_angle_rad);
+  cos_angle = cosf(open_loop->electrical_angle_rad);
+  if (foc_modulate(algorithm, d_voltage_pu, q_voltage_pu,
+                   sin_angle, cos_angle, &modulation) == 0U)
+  {
+    return 0U;
+  }
+
+  algorithm->output.fundamental_d_voltage =
+      modulation.fundamental_alpha * cos_angle +
+      modulation.fundamental_beta * sin_angle;
+  algorithm->output.fundamental_q_voltage =
+      -modulation.fundamental_alpha * sin_angle +
+      modulation.fundamental_beta * cos_angle;
+  algorithm->output.alpha_voltage = modulation.alpha_voltage;
+  algorithm->output.beta_voltage = modulation.beta_voltage;
+  algorithm->output.d_voltage = modulation.alpha_voltage * cos_angle +
+                                modulation.beta_voltage * sin_angle;
+  algorithm->output.q_voltage = -modulation.alpha_voltage * sin_angle +
+                                modulation.beta_voltage * cos_angle;
+  algorithm->output.phase_a_voltage = modulation.alpha_voltage;
+  algorithm->output.phase_b_voltage = -0.5f * modulation.alpha_voltage +
+                                       0.8660254038f * modulation.beta_voltage;
+  algorithm->output.phase_c_voltage = -0.5f * modulation.alpha_voltage -
+                                       0.8660254038f * modulation.beta_voltage;
+  algorithm->output.phase_a_duty = modulation.phase_a_duty;
+  algorithm->output.phase_b_duty = modulation.phase_b_duty;
+  algorithm->output.phase_c_duty = modulation.phase_c_duty;
+  algorithm->output.fundamental_voltage_limit = modulation.fundamental_limit;
+  algorithm->output.modulation_region = modulation.region;
+  algorithm->output.sector = modulation.sector;
+  algorithm->output.saturated = ((modulation.limited != 0U) ||
+      (modulation.region != FOC_MODULATION_REGION_LINEAR)) ? 1U : 0U;
+  algorithm->output.valid = 1U;
+
+  open_loop->electrical_angle_rad += FOC_TWO_PI *
+      open_loop->electrical_frequency_hz * sample_period_s;
+  if (open_loop->electrical_angle_rad >= FOC_TWO_PI)
+  {
+    open_loop->electrical_angle_rad -= FOC_TWO_PI;
+  }
+  else if (open_loop->electrical_angle_rad < 0.0f)
+  {
+    open_loop->electrical_angle_rad += FOC_TWO_PI;
+  }
+  open_loop->cycle_count++;
+  return 1U;
 }
 
 void FOC_AlgorithmStep(foc_algorithm_t *algorithm,
@@ -143,8 +270,8 @@ void FOC_AlgorithmStep(foc_algorithm_t *algorithm,
    *     alpha_current = ia
    *     beta_current  = (ia + 2*ib) / sqrt(3)
    *
-   * 0.5773502692f = 1/sqrt(3)。这里的 phase_a/phase_b 是标定后的 S16 值，
-   * 只要两相使用同一比例尺度，变换结果就保持同一比例。
+   * 0.5773502692f = 1/sqrt(3)。这里的 phase_a/phase_b 已经完成零点标定
+   * 和物理量换算，单位为 A；d/q 反馈、给定和限幅也统一使用 A。
    *
    * 归一化注意：
    * - 当前是“等幅值”形式，使基波空间电流矢量的幅值与相电流幅值保持一致。
@@ -161,9 +288,9 @@ void FOC_AlgorithmStep(foc_algorithm_t *algorithm,
    * 电流限幅和功率计算使用同一套归一化。切换归一化时，电流参考和
    * 反馈、PI 增益、限幅阈值都要同比换算，不能只改这里的一个系数。
    */
-  alpha_current = (float)input->phase_a;
-  beta_current = ((float)input->phase_a +
-                  (2.0f * (float)input->phase_b)) * 0.5773502692f;
+  alpha_current = input->phase_a;
+  beta_current = (input->phase_a +
+                  (2.0f * input->phase_b)) * 0.5773502692f;
   sin_angle = sinf(input->electrical_angle_rad);
   cos_angle = cosf(input->electrical_angle_rad);
 

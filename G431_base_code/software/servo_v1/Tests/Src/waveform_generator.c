@@ -1,38 +1,28 @@
 #include "waveform_generator.h"
 
+#include <limits.h>
 #include <math.h>
+#include <stddef.h>
 
-#define WAVEFORM_QUEUE_LENGTH 32U
-#define WAVEFORM_FRAME_LENGTH 8U
+#define WAVEFORM_QUEUE_LENGTH  32U
+#define WAVEFORM_FRAME_LENGTH  24U
+#define WAVEFORM_FRAME_VERSION 1U
 
-static UART_HandleTypeDef *s_huart;
-static volatile uint16_t s_queue[WAVEFORM_QUEUE_LENGTH];
+typedef struct
+{
+  uint32_t source_sequence;
+  float value[3];
+} waveform_sample3_t;
+
+static waveform_transport_t s_transport;
+static volatile waveform_sample3_t s_queue[WAVEFORM_QUEUE_LENGTH];
 static volatile uint8_t s_head;
 static volatile uint8_t s_tail;
-static volatile uint32_t s_source_count;
-static uint16_t s_phase_index;
-static uint8_t s_frame_sequence;
+static volatile uint32_t s_decimation_count;
+static uint32_t s_decimation;
+static uint16_t s_frame_sequence;
 
-HAL_StatusTypeDef WaveformGenerator_PortInit(UART_HandleTypeDef *huart)
-{
-  if (huart == NULL)
-  {
-    return HAL_ERROR;
-  }
-
-  huart->Instance = USART1;
-  huart->Init.BaudRate = WAVEFORM_RS485_BAUDRATE;
-  huart->Init.WordLength = UART_WORDLENGTH_8B;
-  huart->Init.StopBits = UART_STOPBITS_1;
-  huart->Init.Parity = UART_PARITY_NONE;
-  huart->Init.Mode = UART_MODE_TX_RX;
-  huart->Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart->Init.OverSampling = UART_OVERSAMPLING_16;
-  huart->Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
-  huart->AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
-
-  return (HAL_UART_Init(huart) == HAL_OK) ? HAL_OK : HAL_ERROR;
-}
+waveform_generator_status_t g_waveform_generator;
 
 static uint8_t WaveformGenerator_Crc8(const uint8_t *data, uint32_t length)
 {
@@ -52,88 +42,122 @@ static uint8_t WaveformGenerator_Crc8(const uint8_t *data, uint32_t length)
   return crc;
 }
 
-HAL_StatusTypeDef WaveformGenerator_Init(UART_HandleTypeDef *huart)
+static void WaveformGenerator_PutU16(uint8_t *destination, uint16_t value)
 {
-  if (huart == NULL)
-  {
-    return HAL_ERROR;
-  }
-
-  s_huart = huart;
-  s_head = 0U;
-  s_tail = 0U;
-  s_source_count = 0U;
-  s_phase_index = 0U;
-  s_frame_sequence = 0U;
-  return HAL_OK;
+  destination[0] = (uint8_t)(value & 0xFFU);
+  destination[1] = (uint8_t)(value >> 8U);
 }
 
-void WaveformGenerator_SampleTick(void)
+static void WaveformGenerator_PutU32(uint8_t *destination, uint32_t value)
+{
+  destination[0] = (uint8_t)(value & 0xFFUL);
+  destination[1] = (uint8_t)((value >> 8U) & 0xFFUL);
+  destination[2] = (uint8_t)((value >> 16U) & 0xFFUL);
+  destination[3] = (uint8_t)(value >> 24U);
+}
+
+static int32_t WaveformGenerator_ToMilliUnits(float value)
+{
+  float scaled = value * 1000.0f;
+  if (!isfinite(value)) return 0;
+  if (scaled > 2147483520.0f) return INT32_MAX;
+  if (scaled < -2147483520.0f) return INT32_MIN;
+  return (int32_t)scaled;
+}
+
+uint8_t WaveformGenerator_Init(const waveform_transport_t *transport,
+                               const waveform_generator_config_t *config)
+{
+  if ((transport == NULL) || (transport->send == NULL) || (config == NULL) ||
+      (config->source_rate_hz == 0UL) || (config->output_rate_hz == 0UL) ||
+      (config->output_rate_hz > config->source_rate_hz))
+  {
+    return 0U;
+  }
+
+  s_transport = *transport;
+  g_waveform_generator.config = *config;
+  s_decimation = config->source_rate_hz / config->output_rate_hz;
+  if (s_decimation == 0UL) s_decimation = 1UL;
+  s_head = 0U;
+  s_tail = 0U;
+  s_decimation_count = 0UL;
+  s_frame_sequence = 0U;
+  g_waveform_generator.enabled = 1U;
+  g_waveform_generator.queued_samples = 0U;
+  g_waveform_generator.published_samples = 0UL;
+  g_waveform_generator.dropped_samples = 0UL;
+  g_waveform_generator.sent_frames = 0UL;
+  g_waveform_generator.transport_errors = 0UL;
+  return 1U;
+}
+
+void WaveformGenerator_Publish3FromIsr(uint32_t source_sequence,
+                                       float value_0,
+                                       float value_1,
+                                       float value_2)
 {
   uint8_t next_head;
 
-  if (s_huart == NULL)
-  {
-    return;
-  }
-
-  if (++s_source_count < WAVEFORM_DECIMATION)
-  {
-    return;
-  }
-  s_source_count = 0U;
+  if (g_waveform_generator.enabled == 0U) return;
+  g_waveform_generator.published_samples++;
+  if (++s_decimation_count < s_decimation) return;
+  s_decimation_count = 0UL;
 
   next_head = (uint8_t)((s_head + 1U) % WAVEFORM_QUEUE_LENGTH);
   if (next_head == s_tail)
   {
-    return; /* Drop newest sample rather than corrupting an in-flight frame. */
+    g_waveform_generator.dropped_samples++;
+    return;
   }
-  /* One complete cycle per second keeps the first scope test easy to identify.
-     Store only the phase in the ISR; floating-point sine evaluation stays in
-     the background task and cannot extend the ADC/FOC interrupt. */
-  s_queue[s_head] = s_phase_index;
+
+  s_queue[s_head].source_sequence = source_sequence;
+  s_queue[s_head].value[0] = value_0;
+  s_queue[s_head].value[1] = value_1;
+  s_queue[s_head].value[2] = value_2;
   s_head = next_head;
-  s_phase_index = (uint16_t)((s_phase_index + 1U) % 1000U);
+  g_waveform_generator.queued_samples++;
 }
 
 void WaveformGenerator_Task(void)
 {
   uint8_t frame[WAVEFORM_FRAME_LENGTH];
-  uint16_t sample;
-  float phase;
-  int32_t sample_value;
-  uint32_t transmit_start;
+  waveform_sample3_t sample;
   uint8_t tail;
+  uint8_t channel;
 
-  if ((s_huart == NULL) || (s_tail == s_head) ||
-      (HAL_UART_GetState(s_huart) != HAL_UART_STATE_READY))
-  {
-    return;
-  }
+  if ((g_waveform_generator.enabled == 0U) || (s_tail == s_head)) return;
 
   tail = s_tail;
-  sample = s_queue[tail];
-  phase = (float)sample * (2.0f * 3.14159265358979323846f / 1000.0f);
-  sample_value = (int32_t)(32767.0f * sinf(phase));
+  sample.source_sequence = s_queue[tail].source_sequence;
+  sample.value[0] = s_queue[tail].value[0];
+  sample.value[1] = s_queue[tail].value[1];
+  sample.value[2] = s_queue[tail].value[2];
+
   frame[0] = 0xA5U;
   frame[1] = 0x5AU;
-  frame[2] = 0x01U; /* waveform channel: sine */
-  frame[3] = s_frame_sequence++;
-  frame[4] = (uint8_t)((uint16_t)(int16_t)sample_value & 0xFFU);
-  frame[5] = (uint8_t)((uint16_t)(int16_t)sample_value >> 8U);
-  frame[6] = 0U; /* reserved for a future timestamp/divider */
-  frame[7] = WaveformGenerator_Crc8(frame, 7U);
+  frame[2] = WAVEFORM_FRAME_VERSION;
+  frame[3] = (uint8_t)g_waveform_generator.config.signal_group;
+  frame[4] = 3U;
+  WaveformGenerator_PutU16(&frame[5], s_frame_sequence);
+  WaveformGenerator_PutU32(&frame[7], sample.source_sequence);
+  for (channel = 0U; channel < 3U; ++channel)
+  {
+    WaveformGenerator_PutU32(&frame[11U + 4U * channel],
+        (uint32_t)WaveformGenerator_ToMilliUnits(sample.value[channel]));
+  }
+  frame[23] = WaveformGenerator_Crc8(frame, 23U);
 
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_SET); /* RS485 transmit */
-  transmit_start = HAL_GetTick();
-  if (HAL_UART_Transmit(s_huart, frame, sizeof(frame), 2U) == HAL_OK)
+  if (s_transport.send(s_transport.context, frame, sizeof(frame)) != 0U)
   {
+    s_frame_sequence++;
     s_tail = (uint8_t)((tail + 1U) % WAVEFORM_QUEUE_LENGTH);
+    if (g_waveform_generator.queued_samples != 0U)
+      g_waveform_generator.queued_samples--;
+    g_waveform_generator.sent_frames++;
   }
-  while ((__HAL_UART_GET_FLAG(s_huart, UART_FLAG_TC) == RESET) &&
-         ((HAL_GetTick() - transmit_start) < 2U))
+  else
   {
-    /* At 921600 baud this is under 100 us; DE must stay asserted to flush it. */
+    g_waveform_generator.transport_errors++;
   }
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_RESET); /* RS485 receive */
 }

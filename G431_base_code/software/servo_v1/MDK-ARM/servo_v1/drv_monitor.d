@@ -38,4 +38,5 @@ servo_v1/drv_monitor.o: ..\Modules\Driver_Communication\Src\drv_monitor.c \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_usart_ex.h \
   ..\Modules\Driver_Communication\Inc\stspin32g4.h ..\Core\Inc\gpio.h \
   ..\Modules\Driver_Communication\Inc\i2c3_bus.h \
-  ..\Modules\Driver_Communication\Inc\tim6_heartbeat.h
+  ..\Modules\Driver_Communication\Inc\tim6_heartbeat.h \
+  ..\Modules\Three_Phase_Driver\Inc\tim1_pwm.h

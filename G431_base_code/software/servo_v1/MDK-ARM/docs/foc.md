@@ -402,12 +402,10 @@ MainFoc_OnAdcConversion(&g_foc_controller);
 ```c
 static void MainFoc_OnAdcConversion(void *context)
 {
-    WaveformGenerator_SampleTick();
-
-    if (context != NULL)
-    {
-        FOC_ControllerStep((foc_controller_t *)context);
-    }
+    读取三相安培值；
+    WaveformGenerator_Publish3FromIsr(...); // 仅入队，不访问串口
+    根据 g_foc_control.active_mode 执行电压开环、
+        虚拟角度电流环或正式电流环；
 }
 ```
 

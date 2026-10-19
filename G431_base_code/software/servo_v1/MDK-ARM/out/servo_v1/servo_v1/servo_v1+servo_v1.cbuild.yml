@@ -95,6 +95,7 @@ build:
   add-path:
     - ../../../../Core/Inc
     - ../../../../FOC/Inc
+    - ../../../../Servo/Inc
     - ../../../../Modules/Driver_Communication/Inc
     - ../../../../Modules/Three_Phase_Driver/Inc
     - ../../../../Modules/Current_Sampling/Inc
@@ -192,6 +193,10 @@ build:
           category: header
     - group: Modules/Three-Phase Driver
       files:
+        - file: ../../../../Modules/Three_Phase_Driver/Src/pwm_sampling.c
+          category: sourceC
+        - file: ../../../../Modules/Three_Phase_Driver/Inc/pwm_sampling.h
+          category: header
         - file: ../../../../Modules/Three_Phase_Driver/Src/tim1_pwm.c
           category: sourceC
         - file: ../../../../Modules/Three_Phase_Driver/Inc/tim1_pwm.h
@@ -234,6 +239,12 @@ build:
           category: header
     - group: Modules/FOC
       files:
+        - file: ../../../../FOC/Inc/foc_modulation.h
+          category: header
+        - file: ../../../../FOC/Src/foc_modulation.c
+          category: sourceC
+        - file: ../../../../FOC/Src/foc_modulation_lut.h
+          category: header
         - file: ../../../../FOC/Inc/foc_algorithm.h
           category: header
         - file: ../../../../FOC/Src/foc_algorithm.c
@@ -241,6 +252,12 @@ build:
         - file: ../../../../FOC/Inc/foc_interface.h
           category: header
         - file: ../../../../FOC/Src/foc_interface.c
+          category: sourceC
+    - group: Application/Servo Manager
+      files:
+        - file: ../../../../Servo/Inc/servo_manager.h
+          category: header
+        - file: ../../../../Servo/Src/servo_manager.c
           category: sourceC
     - group: Drivers/STM32G4xx_HAL_Driver
       files:

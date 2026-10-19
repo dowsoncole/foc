@@ -69,6 +69,8 @@ target_include_directories(${CONTEXT} PUBLIC
   "${SOLUTION_ROOT}/../Tests/Inc"
   "${SOLUTION_ROOT}/../Modules/Current_Sampling/Inc"
   "${SOLUTION_ROOT}/../FOC/Inc"
+  "${SOLUTION_ROOT}/../FOC/Src"
+  "${SOLUTION_ROOT}/../Servo/Inc"
 )
 
 # Defines
@@ -140,6 +142,7 @@ target_link_libraries(${CONTEXT} PUBLIC
   Group_Tests
   Group_Modules_Current_Sampling
   Group_Modules_FOC
+  Group_Application_Servo_Manager
   Group_Drivers_STM32G4xx_HAL_Driver
   Group_Drivers_CMSIS
   ARM_CMSIS_CORE_6_2_0

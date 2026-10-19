@@ -105,6 +105,16 @@ rule C_COMPILER__Group_Modules_FOC_unscanned_
 #############################################
 # Rule for compiling C files.
 
+rule C_COMPILER__Group_Application_Servo_Manager_unscanned_
+  depfile = $DEP_FILE
+  deps = gcc
+  command = ${LAUNCHER}${CODE_CHECK}c:\Users\penghao\.vcpkg\artifacts\2139c4c6\compilers.arm.armclang\6.24.0\bin\armclang.exe --target=arm-arm-none-eabi $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
+  description = Building C object $out
+
+
+#############################################
+# Rule for compiling C files.
+
 rule C_COMPILER__Group_Drivers_STM32G4xx_HAL_Driver_unscanned_
   depfile = $DEP_FILE
   deps = gcc

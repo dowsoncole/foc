@@ -36,4 +36,5 @@ servo_v1/tim1_pwm.o: ..\Modules\Three_Phase_Driver\Src\tim1_pwm.c \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_uart_ex.h \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_usart.h \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_usart_ex.h \
+  ..\Modules\Three_Phase_Driver\Inc\pwm_sampling.h \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_ll_tim.h

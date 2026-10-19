@@ -16,6 +16,7 @@
 #include "drv_monitor.h"
 #include "stspin32g4.h"
 #include "tim6_heartbeat.h"
+#include "tim1_pwm.h"
 
 /* --------------------------------------------------------------------------*/
 /* 可调参数                                                                  */
@@ -217,6 +218,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   if (htim->Instance == TIM6)
   {
     g_drv_monitor_tick = 1U;
+  }
+  else if (htim->Instance == TIM1)
+  {
+    Tim1Pwm_DispatchPeriodElapsed();
   }
 }
 

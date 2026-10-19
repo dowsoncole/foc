@@ -63,7 +63,7 @@ typedef void (*current_sampling_conversion_callback_t)(void *context);
 
 extern current_sampling_t g_current_sampling;
 
-/** 请求一次异步零点校准；调用者必须先让三相下管处于导通状态。 */
+/** 请求一次异步零点校准；调用者必须确保三相电流为零，推荐保持 MOE 关闭。 */
 void CurrentSampling_RequestCalibration(void);
 
 /** 在主循环或应用任务中周期调用，不阻塞 FOC。 */

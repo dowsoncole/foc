@@ -595,6 +595,11 @@
               <FileType>5</FileType>
               <FilePath>../FOC/Inc/foc_interface.h</FilePath>
             </File>
+            <File>
+              <FileName>foc_control_manager.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>../FOC/Inc/foc_control_manager.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -639,6 +644,16 @@
               <FileName>waveform_generator.h</FileName>
               <FileType>5</FileType>
               <FilePath>../Tests/Inc/waveform_generator.h</FilePath>
+            </File>
+            <File>
+              <FileName>waveform_uart1_port.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Tests/Src/waveform_uart1_port.c</FilePath>
+            </File>
+            <File>
+              <FileName>waveform_uart1_port.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>../Tests/Inc/waveform_uart1_port.h</FilePath>
             </File>
             <File>
               <FileName>mt6835_verify.c</FileName>
