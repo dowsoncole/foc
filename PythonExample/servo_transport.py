@@ -1,228 +1,307 @@
-"""Real RS485 waveform transport for the servo workstation.
+"""RS485 V2 multi-mode waveform transport.
 
-The ``servo_v1`` firmware streams a binary waveform protocol on USART1
-(RS485 half duplex, 921600 8-N-1). Each frame is eight bytes::
-
-    A5 5A <channel> <sequence> <sample_lo> <sample_hi> <reserved> <crc8>
-
-* ``crc8`` covers the first seven bytes with polynomial ``0x07``.
-* ``sample`` is a signed 16-bit value. The firmware emits 1 kHz samples and
-  completes exactly one sine cycle per second.
-
-Every serial detail lives here so the Qt pages stay free of hardware code, as
-the project README requires. Two interchangeable sources are provided:
-``SerialWaveformSource`` reads a real COM port on a background thread, while
-``SineWaveformSource`` synthesises the same frames so the display path can be
-verified without hardware attached.
+Implements the variable-length protocol documented by the firmware in
+``MDK-ARM/docs/pc_waveform_protocol.md``.  Frames carry one to four channel
+IDs, so decoded values always retain their identity and engineering unit.
 """
 
 from __future__ import annotations
 
 import math
+import struct
 import threading
 import time
 from collections import deque
 from dataclasses import dataclass, field
 from typing import Iterable, Sequence
 
-FRAME_LENGTH = 8
-FRAME_HEADER = (0xA5, 0x5A)
+FRAME_HEADER = b"\xA5\x5A"
+PROTOCOL_VERSION = 2
+MIN_CHANNELS = 1
+MAX_CHANNELS = 4
 CRC8_POLYNOMIAL = 0x07
 DEFAULT_BAUDRATE = 921600
 SAMPLE_RATE_HZ = 1000
+ADC_SAMPLE_RATE_HZ = 20_000
+ADC_SAMPLES_PER_FRAME = ADC_SAMPLE_RATE_HZ // SAMPLE_RATE_HZ
 SERIAL_READ_TIMEOUT_S = 0.05
-SERIAL_READ_CHUNK = 512
-FULL_SCALE = 32768.0
+SERIAL_READ_CHUNK = 4096
+
+MODE_NAMES = {
+    0: "关闭",
+    1: "电压开环",
+    2: "电流开环",
+    3: "自定义",
+}
+
+
+@dataclass(frozen=True)
+class ChannelDefinition:
+    channel_id: int
+    name: str
+    unit: str
+
+
+CHANNEL_DEFINITIONS = {
+    item.channel_id: item
+    for item in (
+        ChannelDefinition(1, "U相电流", "A"),
+        ChannelDefinition(2, "V相电流", "A"),
+        ChannelDefinition(3, "W相电流", "A"),
+        ChannelDefinition(4, "D电流指令", "A"),
+        ChannelDefinition(5, "D电流反馈", "A"),
+        ChannelDefinition(6, "Q电流指令", "A"),
+        ChannelDefinition(7, "Q电流反馈", "A"),
+        ChannelDefinition(8, "D电压输出", "pu"),
+        ChannelDefinition(9, "Q电压输出", "pu"),
+        ChannelDefinition(10, "U相占空比", ""),
+        ChannelDefinition(11, "V相占空比", ""),
+        ChannelDefinition(12, "W相占空比", ""),
+        ChannelDefinition(13, "电角度", "rad"),
+        ChannelDefinition(14, "直流母线电压", "V"),
+    )
+}
 
 
 class TransportError(RuntimeError):
     """Raised when a waveform source cannot be opened or configured."""
 
 
+def frame_length(channel_count: int) -> int:
+    if not MIN_CHANNELS <= channel_count <= MAX_CHANNELS:
+        raise ValueError(f"通道数量必须为 {MIN_CHANNELS}～{MAX_CHANNELS}")
+    return 12 + 5 * channel_count
+
+
 def crc8(data: bytes) -> int:
-    """CRC-8 with polynomial 0x07, matching ``WaveformGenerator_Crc8()``."""
     crc = 0
     for byte in data:
         crc ^= byte
         for _ in range(8):
-            if crc & 0x80:
-                crc = ((crc << 1) ^ CRC8_POLYNOMIAL) & 0xFF
-            else:
-                crc = (crc << 1) & 0xFF
+            crc = (((crc << 1) ^ CRC8_POLYNOMIAL) if crc & 0x80 else crc << 1) & 0xFF
     return crc
 
 
-def build_frame(sequence: int, sample: int, channel: int = 1) -> bytes:
-    """Assemble one firmware-format frame. Used by tests and the simulator."""
-    sample &= 0xFFFF
-    body = bytes((
-        FRAME_HEADER[0],
-        FRAME_HEADER[1],
-        channel & 0xFF,
-        sequence & 0xFF,
-        sample & 0xFF,
-        (sample >> 8) & 0xFF,
-        0x00,
-    ))
+def build_frame(
+    mode: int,
+    frame_sequence: int,
+    adc_sequence: int,
+    channels: Sequence[tuple[int, float]],
+) -> bytes:
+    """Build a V2 frame from ``(channel_id, engineering_value)`` pairs."""
+    if mode not in MODE_NAMES:
+        raise ValueError(f"未知波形模式：{mode}")
+    count = len(channels)
+    frame_length(count)
+    ids = bytes(channel_id for channel_id, _ in channels)
+    if any(channel_id not in CHANNEL_DEFINITIONS for channel_id, _ in channels):
+        raise ValueError("包含未知通道 ID")
+    raw_values = [int(round(value * 1000.0)) for _, value in channels]
+    body = struct.pack(
+        "<2sBBBHI",
+        FRAME_HEADER,
+        PROTOCOL_VERSION,
+        mode,
+        count,
+        frame_sequence & 0xFFFF,
+        adc_sequence & 0xFFFFFFFF,
+    ) + ids + struct.pack("<" + "i" * count, *raw_values)
     return body + bytes((crc8(body),))
 
 
 @dataclass(frozen=True)
-class WaveformFrame:
-    """One decoded waveform sample."""
-
-    channel: int
-    sequence: int
-    sample: int
+class WaveformChannel:
+    channel_id: int
+    value: float
 
     @property
-    def normalized(self) -> float:
-        """Map the signed 16-bit sample onto the scope's +/-100 scale."""
-        return self.sample / FULL_SCALE * 100.0
+    def definition(self) -> ChannelDefinition:
+        return CHANNEL_DEFINITIONS[self.channel_id]
+
+    @property
+    def name(self) -> str:
+        return self.definition.name
+
+    @property
+    def unit(self) -> str:
+        return self.definition.unit
+
+
+@dataclass(frozen=True)
+class WaveformFrame:
+    mode: int
+    frame_sequence: int
+    adc_sequence: int
+    channels: tuple[WaveformChannel, ...]
+
+    @property
+    def mode_name(self) -> str:
+        return MODE_NAMES[self.mode]
+
+    @property
+    def channel_ids(self) -> tuple[int, ...]:
+        return tuple(channel.channel_id for channel in self.channels)
+
+    @property
+    def values(self) -> tuple[float, ...]:
+        return tuple(channel.value for channel in self.channels)
 
 
 @dataclass
 class SourceStats:
-    """Counters shared by every waveform source."""
-
     frames: int = 0
     crc_errors: int = 0
+    protocol_errors: int = 0
     resync_bytes: int = 0
     sequence_gaps: int = 0
+    adc_discontinuities: int = 0
     dropped_samples: int = 0
     last_sequence: int | None = field(default=None)
+    last_adc_sequence: int | None = field(default=None)
+    last_mode: int | None = field(default=None)
 
     def reset(self) -> None:
-        self.frames = 0
-        self.crc_errors = 0
-        self.resync_bytes = 0
-        self.sequence_gaps = 0
-        self.dropped_samples = 0
-        self.last_sequence = None
+        for name in vars(self):
+            setattr(self, name, None if name.startswith("last_") else 0)
 
     def summary(self) -> str:
-        gaps = "" if self.last_sequence is None else f"  seq {self.last_sequence}"
+        mode = "--" if self.last_mode is None else MODE_NAMES.get(self.last_mode, str(self.last_mode))
         return (
-            f"帧 {self.frames}   CRC错 {self.crc_errors}   "
-            f"重同步 {self.resync_bytes}B   跳帧 {self.sequence_gaps}   "
-            f"丢弃 {self.dropped_samples}{gaps}"
+            f"帧 {self.frames}   模式 {mode}   CRC错 {self.crc_errors}   "
+            f"协议错 {self.protocol_errors}   重同步 {self.resync_bytes}B   "
+            f"跳帧 {self.sequence_gaps}   ADC异常 {self.adc_discontinuities}   "
+            f"丢弃 {self.dropped_samples}   seq {self.last_sequence}   adc {self.last_adc_sequence}"
+        )
+
+    def compact_summary(self) -> str:
+        mode = "--" if self.last_mode is None else MODE_NAMES.get(self.last_mode, str(self.last_mode))
+        return (
+            f"帧 {self.frames} | {mode} | CRC {self.crc_errors} | 协议 {self.protocol_errors} | "
+            f"跳 {self.sequence_gaps} | ADC {self.adc_discontinuities} | 丢 {self.dropped_samples}"
         )
 
 
 class WaveformParser:
-    """Incremental frame parser that resynchronises after any corruption.
-
-    Feed it arbitrary byte chunks; it returns whole validated frames. A bad CRC
-    discards a single byte and rescans, so one corrupted frame cannot desync the
-    rest of the stream.
-    """
+    """Incrementally decode V2 variable frames and recover one byte at a time."""
 
     def __init__(self) -> None:
         self._buffer = bytearray()
         self.stats = SourceStats()
         self._last_sequence: int | None = None
+        self._last_adc_sequence: int | None = None
 
     def feed(self, chunk: bytes) -> list[WaveformFrame]:
         if chunk:
             self._buffer.extend(chunk)
         frames: list[WaveformFrame] = []
         while True:
-            header = self._find_header()
-            if header < 0:
+            header_index = self._buffer.find(FRAME_HEADER)
+            if header_index < 0:
+                self._discard_without_header()
                 break
-            if len(self._buffer) - header < FRAME_LENGTH:
+            if header_index:
+                self.stats.resync_bytes += header_index
+                del self._buffer[:header_index]
+            if len(self._buffer) < 5:
                 break
-            candidate = bytes(self._buffer[header:header + FRAME_LENGTH])
-            if crc8(candidate[:7]) != candidate[7]:
-                self.stats.crc_errors += 1
-                del self._buffer[header]
+            version, mode, count = self._buffer[2:5]
+            if (
+                version != PROTOCOL_VERSION
+                or mode not in MODE_NAMES
+                or not MIN_CHANNELS <= count <= MAX_CHANNELS
+            ):
+                self._reject_protocol_byte()
                 continue
-            del self._buffer[header:header + FRAME_LENGTH]
+            length = frame_length(count)
+            if len(self._buffer) < length:
+                break
+            candidate = bytes(self._buffer[:length])
+            if crc8(candidate[:-1]) != candidate[-1]:
+                self.stats.crc_errors += 1
+                self.stats.resync_bytes += 1
+                del self._buffer[0]
+                continue
+            channel_ids = tuple(candidate[11:11 + count])
+            if any(channel_id not in CHANNEL_DEFINITIONS for channel_id in channel_ids):
+                self._reject_protocol_byte()
+                continue
+            frame_sequence = struct.unpack_from("<H", candidate, 5)[0]
+            adc_sequence = struct.unpack_from("<I", candidate, 7)[0]
+            values = struct.unpack_from("<" + "i" * count, candidate, 11 + count)
+            del self._buffer[:length]
             frame = WaveformFrame(
-                channel=candidate[2],
-                sequence=candidate[3],
-                sample=int.from_bytes(candidate[4:6], "little", signed=True),
+                mode,
+                frame_sequence,
+                adc_sequence,
+                tuple(
+                    WaveformChannel(channel_id, raw_value / 1000.0)
+                    for channel_id, raw_value in zip(channel_ids, values)
+                ),
             )
-            self.stats.frames += 1
-            if self._last_sequence is not None:
-                expected = (self._last_sequence + 1) & 0xFF
-                if frame.sequence != expected:
-                    self.stats.sequence_gaps += 1
-            self._last_sequence = frame.sequence
-            self.stats.last_sequence = frame.sequence
+            self._update_stats(frame)
             frames.append(frame)
         return frames
 
-    def _find_header(self) -> int:
-        """Return the offset of the next header, discarding leading garbage."""
-        length = len(self._buffer)
-        # A complete header needs two bytes, so the last index to test is
-        # length - 2. Testing length - 1 would read one byte past the buffer.
-        index = 0
-        limit = length - 2
-        while index <= limit:
-            if self._buffer[index] == FRAME_HEADER[0] and self._buffer[index + 1] == FRAME_HEADER[1]:
-                if index:
-                    self.stats.resync_bytes += index
-                    del self._buffer[:index]
-                return 0
-            index += 1
-        # Keep a trailing 0xA5: it may be the first half of a split header.
-        if length and self._buffer[-1] == FRAME_HEADER[0]:
-            if length > 1:
-                self.stats.resync_bytes += length - 1
-                del self._buffer[:-1]
-            return -1
-        if length:
-            self.stats.resync_bytes += length
-            self._buffer.clear()
-        return -1
+    def _reject_protocol_byte(self) -> None:
+        self.stats.protocol_errors += 1
+        self.stats.resync_bytes += 1
+        del self._buffer[0]
+
+    def _discard_without_header(self) -> None:
+        keep = 1 if self._buffer[-1:] == FRAME_HEADER[:1] else 0
+        discarded = len(self._buffer) - keep
+        if discarded:
+            self.stats.resync_bytes += discarded
+            del self._buffer[:discarded]
+
+    def _update_stats(self, frame: WaveformFrame) -> None:
+        self.stats.frames += 1
+        if self._last_sequence is not None:
+            if ((frame.frame_sequence - self._last_sequence) & 0xFFFF) != 1:
+                self.stats.sequence_gaps += 1
+        if self._last_adc_sequence is not None:
+            if ((frame.adc_sequence - self._last_adc_sequence) & 0xFFFFFFFF) != ADC_SAMPLES_PER_FRAME:
+                self.stats.adc_discontinuities += 1
+        self._last_sequence = frame.frame_sequence
+        self._last_adc_sequence = frame.adc_sequence
+        self.stats.last_sequence = frame.frame_sequence
+        self.stats.last_adc_sequence = frame.adc_sequence
+        self.stats.last_mode = frame.mode
 
     def reset(self) -> None:
         self._buffer.clear()
         self.stats.reset()
         self._last_sequence = None
+        self._last_adc_sequence = None
 
 
 def parse_baudrate(text: str) -> int:
-    """Convert UI labels such as ``921600 bps`` or ``1 Mbps`` into an integer."""
     value = text.strip().lower()
     for suffix, multiplier in (("mbps", 1_000_000), ("kbps", 1_000), ("bps", 1)):
         if value.endswith(suffix):
-            number = value[: -len(suffix)].strip()
             try:
-                return int(float(number) * multiplier)
+                return int(float(value[: -len(suffix)].strip()) * multiplier)
             except ValueError as exc:
                 raise TransportError(f"无法解析波特率：{text}") from exc
     raise TransportError(f"无法解析波特率：{text}")
 
 
 def list_serial_ports() -> list[str]:
-    """Return ``COM3 - USB Serial Port`` style entries, or [] without pyserial."""
     try:
         from serial.tools import list_ports
     except ImportError:
         return []
-    entries = []
-    for port in sorted(list_ports.comports(), key=lambda item: item.device):
-        entries.append(f"{port.device} - {port.description}" if port.description else port.device)
-    return entries
+    return [
+        f"{port.device} - {port.description}" if port.description else port.device
+        for port in sorted(list_ports.comports(), key=lambda item: item.device)
+    ]
 
 
 class SerialWaveformSource:
-    """Reads the firmware waveform from a real COM port on a worker thread.
-
-    The worker only parses and appends; the Qt thread drains the buffer from
-    ``drain()``. ``deque`` append/popleft are atomic under the GIL and the lock
-    keeps the statistics consistent.
-    """
-
     BUFFER_SAMPLES = 4000
 
     def __init__(self, port: str, baudrate: int = DEFAULT_BAUDRATE) -> None:
-        self.port = port
-        self.baudrate = baudrate
-        self.rate_hz = SAMPLE_RATE_HZ
+        self.port, self.baudrate, self.rate_hz = port, baudrate, SAMPLE_RATE_HZ
         self._serial = None
         self._thread: threading.Thread | None = None
         self._stop = threading.Event()
@@ -242,25 +321,19 @@ class SerialWaveformSource:
         try:
             import serial
         except ImportError as exc:
-            raise TransportError(
-                "缺少 pyserial 依赖，请先执行：python -m pip install pyserial"
-            ) from exc
+            raise TransportError("缺少 pyserial 依赖，请先执行：python -m pip install pyserial") from exc
         try:
             self._serial = serial.Serial(
-                port=self.port,
-                baudrate=self.baudrate,
-                bytesize=serial.EIGHTBITS,
-                parity=serial.PARITY_NONE,
-                stopbits=serial.STOPBITS_ONE,
+                port=self.port, baudrate=self.baudrate, bytesize=serial.EIGHTBITS,
+                parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE,
                 timeout=SERIAL_READ_TIMEOUT_S,
             )
         except Exception as exc:
             self._serial = None
             raise TransportError(f"无法打开串口 {self.port}：{exc}") from exc
+        self._parser.reset()
         self._stop.clear()
-        self._thread = threading.Thread(
-            target=self._read_loop, name="rs485-waveform", daemon=True
-        )
+        self._thread = threading.Thread(target=self._read_loop, name="rs485-waveform", daemon=True)
         self._thread.start()
 
     def _read_loop(self) -> None:
@@ -273,13 +346,12 @@ class SerialWaveformSource:
             if not chunk:
                 continue
             frames = self._parser.feed(chunk)
-            if not frames:
-                continue
-            with self._lock:
-                room = self.BUFFER_SAMPLES - len(self._samples)
-                if room < len(frames):
-                    self._dropped += len(frames) - max(room, 0)
-                self._samples.extend(frames)
+            if frames:
+                with self._lock:
+                    room = self.BUFFER_SAMPLES - len(self._samples)
+                    if room < len(frames):
+                        self._dropped += len(frames) - max(room, 0)
+                    self._samples.extend(frames)
 
     def drain(self) -> list[WaveformFrame]:
         with self._lock:
@@ -289,9 +361,8 @@ class SerialWaveformSource:
 
     def close(self) -> None:
         self._stop.set()
-        thread = self._thread
-        if thread is not None and thread.is_alive():
-            thread.join(timeout=1.0)
+        if self._thread is not None and self._thread.is_alive():
+            self._thread.join(timeout=1.0)
         self._thread = None
         if self._serial is not None:
             try:
@@ -302,22 +373,15 @@ class SerialWaveformSource:
 
 
 class SineWaveformSource:
-    """Generates the firmware waveform locally, for hardware-free verification.
+    """Balanced three-phase V2 demo source using production encode/decode."""
 
-    It reproduces the firmware timing: 1 kHz samples, one sine cycle per second,
-    an 8-bit rolling sequence number and valid CRC8 framing.
-    """
-
-    def __init__(self, rate_hz: int = SAMPLE_RATE_HZ, amplitude: int = 32767) -> None:
-        self.rate_hz = rate_hz
-        self.amplitude = amplitude
-        self.port = "SIMULATED"
-        self.baudrate = DEFAULT_BAUDRATE
+    def __init__(self, rate_hz: int = SAMPLE_RATE_HZ, amplitude_a: float = 10.0) -> None:
+        self.rate_hz, self.amplitude_a = rate_hz, amplitude_a
+        self.port, self.baudrate = "SIMULATED", DEFAULT_BAUDRATE
         self._parser = WaveformParser()
         self._pending: deque[WaveformFrame] = deque(maxlen=4000)
         self._dropped = 0
         self._running = False
-        self._clock = 0.0
         self._emitted = 0
         self._last_sample_at = 0.0
 
@@ -330,50 +394,42 @@ class SineWaveformSource:
     def open(self) -> None:
         self._parser.reset()
         self._pending.clear()
-        self._dropped = 0
-        self._emitted = 0
-        self._clock = time.perf_counter()
-        self._last_sample_at = self._clock
+        self._dropped = self._emitted = 0
+        self._last_sample_at = time.perf_counter()
         self._running = True
 
     def emit(self, count: int) -> list[WaveformFrame]:
-        """Generate ``count`` frames deterministically, without a clock.
-
-        Phase comes from the emit counter, so exactly one sine cycle spans
-        ``rate_hz`` frames regardless of how fast the caller runs. ``drain()``
-        uses this after converting elapsed time into a frame count, and tests
-        call it directly.
-        """
         if count <= 0:
             return []
         frames: list[WaveformFrame] = []
         for _ in range(count):
             phase = (self._emitted % self.rate_hz) / self.rate_hz * math.tau
-            sample = int(self.amplitude * math.sin(phase))
-            frames.append(
-                WaveformFrame(1, self._emitted & 0xFF, max(-32768, min(32767, sample)))
+            iu = self.amplitude_a * math.sin(phase)
+            iv = self.amplitude_a * math.sin(phase - math.tau / 3.0)
+            iw = -(iu + iv)
+            encoded = build_frame(
+                1,
+                self._emitted,
+                self._emitted * ADC_SAMPLES_PER_FRAME,
+                ((1, iu), (2, iv), (3, iw)),
             )
+            frames.extend(self._parser.feed(encoded))
             self._emitted += 1
         room = self._pending.maxlen - len(self._pending)
         if room < len(frames):
             self._dropped += len(frames) - max(room, 0)
         self._pending.extend(frames)
-        self._parser.stats.frames += len(frames)
-        self._parser.stats.last_sequence = frames[-1].sequence
+        if self._running:
+            self._last_sample_at = time.perf_counter()
         return frames
 
     def drain(self) -> list[WaveformFrame]:
         if not self._running:
             return []
         now = time.perf_counter()
-        period = 1.0 / self.rate_hz
-        due = int((now - self._last_sample_at) / period)
+        due = int((now - self._last_sample_at) * self.rate_hz)
         if due > 0:
-            self._last_sample_at += due * period
-            # A long stall must not produce a burst that floods the buffer.
-            if now - self._last_sample_at > 1.0:
-                self._last_sample_at = now
-            self.emit(due)
+            self.emit(min(due, self._pending.maxlen))
         frames = list(self._pending)
         self._pending.clear()
         return frames
@@ -384,35 +440,20 @@ class SineWaveformSource:
 
 
 def estimate_frequency(values: Sequence[float], rate_hz: float) -> float:
-    """Estimate signal frequency in Hz from rising zero crossings.
-
-    Counting crossings over the whole window under-reads low frequencies, so
-    the span between the first and last crossing is measured instead. Fewer
-    than two crossings means the window holds no complete cycle and the
-    frequency cannot be determined, so 0.0 is returned rather than a guess.
-    """
     if len(values) < 3 or rate_hz <= 0:
         return 0.0
-    crossings = [
-        index for index in range(1, len(values))
-        if values[index - 1] < 0.0 <= values[index]
-    ]
+    crossings = [i for i in range(1, len(values)) if values[i - 1] < 0.0 <= values[i]]
     if len(crossings) < 2:
         return 0.0
-    span_samples = crossings[-1] - crossings[0]
-    if span_samples <= 0:
-        return 0.0
-    return (len(crossings) - 1) * rate_hz / span_samples
+    span = crossings[-1] - crossings[0]
+    return 0.0 if span <= 0 else (len(crossings) - 1) * rate_hz / span
+
+
+def to_scope_sample(frame: WaveformFrame) -> tuple[float, float, float, float]:
+    values = list(frame.values)
+    values.extend([0.0] * (MAX_CHANNELS - len(values)))
+    return tuple(values[:MAX_CHANNELS])  # type: ignore[return-value]
 
 
 def to_scope_samples(frames: Iterable[WaveformFrame]) -> list[tuple[float, float, float, float]]:
-    """Convert frames into the four-channel tuples ``ScopeChart`` expects.
-
-    The firmware currently streams one channel, so it lands on CH1 and the
-    remaining channels stay flat at zero.
-    """
-    samples = []
-    for frame in frames:
-        value = max(-100.0, min(100.0, frame.normalized))
-        samples.append((value, 0.0, 0.0, 0.0))
-    return samples
+    return [to_scope_sample(frame) for frame in frames]

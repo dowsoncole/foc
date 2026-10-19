@@ -15,6 +15,7 @@
 static foc_modulation_parameters_t full_bus = { FOC_MODULATION_OVERMODULATION, 0.0f, 1.0f };
 static double worst_fundamental_error;
 void TestPwmSampling(void);
+void TestWaveformGenerator(void);
 
 static foc_modulation_output_t compute(foc_modulation_parameters_t parameters,
                                        float amplitude, double angle)
@@ -318,6 +319,7 @@ int main(void)
   test_foc_and_faults();
   test_servo_fault_mapping();
   TestPwmSampling();
+  TestWaveformGenerator();
   printf("PASS: linear/OVM1/OVM2/six-step, six sectors, Fourier gain, duty bounds, PI and faults.\n");
   printf("Worst fundamental error / Vdc: %.9f\n", worst_fundamental_error);
   printf("Six-step / linear fundamental gain: %.7f (+%.4f%%)\n",
