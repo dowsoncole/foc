@@ -338,7 +338,7 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls></MiscControls>
+              <MiscControls>-ffp-mode=full</MiscControls>
               <Define>USE_HAL_DRIVER,STM32G431xx</Define>
               <Undefine></Undefine>
               <IncludePath>../Core/Inc;../FOC/Inc;../Servo/Inc;../Modules/Driver_Communication/Inc;../Modules/Three_Phase_Driver/Inc;../Modules/Current_Sampling/Inc;../Modules/Encoder/Inc;../Tests/Inc;../Drivers/STM32G4xx_HAL_Driver/Inc;../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32G4xx/Include;../Drivers/CMSIS/Include</IncludePath>
@@ -561,6 +561,26 @@
           <GroupName>Modules/FOC</GroupName>
           <Files>
             <File>
+              <FileName>foc_pi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../FOC/Src/foc_pi.c</FilePath>
+            </File>
+            <File>
+              <FileName>foc_current_tuning.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../FOC/Src/foc_current_tuning.c</FilePath>
+            </File>
+            <File>
+              <FileName>foc_pi.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>../FOC/Inc/foc_pi.h</FilePath>
+            </File>
+            <File>
+              <FileName>foc_current_tuning.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>../FOC/Inc/foc_current_tuning.h</FilePath>
+            </File>
+            <File>
               <FileName>foc_modulation.c</FileName>
               <FileType>1</FileType>
               <FilePath>../FOC/Src/foc_modulation.c</FilePath>
@@ -620,6 +640,16 @@
         <Group>
           <GroupName>Tests</GroupName>
           <Files>
+            <File>
+              <FileName>current_loop_test.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Tests/Src/current_loop_test.c</FilePath>
+            </File>
+            <File>
+              <FileName>current_loop_test.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>../Tests/Inc/current_loop_test.h</FilePath>
+            </File>
             <File>
               <FileName>tim1_pwm_verify.c</FileName>
               <FileType>1</FileType>

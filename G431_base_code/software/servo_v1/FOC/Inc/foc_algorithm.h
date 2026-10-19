@@ -3,15 +3,7 @@
 
 #include <stdint.h>
 #include "foc_modulation.h"
-
-typedef struct
-{
-  float kp;
-  float ki;
-  float integral;
-  float integral_min;
-  float integral_max;
-} foc_pi_t;
+#include "foc_pi.h"
 
 typedef struct
 {
@@ -45,6 +37,11 @@ typedef struct
 {
   float d_current;
   float q_current;
+  /* Actual vector-limited references, used by performance measurements. */
+  float applied_d_reference;
+  float applied_q_reference;
+  uint8_t reference_limited;
+  uint8_t integral_limited;
   float d_voltage;
   float q_voltage;
   float alpha_voltage;

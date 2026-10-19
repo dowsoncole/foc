@@ -29,6 +29,7 @@ project:
         - C:
             - -std=c99
           C-CPP:
+            - -ffp-mode=full
             - -fno-rtti
             - -funsigned-char
             - -fshort-enums
@@ -105,6 +106,10 @@ project:
         - file: ../Modules/Encoder/Inc/mt6835.h
     - group: Tests
       files:
+        - file: ../Tests/Src/current_loop_test.c
+        - file: ../Tests/Inc/current_loop_test.h
+        - file: ../Tests/Src/waveform_uart1_port.c
+        - file: ../Tests/Inc/waveform_uart1_port.h
         - file: ../Tests/Src/tim1_pwm_verify.c
         - file: ../Tests/Inc/tim1_pwm_verify.h
         - file: ../Tests/Inc/measurement_manager.h
@@ -120,6 +125,11 @@ project:
         - file: ../Modules/Current_Sampling/Inc/current_sampling.h
     - group: Modules/FOC
       files:
+        - file: ../FOC/Src/foc_pi.c
+        - file: ../FOC/Inc/foc_pi.h
+        - file: ../FOC/Src/foc_current_tuning.c
+        - file: ../FOC/Inc/foc_current_tuning.h
+        - file: ../FOC/Inc/foc_control_manager.h
         - file: ../FOC/Inc/foc_modulation.h
         - file: ../FOC/Src/foc_modulation.c
         - file: ../FOC/Src/foc_modulation_lut.h

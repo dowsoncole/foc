@@ -31,6 +31,8 @@
 #include "drv_monitor.h"
 #include "foc_interface.h"
 #include "foc_control_manager.h"
+#include "foc_current_tuning.h"
+#include "current_loop_test.h"
 #include "servo_manager.h"
 #include "waveform_generator.h"
 #include "waveform_uart1_port.h"
@@ -86,6 +88,22 @@ void SystemClock_Config(void);
 foc_controller_t g_foc_controller;
 servo_manager_t g_servo_manager;
 UART_HandleTypeDef huart1;
+/* Commissioning mailbox: write design, then apply_request=1 while output OFF.
+   R/L deliberately have no fabricated motor defaults. status: 1=OK, 2=busy,
+   3=invalid design. Last accepted gains survive control mode switches. */
+struct
+{
+  foc_current_design_t design;
+  foc_current_gains_t gains;
+  volatile uint32_t apply_request, status;
+  uint8_t valid;
+} g_current_tuning = {
+  .design = { .dc_bus_v = 24.0f, .bandwidth_hz = 200.0f,
+    .sample_period_s = 0.00005f, .delay_s = 0.000075f,
+    .phase_margin_deg = 60.0f, .integral_limit_pu = 0.02f }
+};
+/* Zero-initialized capture stays in ZI, avoiding a 14 KB flash copy image. */
+current_loop_test_t g_current_loop_test;
 /* 全局模式控制对象：统一管理电压开环、电流测试环、正常模式及公共运行状态。 */
 foc_control_manager_t g_global_mode_control =
 {
@@ -101,7 +119,7 @@ foc_control_manager_t g_global_mode_control =
   .current_open_loop =
   {
     .d_current_reference_a = 0.10f, .q_current_reference_a = 0.0f,
-    .dc_bus_voltage_v = 24.0f, .electrical_frequency_hz = 2.0f
+    .dc_bus_voltage_v = 24.0f, .electrical_frequency_hz = 0.0f
   },
   .normal_loop =
   {
@@ -153,6 +171,13 @@ static void MainFoc_ReadFeedback(void *context, foc_input_t *input)
         g_global_mode_control.current_open_loop.electrical_angle_rad;
     input->reference_valid = 1U;
     input->angle_valid = 1U;
+    if (g_current_loop_test.state == CURRENT_TEST_ARMED ||
+        g_current_loop_test.state == CURRENT_TEST_RUNNING)
+    {
+      input->reference_valid = CurrentTest_Reference(&g_current_loop_test,
+          g_foc_controller.algorithm.parameters.sample_period_s,
+          &input->d_reference, &input->q_reference);
+    }
   }
   else if (g_global_mode_control.active_mode == FOC_CONTROL_MODE_NORMAL)
   {
@@ -259,6 +284,11 @@ static void MainFoc_ConfigureModeParameters(foc_control_mode_t mode)
     parameters->d_controller.integral_min = -0.02f;
     parameters->d_controller.integral_max = 0.02f;
     parameters->q_controller = parameters->d_controller;
+    if (g_current_tuning.valid)
+    {
+      parameters->d_controller = g_current_tuning.gains.d;
+      parameters->q_controller = g_current_tuning.gains.q;
+    }
   }
   else
   {
@@ -272,6 +302,72 @@ static void MainFoc_ConfigureModeParameters(foc_control_mode_t mode)
     parameters->q_controller = parameters->d_controller;
   }
   FOC_AlgorithmReset(&g_foc_controller.algorithm);
+}
+
+/* Background policy only; all excitation and capture math lives in Tests.
+   Never apply a multi-field PI update while the ADC ISR is using the PI. */
+static void MainCurrentTest_Service(void)
+{
+  foc_control_runtime_t *r = &g_global_mode_control.runtime;
+  uint8_t off = !r->output_request && !r->output_armed &&
+      !r->precharge_in_progress && !g_foc_controller.running &&
+      !Tim1Pwm_IsOutputEnabled();
+  if (g_current_tuning.apply_request)
+  {
+    foc_current_gains_t gains;
+    g_current_tuning.apply_request = 0;
+    if (!off || g_global_mode_control.active_mode != FOC_CONTROL_MODE_CURRENT_OPEN_LOOP ||
+        g_current_loop_test.state == CURRENT_TEST_ARMED)
+      g_current_tuning.status = 2;
+    else
+    {
+      /* Timing comes from firmware, not an independently editable design value. */
+      g_current_tuning.design.sample_period_s = g_foc_controller.timing.pwm_period_s;
+      if (FOC_CurrentDesign(&g_current_tuning.design, &gains) &&
+          g_current_tuning.design.integral_limit_pu <= g_foc_controller.algorithm.parameters.voltage_limit)
+      {
+        g_current_tuning.gains = gains;
+        g_current_tuning.valid = 1;
+        g_global_mode_control.current_open_loop.dc_bus_voltage_v = g_current_tuning.design.dc_bus_v;
+        MainFoc_ConfigureModeParameters(FOC_CONTROL_MODE_CURRENT_OPEN_LOOP);
+        g_current_tuning.status = 1;
+      }
+      else g_current_tuning.status = 3;
+    }
+  }
+  if (g_current_loop_test.command)
+  {
+    uint32_t command = g_current_loop_test.command;
+    uint32_t mask = __get_PRIMASK();
+    __disable_irq();
+    g_current_loop_test.command = 0;
+    if (command == 2)
+    {
+      r->output_request = r->output_armed = 0;
+      FOC_ControllerStop(&g_foc_controller);
+      CurrentTest_Abort(&g_current_loop_test, 0);
+    }
+    else if (command == 3 && off)
+      g_current_loop_test.state = CURRENT_TEST_IDLE;
+    else if (command == 1 && off &&
+        g_global_mode_control.active_mode == FOC_CONTROL_MODE_CURRENT_OPEN_LOOP &&
+        g_global_mode_control.current_open_loop.electrical_frequency_hz == 0.0f)
+    {
+      if (CurrentTest_Arm(&g_current_loop_test,
+          g_foc_controller.algorithm.parameters.current_limit,
+          g_foc_controller.timing.pwm_period_s))
+      {
+        g_current_loop_test.parameters_at_arm = g_foc_controller.algorithm.parameters;
+        g_current_loop_test.dc_bus_at_arm_v = g_global_mode_control.current_open_loop.dc_bus_voltage_v;
+      }
+    }
+    else CurrentTest_Abort(&g_current_loop_test, CURRENT_TEST_INVALID);
+    if (!mask) __enable_irq();
+  }
+  if (g_global_mode_control.active_mode == FOC_CONTROL_MODE_CURRENT_OPEN_LOOP &&
+      (g_current_loop_test.state == CURRENT_TEST_DONE ||
+       g_current_loop_test.state == CURRENT_TEST_ABORTED))
+    r->output_request = 0;
 }
 
 /* 模式切换只在主循环执行，并强制经过 MOE=0、控制器停止、PI 清零的边界。
@@ -307,6 +403,9 @@ static void MainFoc_ServiceModeSwitch(void)
   __disable_irq();
   FOC_ControllerClearFaults(&g_foc_controller);
   MainFoc_ConfigureModeParameters(requested);
+  if (g_current_loop_test.state == CURRENT_TEST_ARMED ||
+      g_current_loop_test.state == CURRENT_TEST_RUNNING)
+    CurrentTest_Abort(&g_current_loop_test, CURRENT_TEST_INVALID);
   g_global_mode_control.voltage_open_loop.applied_d_voltage_v = 0.0f;
   g_global_mode_control.voltage_open_loop.applied_q_voltage_v = 0.0f;
   g_global_mode_control.voltage_open_loop.voltage_ramp_complete = 0U;
@@ -355,9 +454,9 @@ static void MainWaveform_Publish(const foc_controller_t *controller,
   else if (g_global_mode_control.active_mode == FOC_CONTROL_MODE_CURRENT_OPEN_LOOP)
   {
     source.d_current_reference_a =
-        g_global_mode_control.current_open_loop.d_current_reference_a;
+        controller->input.d_reference;
     source.q_current_reference_a =
-        g_global_mode_control.current_open_loop.q_current_reference_a;
+        controller->input.q_reference;
     source.electrical_angle_rad =
         g_global_mode_control.current_open_loop.electrical_angle_rad;
     dc_bus_voltage_v = g_global_mode_control.current_open_loop.dc_bus_voltage_v;
@@ -483,6 +582,19 @@ static void MainFoc_OnAdcConversion(void *context)
     }
 
     FOC_ControllerStep(controller);
+    CurrentTest_Observe(&g_current_loop_test, &controller->algorithm.output,
+        controller->algorithm.parameters.sample_period_s,
+        g_current_sampling.sample_sequence, Tim1Pwm_IsOutputEnabled());
+    if (!controller->running && (g_current_loop_test.state == CURRENT_TEST_ARMED ||
+        g_current_loop_test.state == CURRENT_TEST_RUNNING))
+      CurrentTest_Abort(&g_current_loop_test, CURRENT_TEST_INVALID);
+    if (g_current_loop_test.state == CURRENT_TEST_DONE ||
+        g_current_loop_test.state == CURRENT_TEST_ABORTED)
+    {
+      /* Capture is frozen before stopping (Stop clears algorithm telemetry). */
+      runtime->output_request = runtime->output_armed = 0;
+      FOC_ControllerStop(controller);
+    }
     controller->timing.last_sample_sequence = g_current_sampling.sample_sequence;
     runtime->fault_flags = controller->fault_flags;
     runtime->running = controller->running;
@@ -680,6 +792,10 @@ int main(void)
       Error_Handler();
     }
     FOC_ControllerInit(&g_foc_controller, &foc_parameters, &foc_port);
+    g_current_loop_test.requested = (current_test_config_t) {
+      .kind = CURRENT_TEST_STEP, .axis = 0, .amplitude_a = 0.05f,
+      .settle_s = 0.005f, .step_delay_s = 0.004f, .average_count = 1
+    };
     ServoManager_Init(&g_servo_manager, &g_foc_controller, &servo_port);
     CurrentSampling_SetConversionCallback(MainFoc_OnAdcConversion,
                                            &g_foc_controller);
@@ -725,6 +841,7 @@ int main(void)
     foc_control_runtime_t *runtime = &g_global_mode_control.runtime;
     CurrentSampling_Service();
     MainFoc_ServiceModeSwitch();
+    MainCurrentTest_Service();
 
     if ((g_global_mode_control.active_mode != FOC_CONTROL_MODE_NORMAL) &&
         (runtime->output_request != 0U) &&
@@ -740,7 +857,14 @@ int main(void)
     {
       if (g_global_mode_control.active_mode == FOC_CONTROL_MODE_CURRENT_OPEN_LOOP)
       {
+        uint32_t mask = __get_PRIMASK();
+        __disable_irq();
+        runtime->output_armed = 0U;
         FOC_ControllerStop(&g_foc_controller);
+        if (g_current_loop_test.state == CURRENT_TEST_RUNNING ||
+            g_current_loop_test.state == CURRENT_TEST_ARMED)
+          CurrentTest_Abort(&g_current_loop_test, CURRENT_TEST_MOE_OFF);
+        if (!mask) __enable_irq();
         runtime->running = 0U;
         g_global_mode_control.current_open_loop.output_d_voltage_v = 0.0f;
         g_global_mode_control.current_open_loop.output_q_voltage_v = 0.0f;

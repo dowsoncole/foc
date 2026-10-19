@@ -18,26 +18,6 @@ static float foc_clamp(float value, float minimum, float maximum)
   return value;
 }
 
-static float foc_pi_step(foc_pi_t *controller, float error, float period)
-{
-  float integral = controller->integral + error * controller->ki * period;
-  float output;
-
-  controller->integral = foc_clamp(integral, controller->integral_min,
-                                   controller->integral_max);
-  output = controller->kp * error + controller->integral;
-  /* 积分限幅与输出能力分开；最终基波限幅由调制模块负责。 */
-  return output;
-}
-
-static uint8_t foc_pi_valid(const foc_pi_t *controller)
-{
-  return (isfinite(controller->kp) && isfinite(controller->ki) &&
-          isfinite(controller->integral) && isfinite(controller->integral_min) &&
-          isfinite(controller->integral_max) &&
-          (controller->integral_min <= 0.0f) && (controller->integral_max >= 0.0f)) ? 1U : 0U;
-}
-
 static uint8_t foc_modulate(foc_algorithm_t *algorithm, float d, float q,
                             float sin_angle, float cos_angle,
                             foc_modulation_output_t *modulation)
@@ -223,6 +203,7 @@ void FOC_AlgorithmStep(foc_algorithm_t *algorithm,
   float control_period_s;
   float d_error, q_error, old_d_integral, old_q_integral;
   float fundamental_d, fundamental_q;
+  float reference_norm, reference_scale;
   foc_modulation_output_t modulation;
 
   if ((algorithm == 0) || (input == 0))
@@ -237,14 +218,14 @@ void FOC_AlgorithmStep(foc_algorithm_t *algorithm,
     return;
   }
 
-  control_period_s = (algorithm->parameters.sample_period_s > 0.0f) ?
+  control_period_s = (algorithm->parameters.sample_period_s != 0.0f) ?
                      algorithm->parameters.sample_period_s :
                      algorithm->parameters.pwm_period_s;
   if (!isfinite(control_period_s) || (control_period_s <= 0.0f) ||
       !isfinite(algorithm->parameters.current_limit) ||
       (algorithm->parameters.current_limit < 0.0f) ||
-      (foc_pi_valid(&algorithm->parameters.d_controller) == 0U) ||
-      (foc_pi_valid(&algorithm->parameters.q_controller) == 0U))
+      (FOC_PI_IsValid(&algorithm->parameters.d_controller) == 0U) ||
+      (FOC_PI_IsValid(&algorithm->parameters.q_controller) == 0U))
   {
     FOC_AlgorithmReset(algorithm);
     return;
@@ -302,13 +283,19 @@ void FOC_AlgorithmStep(foc_algorithm_t *algorithm,
 
   old_d_integral = algorithm->parameters.d_controller.integral;
   old_q_integral = algorithm->parameters.q_controller.integral;
-  d_error = foc_clamp(input->d_reference, -algorithm->parameters.current_limit,
-                       algorithm->parameters.current_limit) - algorithm->output.d_current;
-  q_error = foc_clamp(input->q_reference, -algorithm->parameters.current_limit,
-                       algorithm->parameters.current_limit) - algorithm->output.q_current;
-  d_voltage = foc_pi_step(&algorithm->parameters.d_controller,
+  /* Limit vector magnitude; independent clamps allowed sqrt(2)*Imax. */
+  reference_norm = hypotf(input->d_reference, input->q_reference);
+  if (!isfinite(reference_norm)) { FOC_AlgorithmReset(algorithm); return; }
+  algorithm->output.reference_limited = reference_norm > algorithm->parameters.current_limit;
+  reference_scale = algorithm->output.reference_limited ?
+      algorithm->parameters.current_limit / reference_norm : 1.0f;
+  algorithm->output.applied_d_reference = input->d_reference * reference_scale;
+  algorithm->output.applied_q_reference = input->q_reference * reference_scale;
+  d_error = algorithm->output.applied_d_reference - algorithm->output.d_current;
+  q_error = algorithm->output.applied_q_reference - algorithm->output.q_current;
+  d_voltage = FOC_PI_Step(&algorithm->parameters.d_controller,
                           d_error, control_period_s);
-  q_voltage = foc_pi_step(&algorithm->parameters.q_controller,
+  q_voltage = FOC_PI_Step(&algorithm->parameters.q_controller,
                           q_error, control_period_s);
   if (foc_modulate(algorithm, d_voltage, q_voltage, sin_angle, cos_angle,
                     &modulation) == 0U)
@@ -342,6 +329,11 @@ void FOC_AlgorithmStep(foc_algorithm_t *algorithm,
     }
   }
 
+  algorithm->output.integral_limited =
+      algorithm->parameters.d_controller.integral <= algorithm->parameters.d_controller.integral_min ||
+      algorithm->parameters.d_controller.integral >= algorithm->parameters.d_controller.integral_max ||
+      algorithm->parameters.q_controller.integral <= algorithm->parameters.q_controller.integral_min ||
+      algorithm->parameters.q_controller.integral >= algorithm->parameters.q_controller.integral_max;
   algorithm->output.fundamental_d_voltage = modulation.fundamental_alpha * cos_angle +
                                              modulation.fundamental_beta * sin_angle;
   algorithm->output.fundamental_q_voltage = -modulation.fundamental_alpha * sin_angle +

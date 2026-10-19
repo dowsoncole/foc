@@ -313,6 +313,8 @@ static void test_servo_fault_mapping(void)
 
 int main(void)
 {
+  void TestCurrentLoop(void);
+  TestCurrentLoop();
   test_linear_and_sectors();
   test_overmodulation_and_bounds();
   test_invalid();

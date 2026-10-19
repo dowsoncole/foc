@@ -4,6 +4,10 @@ $firmwareRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 $testBuild = Join-Path ([System.IO.Path]::GetTempPath()) ('foc-ovm-' + [guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $testBuild | Out-Null
 $testSources = @(
+    (Join-Path $firmwareRoot 'FOC/Src/foc_pi.c'),
+    (Join-Path $firmwareRoot 'FOC/Src/foc_current_tuning.c'),
+    (Join-Path $firmwareRoot 'Tests/Src/current_loop_test.c'),
+    (Join-Path $PSScriptRoot 'test_current_loop.c'),
     (Join-Path $firmwareRoot 'FOC/Src/foc_modulation.c'),
     (Join-Path $firmwareRoot 'FOC/Src/foc_algorithm.c'),
     (Join-Path $firmwareRoot 'FOC/Src/foc_interface.c'),

@@ -4,6 +4,15 @@
 
 Keil 工程入口：`MDK-ARM/servo_v1.uvprojx`
 
+电流 PI 模型整定、阶跃/正弦采集、时域指标及闭环带宽分析见
+[电流环整定与性能评价手册](MDK-ARM/docs/current_loop_tuning_and_evaluation.md)。
+
+自动调试所需硬件资料、信号、数据格式、设备接口及可填写清单见
+[电流环自动调试数据与接口要求](MDK-ARM/docs/automated_hardware_debug_data_requirements.md)。
+
+电流环验收之后的编码器、电角标定、速度环、轨迹与位置环分阶段安排见
+[伺服闭环实现计划](MDK-ARM/docs/servo_closed_loop_implementation_plan.md)。
+
 FOC 现有独立调制模块，支持线性 SVPWM、两段过调制与六步极限，基波增益补偿、
 板级采样降额和测试方式见 [FOC/README.md](FOC/README.md)。
 
