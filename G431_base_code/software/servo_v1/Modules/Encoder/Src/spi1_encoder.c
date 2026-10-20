@@ -11,6 +11,14 @@
 
 SPI_HandleTypeDef hspi1;
 
+#if (MT6835_USE_SOFTWARE_SPI == 0U)
+static DMA_HandleTypeDef s_hdma_spi1_rx;
+static DMA_HandleTypeDef s_hdma_spi1_tx;
+#endif
+static volatile uint8_t s_async_busy;
+static mt6835_spi_async_callback_t s_async_callback;
+static void *s_async_context;
+
 #if (MT6835_USE_SOFTWARE_SPI != 0U)
 
 /* 单个 NOP 保留数据建立/保持时间；GPIO BSRR 和循环本身构成主要时序。 */
@@ -118,6 +126,47 @@ HAL_StatusTypeDef MX_SPI1_Encoder_Init(void)
     return HAL_ERROR;
   }
 
+  __HAL_RCC_DMA1_CLK_ENABLE();
+
+  s_hdma_spi1_rx.Instance = DMA1_Channel1;
+  s_hdma_spi1_rx.Init.Request = DMA_REQUEST_SPI1_RX;
+  s_hdma_spi1_rx.Init.Direction = DMA_PERIPH_TO_MEMORY;
+  s_hdma_spi1_rx.Init.PeriphInc = DMA_PINC_DISABLE;
+  s_hdma_spi1_rx.Init.MemInc = DMA_MINC_ENABLE;
+  s_hdma_spi1_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+  s_hdma_spi1_rx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+  s_hdma_spi1_rx.Init.Mode = DMA_NORMAL;
+  s_hdma_spi1_rx.Init.Priority = DMA_PRIORITY_HIGH;
+  if (HAL_DMA_Init(&s_hdma_spi1_rx) != HAL_OK)
+  {
+    return HAL_ERROR;
+  }
+  __HAL_LINKDMA(&hspi1, hdmarx, s_hdma_spi1_rx);
+
+  s_hdma_spi1_tx.Instance = DMA1_Channel2;
+  s_hdma_spi1_tx.Init.Request = DMA_REQUEST_SPI1_TX;
+  s_hdma_spi1_tx.Init.Direction = DMA_MEMORY_TO_PERIPH;
+  s_hdma_spi1_tx.Init.PeriphInc = DMA_PINC_DISABLE;
+  s_hdma_spi1_tx.Init.MemInc = DMA_MINC_ENABLE;
+  s_hdma_spi1_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+  s_hdma_spi1_tx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+  s_hdma_spi1_tx.Init.Mode = DMA_NORMAL;
+  s_hdma_spi1_tx.Init.Priority = DMA_PRIORITY_MEDIUM;
+  if (HAL_DMA_Init(&s_hdma_spi1_tx) != HAL_OK)
+  {
+    return HAL_ERROR;
+  }
+  __HAL_LINKDMA(&hspi1, hdmatx, s_hdma_spi1_tx);
+
+  /* ADC/FOC 为优先级 1。编码器 DMA 使用优先级 2，通信完成处理永远不能
+     抢占电流环；TIM1 周期边界只负责启动 DMA。 */
+  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 2U, 0U);
+  HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
+  HAL_NVIC_SetPriority(DMA1_Channel2_IRQn, 2U, 0U);
+  HAL_NVIC_EnableIRQ(DMA1_Channel2_IRQn);
+  HAL_NVIC_SetPriority(SPI1_IRQn, 2U, 0U);
+  HAL_NVIC_EnableIRQ(SPI1_IRQn);
+
   return HAL_OK;
 #endif
 }
@@ -143,4 +192,107 @@ HAL_StatusTypeDef MT6835_SPI_TransmitReceive(const uint8_t *tx, uint8_t *rx,
 #else
   return HAL_SPI_TransmitReceive(&hspi1, (uint8_t *)tx, rx, size, timeout);
 #endif
+}
+
+static void MT6835_SPI_AsyncFinish(HAL_StatusTypeDef status)
+{
+  mt6835_spi_async_callback_t callback = s_async_callback;
+  void *context = s_async_context;
+
+  MT6835_CSN_RELEASE();
+  s_async_callback = NULL;
+  s_async_context = NULL;
+  s_async_busy = 0U;
+  if (callback != NULL)
+  {
+    callback(status, context);
+  }
+}
+
+HAL_StatusTypeDef MT6835_SPI_TransmitReceiveAsync(
+    const uint8_t *tx, uint8_t *rx, uint16_t size,
+    mt6835_spi_async_callback_t callback, void *context)
+{
+  HAL_StatusTypeDef status;
+
+  if ((tx == NULL) || (rx == NULL) || (size == 0U) || (callback == NULL))
+  {
+    return HAL_ERROR;
+  }
+  if (s_async_busy != 0U)
+  {
+    return HAL_BUSY;
+  }
+
+  s_async_busy = 1U;
+  s_async_callback = callback;
+  s_async_context = context;
+  MT6835_CSN_SELECT();
+
+#if (MT6835_USE_SOFTWARE_SPI != 0U)
+  status = MT6835_SPI_TransmitReceive(tx, rx, size, 0U);
+  MT6835_SPI_AsyncFinish(status);
+  return status;
+#else
+  status = HAL_SPI_TransmitReceive_DMA(&hspi1, tx, rx, size);
+  if (status != HAL_OK)
+  {
+    MT6835_CSN_RELEASE();
+    s_async_callback = NULL;
+    s_async_context = NULL;
+    s_async_busy = 0U;
+  }
+  return status;
+#endif
+}
+
+HAL_StatusTypeDef MT6835_SPI_AbortAsync(void)
+{
+  HAL_StatusTypeDef status;
+  if (s_async_busy == 0U)
+  {
+    return HAL_OK;
+  }
+#if (MT6835_USE_SOFTWARE_SPI != 0U)
+  status = HAL_OK;
+#else
+  status = HAL_SPI_Abort(&hspi1);
+#endif
+  MT6835_SPI_AsyncFinish(HAL_ERROR);
+  return status;
+}
+
+uint8_t MT6835_SPI_IsBusy(void)
+{
+  return s_async_busy;
+}
+
+void SPI1_Encoder_DmaRxIrqHandler(void)
+{
+#if (MT6835_USE_SOFTWARE_SPI == 0U)
+  HAL_DMA_IRQHandler(&s_hdma_spi1_rx);
+#endif
+}
+
+void SPI1_Encoder_DmaTxIrqHandler(void)
+{
+#if (MT6835_USE_SOFTWARE_SPI == 0U)
+  HAL_DMA_IRQHandler(&s_hdma_spi1_tx);
+#endif
+}
+
+void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi)
+{
+  if (hspi->Instance == SPI1)
+  {
+    MT6835_SPI_AsyncFinish(HAL_OK);
+  }
+}
+
+void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi)
+{
+  if (hspi->Instance == SPI1)
+  {
+    MT6835_SPI_AsyncFinish(HAL_ERROR);
+  }
 }

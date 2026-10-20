@@ -4,6 +4,11 @@
 
 Keil 工程入口：`MDK-ARM/servo_v1.uvprojx`
 
+编码器当前分层、业务流程、测速选择和拟定 FOC 接口见
+[编码器使用说明](MDK-ARM/docs/encoder/encoder_user_guide.md)；
+代码证据、设计约定和后续验收清单见
+[2026-10-20 编码器分析记录](MDK-ARM/docs/encoder/encoder_analysis_log_2026-10-20.md)。
+
 电流 PI 模型整定、阶跃/正弦采集、时域指标及闭环带宽分析见
 [电流环整定与性能评价手册](MDK-ARM/docs/current_loop_tuning_and_evaluation.md)。
 

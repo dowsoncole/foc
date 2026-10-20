@@ -14,6 +14,7 @@
 #include <string.h>
 
 #include "drv_monitor.h"
+#include "encoder.h"
 #include "stspin32g4.h"
 #include "tim6_heartbeat.h"
 #include "tim1_pwm.h"
@@ -222,6 +223,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   else if (htim->Instance == TIM1)
   {
     Tim1Pwm_DispatchPeriodElapsed();
+    Encoder_OnPwmPeriodIsr();
   }
 }
 

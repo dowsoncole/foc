@@ -25,6 +25,8 @@
 #include "tim6_heartbeat.h"
 #include "tim1_pwm.h"
 #include "adc1_current_sampling.h"
+#include "encoder.h"
+#include "spi1_encoder.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -204,12 +206,29 @@ void SysTick_Handler(void)
 /* USER CODE BEGIN 1 */
 void ADC1_2_IRQHandler(void)
 {
+  uint32_t entry_cycles = DWT->CYCCNT;
   /* Timing probe: JEOS has asserted when this vector is entered.  The HAL
      handler dispatches the injected conversion callback, which runs FOC and
      commits the new CCR values before returning. */
   GPIOA->BSRR = GPIO_PIN_0;
   HAL_ADC_IRQHandler(&hadc1);
   GPIOA->BSRR = ((uint32_t)GPIO_PIN_0 << 16U);
+  Encoder_RecordFocIsrCycles(DWT->CYCCNT - entry_cycles);
+}
+
+void DMA1_Channel1_IRQHandler(void)
+{
+  SPI1_Encoder_DmaRxIrqHandler();
+}
+
+void DMA1_Channel2_IRQHandler(void)
+{
+  SPI1_Encoder_DmaTxIrqHandler();
+}
+
+void SPI1_IRQHandler(void)
+{
+  HAL_SPI_IRQHandler(&hspi1);
 }
 
 /**

@@ -42,6 +42,46 @@ uint8_t MT6835_CalcCrc24(uint32_t data24)
   return crc;
 }
 
+void MT6835_BuildAngleReadCommand(uint8_t tx[6])
+{
+  if (tx == NULL)
+  {
+    return;
+  }
+  tx[0] = MT6835_FRAME_BYTE0(MT6835_CMD_BURST_READ_ANGLE,
+                             MT6835_REG_ANGLE_H);
+  tx[1] = MT6835_FRAME_BYTE1(MT6835_REG_ANGLE_H);
+  tx[2] = 0x00U;
+  tx[3] = 0x00U;
+  tx[4] = 0x00U;
+  tx[5] = 0x00U;
+}
+
+HAL_StatusTypeDef MT6835_DecodeAngleResponse(const uint8_t rx[6],
+                                             mt6835_angle_t *frame)
+{
+  uint32_t data24;
+
+  if ((rx == NULL) || (frame == NULL))
+  {
+    return HAL_ERROR;
+  }
+
+  data24 = ((uint32_t)rx[2] << 16) |
+           ((uint32_t)rx[3] << 8)  |
+           ((uint32_t)rx[4]);
+
+  frame->angle_raw = (data24 >> 3) & 0x1FFFFFUL;
+  frame->status.raw = (uint8_t)(rx[4] & MT6835_ANGLE_L_STATUS_MASK);
+  frame->crc = rx[5];
+  frame->crc_ok = (MT6835_CalcCrc24(data24) == rx[5]) ? 1U : 0U;
+  frame->raw[0] = rx[2];
+  frame->raw[1] = rx[3];
+  frame->raw[2] = rx[4];
+  frame->raw[3] = rx[5];
+  return HAL_OK;
+}
+
 HAL_StatusTypeDef MT6835_ReadRegister(uint16_t reg, uint8_t *value,
                                       uint32_t timeout)
 {
@@ -115,12 +155,7 @@ HAL_StatusTypeDef MT6835_ReadAngle(mt6835_angle_t *frame, uint32_t timeout)
   /* MT6835 §7.6.9 burst angle read：一个 CSN 事务内先发 16 bit 的
      1010 + 地址 0x003（即 A0 03），随后连续读出 0x003~0x006 四个字节。
      因此完整事务是 6 字节、48 个 SCK，不能拆成四个独立 CSN。 */
-  uint8_t tx[6] =
-  {
-    MT6835_FRAME_BYTE0(MT6835_CMD_BURST_READ_ANGLE, MT6835_REG_ANGLE_H),
-    MT6835_FRAME_BYTE1(MT6835_REG_ANGLE_H),
-    0x00U, 0x00U, 0x00U, 0x00U
-  };
+  uint8_t tx[6];
   uint8_t rx[6] = {0U};
 
   if (frame == NULL)
@@ -128,6 +163,7 @@ HAL_StatusTypeDef MT6835_ReadAngle(mt6835_angle_t *frame, uint32_t timeout)
     return HAL_ERROR;
   }
 
+  MT6835_BuildAngleReadCommand(tx);
   MT6835_CSN_SELECT();
   HAL_StatusTypeDef st = MT6835_SPI_TransmitReceive(tx, rx, 6U, timeout);
   MT6835_CSN_RELEASE();
@@ -137,23 +173,5 @@ HAL_StatusTypeDef MT6835_ReadAngle(mt6835_angle_t *frame, uint32_t timeout)
     return st;
   }
 
-  uint8_t reg003 = rx[2];
-  uint8_t reg004 = rx[3];
-  uint8_t reg005 = rx[4];
-  uint8_t reg006 = rx[5];
-
-  uint32_t data24 = ((uint32_t)reg003 << 16) |
-                    ((uint32_t)reg004 << 8)  |
-                    ((uint32_t)reg005);
-
-  frame->angle_raw = (data24 >> 3) & 0x1FFFFFUL;  /* ANGLE[20:0] */
-  frame->status.raw = (uint8_t)(reg005 & MT6835_ANGLE_L_STATUS_MASK);
-  frame->crc = reg006;
-  frame->crc_ok = (MT6835_CalcCrc24(data24) == reg006) ? 1U : 0U;
-  frame->raw[0] = reg003;
-  frame->raw[1] = reg004;
-  frame->raw[2] = reg005;
-  frame->raw[3] = reg006;
-
-  return HAL_OK;
+  return MT6835_DecodeAngleResponse(rx, frame);
 }

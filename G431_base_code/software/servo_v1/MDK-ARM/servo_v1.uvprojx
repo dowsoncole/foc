@@ -555,6 +555,16 @@
               <FileType>5</FileType>
               <FilePath>../Modules/Encoder/Inc/mt6835.h</FilePath>
             </File>
+            <File>
+              <FileName>encoder.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Modules/Encoder/Src/encoder.c</FilePath>
+            </File>
+            <File>
+              <FileName>encoder.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>../Modules/Encoder/Inc/encoder.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -684,16 +694,6 @@
               <FileName>waveform_uart1_port.h</FileName>
               <FileType>5</FileType>
               <FilePath>../Tests/Inc/waveform_uart1_port.h</FilePath>
-            </File>
-            <File>
-              <FileName>mt6835_verify.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Tests/Src/mt6835_verify.c</FilePath>
-            </File>
-            <File>
-              <FileName>mt6835_verify.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>../Tests/Inc/mt6835_verify.h</FilePath>
             </File>
           </Files>
         </Group>

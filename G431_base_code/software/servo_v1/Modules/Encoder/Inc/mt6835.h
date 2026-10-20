@@ -177,6 +177,12 @@ HAL_StatusTypeDef MT6835_ReadAngle(mt6835_angle_t *frame, uint32_t timeout);
   */
 uint8_t MT6835_CalcCrc24(uint32_t data24);
 
+/* 正式持续采集使用的无状态协议接口：构造固定的 6 字节 burst 命令，并把
+   DMA 收到的 6 字节响应解码为与阻塞接口相同的角度帧。 */
+void MT6835_BuildAngleReadCommand(uint8_t tx[6]);
+HAL_StatusTypeDef MT6835_DecodeAngleResponse(const uint8_t rx[6],
+                                             mt6835_angle_t *frame);
+
 #ifdef __cplusplus
 }
 #endif

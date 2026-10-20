@@ -88,6 +88,9 @@ extern "C" {
 
 extern SPI_HandleTypeDef hspi1;
 
+typedef void (*mt6835_spi_async_callback_t)(HAL_StatusTypeDef status,
+                                             void *context);
+
 /**
   * @brief  【配置线】配置 SPI1 为主机、模式 3、8 bit、软件片选，并把 PA4
   *         配成空闲为高的推挽输出。
@@ -108,6 +111,18 @@ HAL_StatusTypeDef MX_SPI1_Encoder_Init(void);
   */
 HAL_StatusTypeDef MT6835_SPI_TransmitReceive(const uint8_t *tx, uint8_t *rx,
                                              uint16_t size, uint32_t timeout);
+
+/* DMA 异步事务：函数只负责启动，CSN 在完成/错误回调后释放。回调运行在
+   DMA 中断上下文，不得阻塞。任一时刻只允许一个事务。 */
+HAL_StatusTypeDef MT6835_SPI_TransmitReceiveAsync(
+    const uint8_t *tx, uint8_t *rx, uint16_t size,
+    mt6835_spi_async_callback_t callback, void *context);
+HAL_StatusTypeDef MT6835_SPI_AbortAsync(void);
+uint8_t MT6835_SPI_IsBusy(void);
+
+/* 中断文件通过这两个入口分发 DMA IRQ，避免暴露 DMA 句柄。 */
+void SPI1_Encoder_DmaRxIrqHandler(void);
+void SPI1_Encoder_DmaTxIrqHandler(void);
 
 #ifdef __cplusplus
 }

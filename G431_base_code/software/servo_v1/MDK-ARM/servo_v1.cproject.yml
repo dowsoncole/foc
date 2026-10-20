@@ -100,6 +100,8 @@ project:
         - file: ../Modules/Three_Phase_Driver/Inc/tim1_pwm.h
     - group: Modules/Encoder
       files:
+        - file: ../Modules/Encoder/Src/encoder.c
+        - file: ../Modules/Encoder/Inc/encoder.h
         - file: ../Modules/Encoder/Src/spi1_encoder.c
         - file: ../Modules/Encoder/Inc/spi1_encoder.h
         - file: ../Modules/Encoder/Src/mt6835.c
@@ -115,8 +117,6 @@ project:
         - file: ../Tests/Inc/measurement_manager.h
         - file: ../Tests/Src/waveform_generator.c
         - file: ../Tests/Inc/waveform_generator.h
-        - file: ../Tests/Src/mt6835_verify.c
-        - file: ../Tests/Inc/mt6835_verify.h
     - group: Modules/Current Sampling
       files:
         - file: ../Modules/Current_Sampling/Src/adc1_current_sampling.c

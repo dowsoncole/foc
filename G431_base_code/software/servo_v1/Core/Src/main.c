@@ -36,9 +36,7 @@
 #include "servo_manager.h"
 #include "waveform_generator.h"
 #include "waveform_uart1_port.h"
-#include "spi1_encoder.h"
-#include "mt6835.h"
-#include "mt6835_verify.h"
+#include "encoder.h"
 
 /* USER CODE END Includes */
 
@@ -181,12 +179,24 @@ static void MainFoc_ReadFeedback(void *context, foc_input_t *input)
   }
   else if (g_global_mode_control.active_mode == FOC_CONTROL_MODE_NORMAL)
   {
+    float encoder_electrical_angle_rad;
     input->d_reference = g_global_mode_control.normal_loop.d_current_reference_a;
     input->q_reference = g_global_mode_control.normal_loop.q_current_reference_a;
-    input->electrical_angle_rad =
-        g_global_mode_control.normal_loop.electrical_angle_rad;
     input->reference_valid = g_global_mode_control.normal_loop.reference_valid;
-    input->angle_valid = g_global_mode_control.normal_loop.angle_valid;
+    if (Encoder_ReadElectricalAngleForFoc(&encoder_electrical_angle_rad) != 0U)
+    {
+      input->electrical_angle_rad = encoder_electrical_angle_rad;
+      input->angle_valid = 1U;
+      /* 保留在模式对象中作为调试遥测，不再把它当作反馈数据源。 */
+      g_global_mode_control.normal_loop.electrical_angle_rad =
+          encoder_electrical_angle_rad;
+      g_global_mode_control.normal_loop.angle_valid = 1U;
+    }
+    else
+    {
+      input->angle_valid = 0U;
+      g_global_mode_control.normal_loop.angle_valid = 0U;
+    }
   }
 }
 
@@ -814,20 +824,12 @@ int main(void)
   HAL_Delay(CURRENT_SAMPLING_MOE_GUARD_MS);
   CurrentSampling_RequestCalibration();
 
-  /* ------------------------------------------------------------------------
-   * 编码器 SPI 配置与通讯验证（Modules/Encoder + Tests）
-   * ------------------------------------------------------------------------
-   * MT6835 走 SPI1：PA4 = 软件片选、PA5 = SCK、PA6 = MISO、PA7 = MOSI，
-   * 模式 3、10.5 MHz。配置层只管外设，器件语义在 mt6835.c。
-   *
-   * 上电等待必须在任何 SPI 通讯之前：手册 T_PwrUp = 2 ms。
-   * 通讯验证测试在此启动，主循环每轮推进，非阻塞。 */
-  if (MX_SPI1_Encoder_Init() != HAL_OK)
+  /* MT6835 正式采集：TIM1 周期边界启动 SPI1 DMA，DMA 中断优先级低于
+     ADC/FOC。电角度在上层完成方向、极对数和零位配置前保持无效。 */
+  if (Encoder_Init() == 0U)
   {
     Error_Handler();
   }
-  MT6835_PowerUpWait();
-  (void)Mt6835Verify_Start();
 
   /* USER CODE END 2 */
 
@@ -950,7 +952,7 @@ int main(void)
       }
     }
     WaveformGenerator_Task();
-    (void)Mt6835Verify_Task();
+    Encoder_Service();
     /* --------------------------------------------------------------------
      * 后台任务层：无截止时间，可阻塞数十 µs
      * --------------------------------------------------------------------
