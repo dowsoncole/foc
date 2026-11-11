@@ -1,0 +1,11 @@
+DS12589 Rev 6 9/198
+STM32G431x6 STM32G431x8 STM32G431xB List of tables
+9
+Table 95. LQFP64 - Mechanical data . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 178
+Table 96. UFBGA64 - Mechanical data  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 181
+Table 97. UFBGA64 - Recommended PCB design rules (0 .5 mm pitch BGA). . . . . . . . . . . . . . . . . 182
+Table 98. LQFP80 - Mechanical data . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 184
+Table 99. LQPF100 - Mechanical data . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  187
+Table 100. Package thermal characteristics. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 190
+Table 101. Ordering information scheme . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 194
+Table 102. Document revision history  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  . . 195

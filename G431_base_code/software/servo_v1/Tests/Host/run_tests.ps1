@@ -1,4 +1,4 @@
-param([string]$VcVarsPath = '', [string]$ZigPath = '')
+param([string]$VcVarsPath = '', [string]$ZigPath = '', [string]$GccPath = '')
 $ErrorActionPreference = 'Stop'
 $firmwareRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 $testBuild = Join-Path ([System.IO.Path]::GetTempPath()) ('foc-ovm-' + [guid]::NewGuid().ToString('N'))
@@ -19,6 +19,7 @@ $testSources = @(
     (Join-Path $PSScriptRoot 'test_foc_modulation.c')
 )
 $compilerArgs = @('/nologo', '/std:c11', '/W4', '/WX', '/O2', '/utf-8',
+    ('/I' + (Join-Path $firmwareRoot 'Core/Inc')),
     ('/I' + (Join-Path $firmwareRoot 'FOC/Inc')),
     ('/I' + (Join-Path $firmwareRoot 'Servo/Inc')),
     ('/I' + (Join-Path $firmwareRoot 'Modules/Three_Phase_Driver/Inc')),
@@ -35,8 +36,18 @@ try {
             }
         }
     }
-    if ($ZigPath) {
+    if ($GccPath) {
+        $env:PATH = (Split-Path -Parent $GccPath) + ';' + $env:PATH
+        & $GccPath -std=c11 -Wall -Wextra -Werror -O2 `
+            ('-I' + (Join-Path $firmwareRoot 'Core/Inc')) `
+            ('-I' + (Join-Path $firmwareRoot 'FOC/Inc')) `
+            ('-I' + (Join-Path $firmwareRoot 'Servo/Inc')) `
+            ('-I' + (Join-Path $firmwareRoot 'Modules/Three_Phase_Driver/Inc')) `
+            ('-I' + (Join-Path $firmwareRoot 'Tests/Inc')) `
+            @testSources -o test_foc.exe -lm
+    } elseif ($ZigPath) {
         & $ZigPath cc -std=c99 -Wall -Wextra -Werror -O2 `
+            ('-I' + (Join-Path $firmwareRoot 'Core/Inc')) `
             ('-I' + (Join-Path $firmwareRoot 'FOC/Inc')) `
             ('-I' + (Join-Path $firmwareRoot 'Servo/Inc')) `
             ('-I' + (Join-Path $firmwareRoot 'Modules/Three_Phase_Driver/Inc')) `

@@ -1,0 +1,50 @@
+DS12589 Rev 6 109/198
+STM32G431x6 STM32G431x8 STM32G431xB Electrical characteristics
+160
+To complete these trials, ESD stress can be applied directly on the device, over the range of 
+specification values. When unexpected behavior is detected, the software can be hardened 
+to prevent unrecoverable errors occurring (see application note AN1015).
+Electromagnetic Interference (EMI)
+The electromagnetic field emitted by the device are monitored while a simple application is 
+executed (toggling 2 LEDs through the I/O ports). This emission test is compliant with 
+IEC 61967-2 standard which specifies the test board and the pin loading.
+          
+5.3.12 Electrical sens itivity characteristics
+Based on three different tests (ESD, LU) using specific measurement methods, the device is 
+stressed in order to determine its performance in terms of electrical sensitivity.
+Electrostatic discharge (ESD)
+Electrostatic discharges (a positive then a negative pulse separated by 1 second) are 
+applied to the pins of each sample according to each pin combination. The sample size 
+depends on the number of supply pins in the device (3 parts × (n+1) supply pins). This test 
+conforms to the ANSI/JEDEC standard.
+           
+Table 49. EMI characteristics 
+Symbol Parameter Conditions Monitored
+frequency band
+Max vs. [fHSE/fHCLK]
+Unit
+8  MHz / 170 MHz
+SEMI Peak level
+VDD = 3.6 V, TA = 25 °C, 
+LQFP100 package 
+compliant with IEC 61967-2
+0.1 MHz to 30 MHz 3
+dBµV
+30 MHz to 130 MHz -2
+130 MHz to 1 GHz 25
+1 GHz to 2 GHz 18
+EMI Level 4 -
+Table 50. ESD absolute maximum ratings
+Symbol Ratings Conditions Class Maximum 
+value(1) Unit
+VESD(HBM)
+Electrostatic discharge 
+voltage (human body model)
+TA = +25 °C, conforming to 
+ANSI/ESDA/JEDEC JS-001 2 2000 V
+VESD(CDM)
+Electrostatic discharge 
+voltage (charge device model)
+TA = +25 °C, conforming to 
+ANSI/ESDA/JEDEC JS- 002 C1 250 V
+1. Guaranteed by characterization results.

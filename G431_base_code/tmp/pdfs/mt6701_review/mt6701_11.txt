@@ -1,0 +1,53 @@
+www.magntek.com.cn | 磁技术带来美妙变革 1.8版本  2022.12
+MT6701
+基于差分霍尔的磁性角度传感器芯片
+11
+7.2 ABZ/UVW/PWM/Analog输出参考电路
+图-6:  MT6701CT(SOP-8)  ABZ/UVW/PWM/模拟/Push输出参考电路
+图-7:  MT6701QT(QFN-16) )  ABZ/UVW/PWM/模拟/Push输出参考电路
+11
+1 2 3 4
+5
+6
+7
+8
+910
+13
+12
+16
+14
+15
+V/-B W/-Z
+0.1uf A
+TVS(6V)
+Recommended 
+for Better Reliability
+U/-A NC
+NC NC NC NC
+B
+Z
+PUSH
+VDD
+Analog
+/PWM
+200KΩ
+200KΩ
+7
+1
+2
+3
+4 5
+6
+8
+B/V
+A/U0.1uf
+VDD
+TVS(6V)
+Recommended 
+for Better Reliability
+Z/W
+Analog
+/PWM
+Push
+200KΩ
+200KΩ

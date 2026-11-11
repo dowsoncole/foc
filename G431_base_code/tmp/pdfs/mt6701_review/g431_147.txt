@@ -1,0 +1,11 @@
+DS12589 Rev 6 147/198
+STM32G431x6 STM32G431x8 STM32G431xB Electrical characteristics
+160
+Figure 34. OPAMP noise density @ 25°C
+1. Guaranteed by design, unless otherwise specified.
+2. Data guaranteed on normal and high speed mode unless otherwise specified.
+3. Guaranteed by characterization results.
+4. Valid also for inverting gain configuration with external bias.
+5. R2 is the internal resistance between OPAMP output and OPAM P inverting input. R1 is the internal resistance between 
+OPAMP inverting input and ground. The PGA gain =1+R2/R1
+MSv62525V1

@@ -29,7 +29,9 @@ project:
         - C:
             - -std=c99
           C-CPP:
-            - -ffp-mode=full
+            - -flto
+            - -ffp-mode=std
+            - -fno-finite-math-only
             - -fno-rtti
             - -funsigned-char
             - -fshort-enums
@@ -54,6 +56,7 @@ project:
           ASM:
             - -masm=auto
           Link:
+            - --lto
             - --map
             - --load_addr_map_info
             - --xref
@@ -100,6 +103,18 @@ project:
         - file: ../Modules/Three_Phase_Driver/Inc/tim1_pwm.h
     - group: Modules/Encoder
       files:
+        - file: ../Modules/Encoder/Src/mpt_t485.c
+        - file: ../Modules/Encoder/Src/mpt_t485_protocol.c
+        - file: ../Servo/Src/output_position.c
+        - file: ../Servo/Src/encoder_calibration.c
+        - file: ../Servo/Src/user_control.c
+        - file: ../Modules/Encoder/Src/encoder_calibration_record.c
+        - file: ../Modules/Encoder/Src/encoder_calibration_store.c
+        - file: ../Servo/Src/output_position_math.c
+        - file: ../Modules/Encoder/Src/mt6701_ssi.c
+        - file: ../Modules/Encoder/Inc/mt6701_ssi.h
+        - file: ../Modules/Encoder/Src/spi3_encoder.c
+        - file: ../Modules/Encoder/Inc/spi3_encoder.h
         - file: ../Modules/Encoder/Src/encoder.c
         - file: ../Modules/Encoder/Inc/encoder.h
         - file: ../Modules/Encoder/Src/spi1_encoder.c
@@ -108,6 +123,8 @@ project:
         - file: ../Modules/Encoder/Inc/mt6835.h
     - group: Tests
       files:
+        - file: ../Tests/Src/mt6701_spi3_test.c
+        - file: ../Tests/Inc/mt6701_spi3_test.h
         - file: ../Tests/Src/current_loop_test.c
         - file: ../Tests/Inc/current_loop_test.h
         - file: ../Tests/Src/waveform_uart1_port.c
@@ -141,6 +158,8 @@ project:
       files:
         - file: ../Servo/Inc/servo_manager.h
         - file: ../Servo/Src/servo_manager.c
+        - file: ../Servo/Inc/speed_commission.h
+        - file: ../Servo/Src/speed_commission.c
     - group: Drivers/STM32G4xx_HAL_Driver
       files:
         - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_pwr_ex.c

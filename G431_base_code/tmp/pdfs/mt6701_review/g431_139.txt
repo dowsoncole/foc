@@ -1,0 +1,16 @@
+DS12589 Rev 6 139/198
+STM32G431x6 STM32G431x8 STM32G431xB Electrical characteristics
+160
+          
+Table 71. DAC 15MSPS accuracy(1) 
+Symbol Parameter Conditions Min Typ Max Unit
+DNL Differential non linearity (2) -- 2 - 2
+LSB
+INL Integral non linearity (3) CL ≤ 50 pF, no RL -5 - 5
+TUE Total unadjusted error CL ≤ 50 pF, no RL -5 - 5
+DCS Dynamic code spike Spike amplitude on DAC voltage when 
+DAC output value is decreasing -04
+1. Guaranteed by design.
+2. Difference between two c onsecutive codes - 1 LSB.
+3. Difference between measured value at code i and the value at code i on a line drawn between code 0 and last code 4095. 
+Offset error is included.

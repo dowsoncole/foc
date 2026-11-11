@@ -1,0 +1,36 @@
+Package information STM32G431x6 STM32G431x8 STM32G431xB
+164/198 DS12589 Rev 6
+6.2 LQFP32 package information
+This LQFP32 is a 32-pin, 7 x 7 mm low-profile quad flat package.
+Figure 43. LQFP32 - Outline
+1. Drawing is not to scale.
+D
+D1
+D3
+E3
+E1
+E
+1 8
+9
+16
+1724
+25
+32
+A1
+L1
+L
+K
+A1
+A2
+A
+c
+b
+GAUGE PLANE
+0.25 mm
+SEATING
+PLANE
+C
+PIN 1
+IDENTIFICATION
+ccc C
+5V_ME_V2e

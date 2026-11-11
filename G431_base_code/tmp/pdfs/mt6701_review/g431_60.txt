@@ -1,0 +1,69 @@
+Pinouts and pin description STM32G431x6 STM32G431x8 STM32G431xB
+60/198 DS12589 Rev 6
+- - 47 46 B6 62 A2 78 96 PB9 I/O FT_f -
+TIM17_CH1, 
+TIM4_CH4,
+SAI1_D2, I2C1_SDA, 
+IR_OUT, USART3_TX, 
+COMP2_OUT, 
+FDCAN1_TX, 
+TIM8_CH3, 
+TIM1_CH3N, 
+SAI1_FS_A, 
+EVENTOUT
+-
+--- - - -- - 97 PE0 I/O FT -
+TIM4_ETR, 
+TIM16_CH1, 
+USART1_TX, 
+EVENTOUT
+-
+--- - - -- - 98 PE1 I/O FT -
+TIM17_CH1, 
+USART1_RX, 
+EVENTOUT
+-
+32 32 - 47 A6 63 B2 79 99 VSS S - - - -
+1 1 48 48 A7 64 A1 80 100 VDD S - - - -
+1. Function availability depends on the chosen device.
+2.  PC13, PC14 and PC15 are supplied through the power switch. Si nce the switch only sinks a limited amount of current (3 
+mA), the use of GPIOs PC13 to PC15 in output mode is limited: 
+- The speed should not exceed 2 MHz with a maximum load of 30 pF  
+- These GPIOs must not be used as current sources (for instance to drive an LED).
+3. After a Backup domain power-up, PC13, PC14 and PC15 oper ate as GPIOs. Their function then depends on the content of 
+the RTC registers which are not reset by the system reset. For details on how to manage these GPIOs, refer to the Backup 
+domain and RTC register descriptions in the reference manual RM0440 "STM32G4 Series advanced Arm®-based 32-bit 
+MCUs".
+4. PG10-NRST pin is FT tolerant if it is configured as PG10 GPIO  by option bytes except for the startup time until option bytes 
+are loaded.
+5. After reset, these pins are configur ed as JTAG/SW debug alternate functions, and the internal pull-up on PA15, PA13, PB4 
+pins and the internal pull-down on PA14 pin are activated.
+6. After reset, a pull-down resistor (Rd = 5.1k Ω from UCPD peripheral) can be activated on PB6, PB4 (UCPD1_CC1, 
+UCPD1_CC2). The pull-down on PB6 (UCPD1_CC1) is activated by high level on PA9 (UCPD1_DBCC1). The pull-down on 
+PB4 (UCPD1_CC2) is activated by high level on PA10 (UCPD1_DBCC2). This pull-down control (dead battery support on 
+UCPD peripheral) can be disabled by setting bit UCPD1_DBDIS=1 in the PWR_CR3 register. PB4, PB6 have UCPD_CC 
+functionality  which implements an internal pull-down resistor (5.1kΩ) which is controlled by the voltage on the 
+UCPD_DBCC pin (PA10, PA9). A high level on the UCPD_DBCC pin activates the pull-down on the UCPD_CC pin. The 
+pull-down effect on the CC lines can be removed by using the bit UCPD1_DBDIS =1 (USB Type-C and power delivery dead 
+battery disable) in the PWR_CR3 register.
+7. It is recommended to set PB8 in another mode than analog mode after startup to limit consumption if the pin is left 
+unconnected.
+Table 12. STM32G431x6/x8/xB pin definition(1) (continued)
+Pin Number
+Pin name 
+(function 
+after reset)
+Pin type
+I/O structure
+Notes
+Alternate function Additional 
+functions
+UFQFPN32
+LQFP32
+UFQFPN48
+LQFP48
+WLCSP49
+LQFP64
+UFBGA64
+LQFP80
+LQFP100

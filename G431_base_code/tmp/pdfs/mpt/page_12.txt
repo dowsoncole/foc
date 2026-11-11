@@ -1,0 +1,23 @@
+11
+Timing parameters:
+Parameters Symbol Min. Typ. Max.. Clock period 𝐶 400 ns - 14 μs Clock frequency f 120 kHz - 2.5 MHz
+(1) ACK length  - 5 bits - Transmit timeout  - 10 μs - Pause duration  20 μs - - After the transfer is complete, when the  transfer time is over, the SLO line goes high and the MA signal
+must remain high until the next read is allowed, i.e. after  time. 𝐶 must be less than , and the read can
+be terminated by making the time exceed  while any read operation is in progress. After transmission is completed and the timeout period  expires, the SLO line returns high. The MA
+signal must remain high until the next read operation is allowed, i.e., after the pause time . tCL must be
+shorter than . During any read operation, if the interval exceeds , the transmission will be terminated. Data format:
+Bit b(23 + X) : b(8 + X) b(7 + X) : b8 b7 b6 b5 : b0
+Length 16 bits X bits 1bit 1bit 6 bits
+Data Multi-turn Count
+(1) Angular position
+data
+Error bit
+(2) Warning bit
+(3) CRC
+(4) (1) Multi-turn count is only available in standard multi-turn, battery multi-turn, and flash multi-turn versions. (2) The error bit is active low and may only become low in battery-backed multi-turn versions. When the bit is high, all
+battery-related status bits are normal and the multi-turn data is valid. When the bit is low, the battery low-voltage or battery disconnection status bit has been triggered. Refer to the Status Bits section for corrective actions. (3) The warning bit is active low. When the bit is high, no error or warning condition is present. When the bit is low, at
+least one error or warning condition has been triggered. (4) The CRC polynomial is x6 + x1 + 1 (i.e. 0x43), According to the BISS-C protocol, the calculated CRC is inverted
+before transmission. The appendix “CRC-6 Calculation” provides directly portable reference code. For detailed descriptions of the error and warning bits, refer to the Status Bits section.
+BIS
+-
+C

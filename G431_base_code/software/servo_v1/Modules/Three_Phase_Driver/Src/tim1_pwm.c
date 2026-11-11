@@ -5,7 +5,7 @@
   * @brief   TIM1 三相互补 PWM 的初始化与占空比控制。
   *
   *          配置摘要
-  *            计数器    ：中央对齐模式 1，ARR = 4199，RCR = 1
+  *            计数器    ：中央对齐模式 1，ARR = 4200，RCR = 1
   *                        -> 168 MHz / (2 x 4200) = 20 kHz 载波，
   *                           每个载波周期恰好产生一次更新事件
   *            通道 1..3 ：PWM 模式 1，主输出（INH）+ 互补输出（INL），
@@ -32,6 +32,7 @@
 
 #include "tim1_pwm.h"
 #include "pwm_sampling.h"
+#include "encoder.h"
 #include "stm32g4xx_ll_tim.h"
 
 #include <float.h>
@@ -77,6 +78,9 @@ static uint32_t s_previous_sample_sequence;
 static tim1_pwm_period_callback_t volatile s_period_callback;
 static void * volatile s_period_context;
 volatile tim1_pwm_sampling_status_t g_tim1_pwm_sampling;
+volatile pwm_commit_fault_t g_tim1_pwm_commit_fault;
+volatile pwm_commit_timing_t g_tim1_pwm_commit_timing;
+volatile uint32_t g_tim1_pwm_adc_entry_cycle;
 
 /* USER CODE END 0 */
 
@@ -150,7 +154,7 @@ static uint32_t Tim1Pwm_FloatDutyCompare(float duty)
 {
   uint32_t compare = (uint32_t)(duty * (float)TIM1_PWM_COMPARE_FULL_SCALE + 0.5f);
 
-  /* duty=1 显式允许 CCR=ARR+1，表示静态高侧；只有具有合适采样和
+  /* duty=1 映射到 CCR=ARR；只有具有合适采样和
      栅极供电条件的调用方才可请求。正常 FOC 使用板级采样上限。 */
   if (compare > TIM1_PWM_COMPARE_FULL_SCALE) compare = TIM1_PWM_COMPARE_FULL_SCALE;
   return compare;
@@ -166,10 +170,49 @@ static uint32_t Tim1Pwm_CyclePosition(void)
   return (final_direction != 0U) ? 2U * TIM1_PWM_COUNTER_PERIOD - count : count;
 }
 
+/* Only called on a rejected deadline, with interrupts masked. Remove output
+   before collecting evidence; no added normal-path register polling or retry. */
+static void Tim1Pwm_CaptureCommitFault(uint32_t reason, uint32_t entry_cycle,
+                                     uint32_t before, uint32_t after,
+                                     uint32_t guard, const uint32_t compare[3],
+                                     uint32_t trigger)
+{
+  uint32_t cycle = DWT->CYCCNT;
+  uint32_t bdtr = TIM1->BDTR;
+  __HAL_TIM_MOE_DISABLE_UNCONDITIONALLY(&htim1);
+  /* Background Stop may attempt a harmless OFF write at any carrier phase.
+     Preserve the first real ADC-context rejection, not that cleanup write. */
+  if (__get_IPSR() != (uint32_t)ADC1_2_IRQn + 16U ||
+      g_tim1_pwm_commit_fault.count != 0U) return;
+  pwm_commit_fault_t event = {0};
+  event.reason = reason;
+  event.cycle = cycle;
+  event.adc_entry_cycle = g_tim1_pwm_adc_entry_cycle;
+  event.write_entry_cycle = entry_cycle;
+  event.exception = __get_IPSR();
+  event.position_before = before;
+  event.position_after = after;
+  event.guard_ticks = guard;
+  event.cr1 = TIM1->CR1;
+  event.cnt = TIM1->CNT;
+  event.arr = TIM1->ARR;
+  event.bdtr = bdtr;
+  event.observed_ccr[0] = TIM1->CCR1;
+  event.observed_ccr[1] = TIM1->CCR2;
+  event.observed_ccr[2] = TIM1->CCR3;
+  event.observed_ccr[3] = TIM1->CCR4;
+  event.requested_ccr[0] = compare[0];
+  event.requested_ccr[1] = compare[1];
+  event.requested_ccr[2] = compare[2];
+  event.requested_ccr[3] = trigger;
+  PwmCommit_FreezeFirst(&g_tim1_pwm_commit_fault, &event);
+}
+
 HAL_StatusTypeDef Tim1Pwm_SetPhaseVoltage(float phase_a_duty,
                                           float phase_b_duty,
                                           float phase_c_duty)
 {
+  uint32_t write_entry_cycle = DWT->CYCCNT;
   uint32_t compare[3], interrupt_mask, before, after, commit_guard;
   pwm_sampling_plan_t plan;
   if (!isfinite(phase_a_duty) || !isfinite(phase_b_duty) ||
@@ -202,6 +245,10 @@ HAL_StatusTypeDef Tim1Pwm_SetPhaseVoltage(float phase_a_duty,
   if (((TIM1->CR1 & TIM_CR1_UDIS) != 0U) ||
       ((2U * TIM1_PWM_COUNTER_PERIOD - before) <= commit_guard))
   {
+    uint32_t reason = (TIM1->CR1 & TIM_CR1_UDIS) != 0U ?
+        PWM_COMMIT_FAULT_UDIS : PWM_COMMIT_FAULT_BEFORE_GUARD;
+    Tim1Pwm_CaptureCommitFault(reason, write_entry_cycle, before,
+        PWM_COMMIT_POSITION_UNREAD, commit_guard, compare, plan.trigger);
     g_tim1_pwm_sampling.deadline_rejections++;
     if (interrupt_mask == 0U) __enable_irq();
     return HAL_ERROR;
@@ -216,12 +263,20 @@ HAL_StatusTypeDef Tim1Pwm_SetPhaseVoltage(float phase_a_duty,
   if ((after < before) ||
       ((2U * TIM1_PWM_COUNTER_PERIOD - after) <= commit_guard))
   {
-    __HAL_TIM_MOE_DISABLE_UNCONDITIONALLY(&htim1);
+    Tim1Pwm_CaptureCommitFault(after < before ? PWM_COMMIT_FAULT_WRAPPED :
+        PWM_COMMIT_FAULT_AFTER_GUARD, write_entry_cycle, before, after,
+        commit_guard, compare, plan.trigger);
     g_tim1_pwm_sampling.deadline_rejections++;
     if (interrupt_mask == 0U) __enable_irq();
     return HAL_ERROR;
   }
   if (interrupt_mask == 0U) __enable_irq();
+  /* Record AFTER the critical commit. Keep the guard and all rejections
+     unchanged, and never count the foreground Stop/cleanup as control work. */
+  if (__get_IPSR() == (uint32_t)ADC1_2_IRQn + 16U)
+    PwmCommit_RecordSuccess(&g_tim1_pwm_commit_timing,
+        2U * TIM1_PWM_COUNTER_PERIOD - after,
+        DWT->CYCCNT - g_tim1_pwm_adc_entry_cycle);
   s_phase_duty[0] = (uint16_t)(phase_a_duty * (float)TIM1_PWM_DUTY_SCALE + 0.5f);
   s_phase_duty[1] = (uint16_t)(phase_b_duty * (float)TIM1_PWM_DUTY_SCALE + 0.5f);
   s_phase_duty[2] = (uint16_t)(phase_c_duty * (float)TIM1_PWM_DUTY_SCALE + 0.5f);
@@ -239,6 +294,8 @@ static pwm_sampling_parameters_t Tim1Pwm_SamplingParameters(uint32_t sequence_ns
   parameters.sequence_ticks = Tim1Pwm_NsToCounts(sequence_ns) + 1U;
   parameters.guard_ticks = Tim1Pwm_NsToCounts(TIM1_PWM_DEADTIME_NS +
                                               TIM1_PWM_CURRENT_SETTLE_NS) + 1U;
+  parameters.preferred_lead_ticks =
+      Tim1Pwm_NsToCounts(TIM1_PWM_ADC_CONTROL_HEADROOM_NS);
   return parameters;
 }
 
@@ -557,6 +614,19 @@ void Tim1Pwm_SetNeutral(void)
   }
 }
 
+/* Serialize release with the first encoder fault ISR. A fault immediately
+   after release clears MOE; a prior fault prevents it being enabled again. */
+static void Tim1Pwm_ReleaseMainOutput(void)
+{
+  uint32_t mask = __get_PRIMASK();
+  __disable_irq();
+  if (Encoder_PowerOutputPermitted())
+    __HAL_TIM_MOE_ENABLE(&htim1);
+  else
+    __HAL_TIM_MOE_DISABLE_UNCONDITIONALLY(&htim1);
+  if (!mask) __enable_irq();
+}
+
 void Tim1Pwm_EnableCalibrationLowSide(void)
 {
   uint32_t phase;
@@ -565,7 +635,7 @@ void Tim1Pwm_EnableCalibrationLowSide(void)
      duty=0。复位/驱动器唤醒阶段如果同时改变 MOE 和 CCR，输出级可能在
      输入滤波和自举电容尚未稳定时产生一个非对称脉冲，表现为复位电流尖峰。 */
   Tim1Pwm_SetNeutral();
-  __HAL_TIM_MOE_ENABLE(&htim1);
+  Tim1Pwm_ReleaseMainOutput();
   HAL_Delay(TIM1_PWM_MOE_SETTLE_MS);
 
   /* 只有 MOE 稳定后才切到下管校准：duty=0 对应高侧关闭、互补低侧导通，
@@ -582,7 +652,7 @@ void Tim1Pwm_BootstrapPrecharge(void)
   uint32_t phase;
 
   /* Program the low-side vector while the bridge is still disabled.  CCR1..3
-     are preloaded, so wait for at least one 20 kHz update before releasing
+     are preloaded, so wait for at least one carrier update before releasing
      MOE; otherwise the old neutral vector could become the first live pulse. */
   Tim1Pwm_EmergencyStop();
   for (phase = 0U; phase < 3U; phase++)
@@ -592,7 +662,7 @@ void Tim1Pwm_BootstrapPrecharge(void)
   }
   HAL_Delay(1U);
 
-  __HAL_TIM_MOE_ENABLE(&htim1);
+  Tim1Pwm_ReleaseMainOutput();
   HAL_Delay(TIM1_PWM_MOE_SETTLE_MS);
 
   /* Return to a zero-voltage switching vector before the first FOC update.
@@ -607,7 +677,7 @@ void Tim1Pwm_BootstrapPrecharge(void)
   */
 void Tim1Pwm_EnableOutputs(void)
 {
-  __HAL_TIM_MOE_ENABLE(&htim1);
+  Tim1Pwm_ReleaseMainOutput();
 }
 
 /**

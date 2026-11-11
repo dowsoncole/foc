@@ -1,0 +1,50 @@
+DS12589 Rev 6 159/198
+STM32G431x6 STM32G431x8 STM32G431xB Electrical characteristics
+160
+USB characteristics
+The device USB interface is fully compliant with the USB specification version 2.0 and is 
+USB-IF certified (for Full-speed device operation).
+          
+USART interface characteristics
+Unless otherwise specified, the parameters given in Table 87 for USART are derived from 
+tests performed under the ambient temperature, fPCLKx frequency and VDD supply voltage 
+conditions summarized in Table 87, with the following configuration:
+• Output speed is set to OSPEEDRy[1:0] = 10
+• Capacitive load C=30 pF
+• Measurement points are done at CMOS levels: 0.5 VDD
+Refer to Section 5.3.14: I/O port characteristics for more details on the input/output alternate 
+function characteristics (NSS, CK, TX, RX for USART).
+          
+Table 86. USB electrical characteristics(1) 
+Symbol Parameter Conditions Min Typ Max Unit
+VDD USB transceiver operating voltage 3.0 (2) -3 . 6 V
+tCrystal_less USB crystal less operation temperature -15 - 85 °C
+RPUI Embedded USB_DP pull-up value during idle 900 1250 1500
+Ω
+RPUR Embedded USB_PD pull-up value during reception 1400 2300 3200
+ZsDRV
+(3) Output driver impedance(4) Driving high and low 28 36 44 Ω
+1. TA = -40 to 125 °C unless otherwise specified.
+2. The device USB functionality is ensured down to 2.7 V but not th e full USB electrical characteristics, which are degraded in 
+the 2.7-to-3.0 V voltage range.
+3. Guarantee by design. 
+4. No external termination series resistors are required on USB_PD (D+) and USB_DM (D-); the matching impedance is 
+already included in the embedded driver.
+Table 87. USART electrical characteristics(1) 
+Symbol Parameter Conditions Min Typ Max Unit
+fCK USART clock frequency
+Master mode - - 21
+MHz
+Slave mode - - 22
+tsu(NSS) NSS setup time Slave mode t ker + 2 - -
+ns
+th(NSS) NSS hold time Slave mode 2 - -
+tw(CKH)
+tw(CKL) CK high and low time Master mode 1/f ck/2-1 1/f ck/2 1/f ck/2+1 ns
+tsu(RX) Data inpu t setup time
+Master mode t ker + 2 - -
+ns
+Slave mode 2 - -
+th(RX) Data input hold time
+Master mode 1 - -
+Slave mode 0.5 - -

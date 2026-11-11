@@ -14,7 +14,6 @@
 #include <string.h>
 
 #include "drv_monitor.h"
-#include "encoder.h"
 #include "stspin32g4.h"
 #include "tim6_heartbeat.h"
 #include "tim1_pwm.h"
@@ -222,8 +221,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   }
   else if (htim->Instance == TIM1)
   {
+    /* Encoder DMA is already started directly by TIM1_UP_TIM16_IRQHandler.
+       Dispatch application work only; do not trigger a second SPI slot. */
     Tim1Pwm_DispatchPeriodElapsed();
-    Encoder_OnPwmPeriodIsr();
   }
 }
 

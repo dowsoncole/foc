@@ -1,0 +1,46 @@
+Electrical characteristics STM32G431x6 STM32G431x8 STM32G431xB
+70/198 DS12589 Rev 6
+          
+          
+2. V IN maximum must always be respected. Refer to Table 15: Current characteristics for the maximum 
+allowed injected current values.
+3. This formula has to be applied only on the power suppl ies related to the IO structure described in the pin 
+definition table.
+4. To sustain a voltage higher than 4 V the intern al pull-up/pull-down resistors must be disabled.
+5. Include VREF- pin.
+Table 15. Current characteristics 
+Symbol Ratings Max Unit
+∑IVDD Total current into sum of all VDD power lines (source)(1)
+1. All main power (V DD, VDDA, VBAT) and ground (VSS, VSSA) pins must always be connected to the external 
+power supplies, in the permitted range.
+150
+mA
+∑IVSS Total current out of sum of all VSS ground lines (sink)(1) 150
+IVDD(PIN) Maximum current into each VDD power pin (source)(1) 100
+IVSS(PIN) Maximum current out of each VSS ground pin (sink)(1) 100
+IIO(PIN)
+Output current sunk by any I/O and control pin except FT_f 20
+Output current sunk by any FT_f pin 20
+Output current sourced by any I/O and control pin 20
+∑IIO(PIN)
+Total output current sunk by sum of all I/Os and control pins(2)
+2. This current consumption must be correctly distri buted over all I/Os and control pins. The total output 
+current must not be sunk/sourced between two consecutive power supply pins referring to high pin count 
+LQFP packages.
+100
+Total output current sourced by sum of all I/Os and control pins(2) 100
+IINJ(PIN)
+(3)
+3. Positive injection (when V IN > VDD) is not possible on these I/Os and does not occur for input voltages 
+lower than the specified maximum value.
+Injected current on FT_xxx, TT_xx, NRST pins -5/0 (4)
+4. A negative injection is induced by VIN < VSS. IIN J(PIN) must never be exceeded. Refer also to Table 14: 
+Voltage characteristics for the minimum allowed input voltage values. 
+∑|IINJ(PIN)| Total injected current (sum of all I/Os and control pins) (5)
+5. When several inputs are submitted to a current injection, the maximum ∑|IINJ(PIN)| is the absolute sum of 
+the negative injected currents (instantaneous values).
+±25
+Table 16. Thermal characteristics 
+Symbol Ratings  Value Unit
+TSTG Storage temperature range –65 to +150 °C
+TJ Maximum junction temperature 150 °C

@@ -1,0 +1,2 @@
+MPT Magnetic Encoder Datasheet
+v0.6

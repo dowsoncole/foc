@@ -1,0 +1,40 @@
+Electrical characteristics STM32G431x6 STM32G431x8 STM32G431xB
+150/198 DS12589 Rev 6
+          
+          
+5.3.26 Communication interfaces characteristics
+I2C interface characteristics
+The I2C interface meets the timings requirements of the I2C-bus specification and user 
+manual rev. 03 for: 
+• Standard-mode (Sm): with a bit rate up to 100 kbit/s 
+• Fast-mode (Fm): with a bit rate up to 400 kbit/s 
+• Fast-mode Plus (Fm+): with a bit rate up to 1 Mbit/s. 
+The I2C timings requirements are guaranteed by design when the I2C peripheral is properly 
+configured (refer to reference manual RM0440 "STM32G4 Series advanced Arm®-based 
+32-bit MCUs") and when the I2CCLK frequency is greater than the minimum shown in the 
+table below.
+Table 79. IWDG min/max timeout period at 32 kHz (LSI)
+(1)(2) 
+1. Guaranteed by design.
+2. The exact timings still depend on the phasing of the APB in terface clock versus the LSI clock so that there 
+is always a full RC period of uncertainty.
+Prescaler divider PR[2:0] bits Min timeout RL[11:0]= 
+0x000
+Max timeout RL[11:0]= 
+0xFFF Unit
+/4 0 0.125 512
+ms
+/8 1 0.250 1024
+/16 2 0.500 2048
+/32 3 1.0 4096
+/64 4 2.0 8192
+/128 5 4.0 16384
+/256 6 or 7 8.0 32768
+Table 80. WWDG min/max timeout value at 170 MHz (PCLK)(1) 
+1. Guaranteed by design.
+Prescaler WDGTB Min timeout value Max timeout value Unit
+1 0 0.0241 1.542
+ms
+2 1 0.0482 3.084
+4 2 0.0964 6.168
+8 3 0.1928 12.336

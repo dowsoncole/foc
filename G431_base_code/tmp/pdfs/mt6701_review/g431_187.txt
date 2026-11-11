@@ -1,0 +1,54 @@
+DS12589 Rev 6 187/198
+STM32G431x6 STM32G431x8 STM32G431xB Package information
+193
+6.9 LQFP100 pac kage information
+This LQFP is a 100-pin, 14 x 14 mm low-profile quad flat package.
+Figure 64. LQFP100 - Outline
+1. Drawing is not to scale.
+          
+Table 99. LQPF100 - Mechanical data 
+Symbol
+millimeters inches (1)
+Min Typ Max Min Typ Max
+A - - 1.600 - - 0.0630
+A1 0.050 - 0.150 0.0020 - 0.0059
+A2 1.350 1.400 1.450 0.0531 0.0551 0.0571
+b 0.170 0.220 0.270 0.0067 0.0087 0.0106
+c 0.090 - 0.200 0.0035 - 0.0079
+D 15.800 16.000 16.200 0. 6220 0.6299 0.6378
+D1 13.800 14.000 14.200 0. 5433 0.5512 0.5591
+D3 - 12.000 - - 0.4724 -
+E 15.800 16.000 16.200 0. 6220 0.6299 0.6378
+E1 13.800 14.000 14.200 0. 5433 0.5512 0.5591
+E3 - 12.000 - - 0.4724 -
+e - 0.500 - - 0.0197 -
+L 0.450 0.600 0.750 0.0177 0.0236 0.0295
+L1 - 1.000 - - 0.0394 -
+eIDENTIFICATION
+PIN 1
+GAUGE PLANE
+0.25 mm
+SEATING PLANE
+D
+D1
+D3
+E3
+E1
+E
+K
+ccc C
+C
+1 25
+26100
+76
+75 51
+50
+1L_LQFP100_ME_V1
+A2
+A
+A1
+L1
+L
+c
+b
+A1

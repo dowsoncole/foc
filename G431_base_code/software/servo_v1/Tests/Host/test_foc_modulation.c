@@ -289,6 +289,67 @@ static void test_foc_and_faults(void)
   CHECK(algorithm.parameters.q_controller.integral == -0.01f);
 }
 
+/* 用一个对称 RL 电机的 dq 数值模型验证闭环符号和旋转坐标变换。
+   这不是硬件模型；它保护的是 ref-current -> PI -> voltage 的负反馈关系，
+   以及虚拟电角度变化时 Clarke/Park 仍能保持 Id 跟随、Iq 接近零。 */
+static void test_rotating_dq_current_closed_loop(void)
+{
+  foc_parameters_t p = parameters();
+  foc_algorithm_t algorithm;
+  foc_input_t input;
+  float d_current = 0.0f;
+  float q_current = 0.0f;
+  float angle = 0.0f;
+  const float period_s = 0.00005f;
+  const float resistance_ohm = 1.0f;
+  const float inductance_h = 0.005f;
+  const float frequency_hz = 2.0f;
+  int i;
+
+  p.sample_period_s = period_s;
+  p.pwm_period_s = period_s;
+  p.voltage_limit = 0.2f;
+  p.current_limit = 0.5f;
+  p.d_controller.kp = 0.05f;
+  p.d_controller.ki = 2.0f;
+  p.d_controller.integral_min = -0.2f;
+  p.d_controller.integral_max = 0.2f;
+  p.q_controller = p.d_controller;
+  FOC_AlgorithmInit(&algorithm, &p);
+  memset(&input, 0, sizeof(input));
+  input.current_valid = 1U;
+  input.angle_valid = 1U;
+  input.reference_valid = 1U;
+  input.d_reference = 0.1f;
+  input.q_reference = 0.0f;
+
+  for (i = 0; i < 60000; ++i)
+  {
+    float sin_angle = sinf(angle);
+    float cos_angle = cosf(angle);
+    float alpha = d_current * cos_angle - q_current * sin_angle;
+    float beta = d_current * sin_angle + q_current * cos_angle;
+    input.phase_a = alpha;
+    input.phase_b = -0.5f * alpha + 0.8660254038f * beta;
+    input.electrical_angle_rad = angle;
+    FOC_AlgorithmStep(&algorithm, &input);
+    CHECK(algorithm.output.valid != 0U);
+    d_current += period_s *
+        (algorithm.output.fundamental_d_voltage -
+         resistance_ohm * d_current) / inductance_h;
+    q_current += period_s *
+        (algorithm.output.fundamental_q_voltage -
+         resistance_ohm * q_current) / inductance_h;
+    angle += (float)(2.0 * PI) * frequency_hz * period_s;
+    if (angle >= (float)(2.0 * PI)) angle -= (float)(2.0 * PI);
+  }
+
+  CHECK(fabs(d_current - input.d_reference) < 0.002f);
+  CHECK(fabs(q_current - input.q_reference) < 0.002f);
+  CHECK(fabs(algorithm.output.d_current - input.d_reference) < 0.002f);
+  CHECK(fabs(algorithm.output.q_current - input.q_reference) < 0.002f);
+}
+
 static void test_servo_fault_mapping(void)
 {
   foc_parameters_t p = parameters();
@@ -311,14 +372,226 @@ static void test_servo_fault_mapping(void)
   CHECK(ServoManager_GetLatchedFaults(&manager) == SERVO_FAULT_NONE);
 }
 
+static void test_fixed_angle_d_voltage_commissioning(void)
+{
+  foc_parameters_t p = parameters();
+  foc_algorithm_t algorithm;
+  float angle = 0.73f;
+  float expected_d = 0.31f;
+  float expected_q = -0.07f;
+  float alpha = expected_d * cosf(angle) - expected_q * sinf(angle);
+  float beta = expected_d * sinf(angle) + expected_q * cosf(angle);
+  float phase_a = alpha;
+  float phase_b = -0.5f * alpha + 0.8660254038f * beta;
+  float measured_d;
+  float measured_q;
+
+  p.voltage_limit = 0.02f;
+  p.modulation.mode = FOC_MODULATION_LINEAR_ONLY;
+  FOC_AlgorithmInit(&algorithm, &p);
+  CHECK(FOC_AlgorithmVoltageCommandStep(&algorithm, 0.20f, 0.0f,
+          24.0f, angle) != 0U);
+  CHECK(fabsf(algorithm.output.d_voltage - (0.20f / 24.0f)) < 1.0e-6f);
+  CHECK(fabsf(algorithm.output.q_voltage) < 1.0e-6f);
+  CHECK(FOC_TransformCurrentDQ(phase_a, phase_b, angle,
+          &measured_d, &measured_q) != 0U);
+  CHECK(fabsf(measured_d - expected_d) < 1.0e-6f);
+  CHECK(fabsf(measured_q - expected_q) < 1.0e-6f);
+}
+
+static void test_single_pass_antiwindup(void)
+{
+  foc_parameters_t p = parameters();
+  foc_algorithm_t a;
+  foc_input_t in = {0};
+  p.voltage_limit=.50f;
+  p.modulation.duty_min=.0202381f;
+  p.modulation.duty_max=.86404765f;
+  p.q_controller.kp=0.0f;
+  p.q_controller.ki=20.0f;
+  in.current_valid=in.angle_valid=in.reference_valid=1;
+  in.q_reference=1.0f;
+  FOC_AlgorithmInit(&a,&p);
+  a.parameters.q_controller.integral=.4995f;
+  for (unsigned i=0;i<1000;++i)
+  {
+    FOC_AlgorithmStep(&a,&in);
+    CHECK(a.output.valid && a.output.saturated);
+    CHECK(fabsf(a.parameters.q_controller.integral-.4995f)<1e-7f);
+    CHECK(fabsf(a.output.q_pi_command-.5005f)<1e-6f);
+    CHECK(fabsf(a.output.fundamental_q_voltage-.50f)<1e-6f);
+    CHECK(a.output.phase_a_duty>=p.modulation.duty_min && a.output.phase_a_duty<=p.modulation.duty_max);
+    CHECK(a.output.phase_b_duty>=p.modulation.duty_min && a.output.phase_b_duty<=p.modulation.duty_max);
+    CHECK(a.output.phase_c_duty>=p.modulation.duty_min && a.output.phase_c_duty<=p.modulation.duty_max);
+  }
+  in.q_reference=-1.0f;
+  FOC_AlgorithmStep(&a,&in);
+  CHECK(a.parameters.q_controller.integral<.4995f);
+  puts("PASS: single-pass saturated output stays bounded, outward integral frozen, inward recovery retained.");
+}
+
+static void test_linear_radial_saturation(void)
+{
+  const float limits[] = {0.0f, 0.02f, 0.30f, 0.9f};
+  const float magnitudes[] = {0.0f, 0.019999f, 0.020001f, 0.299999f, 0.300001f, 0.50f, 1.0f};
+  foc_modulation_parameters_t p = {FOC_MODULATION_LINEAR_ONLY, 0.0202381f, 0.86404765f};
+  for (unsigned l=0; l<sizeof(limits)/sizeof(limits[0]); ++l)
+  for (unsigned m=0; m<sizeof(magnitudes)/sizeof(magnitudes[0]); ++m)
+  for (unsigned i=0; i<720; ++i)
+  {
+    float angle = (float)i * (2.0f * (float)PI / 720.0f);
+    float alpha = magnitudes[m] * cosf(angle), beta = magnitudes[m] * sinf(angle);
+    float magnitude = sqrtf(alpha*alpha+beta*beta);
+    float limit = fminf(limits[l], (p.duty_max-p.duty_min)*FOC_MODULATION_LINEAR_MAX);
+    float gain = magnitude>limit ? limit/magnitude : 1.0f;
+    float a=alpha*gain, b=(-.5f*alpha+.8660254038f*beta)*gain;
+    float c=(-.5f*alpha-.8660254038f*beta)*gain;
+    float zero=-.5f*(fmaxf(a,fmaxf(b,c))+fminf(a,fminf(b,c)));
+    float midpoint=.5f*(p.duty_min+p.duty_max);
+    foc_modulation_output_t o;
+    CHECK(FOC_ModulationCompute(&p, limits[l], alpha, beta, &o));
+    CHECK(fabsf(o.phase_a_duty-(midpoint+a+zero))<2e-6f);
+    CHECK(fabsf(o.phase_b_duty-(midpoint+b+zero))<2e-6f);
+    CHECK(fabsf(o.phase_c_duty-(midpoint+c+zero))<2e-6f);
+    CHECK(fabsf(o.fundamental_alpha-alpha*gain)<2e-6f);
+    CHECK(fabsf(o.fundamental_beta-beta*gain)<2e-6f);
+    CHECK(o.limited==(magnitude>limit));
+    if (magnitude <= (p.duty_max-p.duty_min)*FOC_MODULATION_LINEAR_MAX ||
+        limits[l] <= (p.duty_max-p.duty_min)*FOC_MODULATION_LINEAR_MAX)
+    {
+      foc_modulation_parameters_t ovm = p;
+      foc_modulation_output_t other;
+      ovm.mode = FOC_MODULATION_OVERMODULATION;
+      CHECK(FOC_ModulationCompute(&ovm, limits[l], alpha, beta, &other));
+      CHECK(fabsf(o.phase_a_duty-other.phase_a_duty)<2e-6f);
+      CHECK(fabsf(o.phase_b_duty-other.phase_b_duty)<2e-6f);
+      CHECK(fabsf(o.phase_c_duty-other.phase_c_duty)<2e-6f);
+      CHECK(o.limited==other.limited);
+    }
+  }
+  puts("PASS: linear saturation/reference agreement, 20160 vectors including zero and limit boundaries.");
+}
+
+static void test_fused_voltage_feedback(void)
+{
+  foc_parameters_t p = parameters();
+  foc_algorithm_t legacy, fused;
+  foc_input_t in = {0};
+  const float voltages[] = {0.0f, 1.0f, -1.0f, 15.0f};
+  FOC_AlgorithmInit(&legacy, &p);
+  FOC_AlgorithmInit(&fused, &p);
+  fused.parameters.d_controller.integral = 0.31f;
+  fused.parameters.q_controller.integral = -0.27f;
+  for (unsigned mode = 0; mode < 2; ++mode)
+  for (unsigned v = 0; v < 4; ++v)
+  for (unsigned i = 0; i < 7200; ++i)
+  {
+    float d, q;
+    float angle = ((float)i - 3600.0f) * (4.0f * (float)PI / 7200.0f);
+    in.electrical_angle_rad = angle;
+    in.phase_a = 6.0f * cosf(angle);
+    in.phase_b = -3.0f * sinf(angle);
+    legacy.parameters.modulation.mode = fused.parameters.modulation.mode =
+        mode ? FOC_MODULATION_OVERMODULATION : FOC_MODULATION_LINEAR_ONLY;
+    CHECK(FOC_AlgorithmVoltageCommandStep(&legacy, voltages[v], 0.3f * voltages[v], 24, angle));
+    CHECK(FOC_TransformCurrentDQ(in.phase_a, in.phase_b, angle, &d, &q));
+    CHECK(FOC_AlgorithmVoltageFeedbackStep(&fused, voltages[v], 0.3f * voltages[v], 24, &in));
+    CHECK(fabsf(fused.output.d_current - d) < 2e-6f);
+    CHECK(fabsf(fused.output.q_current - q) < 2e-6f);
+    /* All remaining output fields must retain the separate-path result. */
+    legacy.output.d_current = d; legacy.output.q_current = q;
+    CHECK(memcmp(&legacy.output, &fused.output, sizeof(fused.output)) == 0);
+    CHECK(fused.parameters.d_controller.integral == 0.31f);
+    CHECK(fused.parameters.q_controller.integral == -0.27f);
+  }
+  CHECK(!FOC_AlgorithmVoltageFeedbackStep(NULL, 1, 0, 24, &in));
+  CHECK(!FOC_AlgorithmVoltageFeedbackStep(&fused, 1, 0, 24, NULL));
+  CHECK(!fused.output.valid);
+  for (unsigned fault = 0; fault < 6; ++fault)
+  {
+    in.phase_a = in.phase_b = in.electrical_angle_rad = 0;
+    float ud = 1, uq = 0, bus = 24;
+    if (fault == 0) in.phase_a = NAN;
+    if (fault == 1) in.phase_b = INFINITY;
+    if (fault == 2) in.electrical_angle_rad = NAN;
+    if (fault == 3) ud = INFINITY;
+    if (fault == 4) uq = NAN;
+    if (fault == 5) bus = 0;
+    fused.output.valid = 1U;
+    CHECK(!FOC_AlgorithmVoltageFeedbackStep(&fused, ud, uq, bus, &in));
+    CHECK(!fused.output.valid);
+  }
+  puts("PASS: fused voltage/current telemetry equals separate path, 57600 vectors; PI untouched; invalid inputs fail closed.");
+}
+
+static void test_voltage_controller_without_pi(void)
+{
+  foc_parameters_t p=parameters();
+  foc_controller_t c;
+  foc_port_t port={is_safe,read_feedback,write_voltage,disable_output,NULL};
+  foc_voltage_command_t v={1,0,24};
+  safe=write_ok=1;
+  memset(&feedback,0,sizeof(feedback));
+  feedback.current_valid=feedback.angle_valid=feedback.reference_valid=1;
+  feedback.electrical_angle_rad=1.1f;
+  feedback.d_reference=90; feedback.q_reference=-90;
+  FOC_ControllerInit(&c,&p,&port); FOC_ControllerStart(&c);
+  c.algorithm.parameters.d_controller.integral=.31f;
+  c.algorithm.parameters.q_controller.integral=-.27f;
+  for(unsigned i=0;i<100;i++) {
+    feedback.phase_a=(float)i*.1f; feedback.phase_b=-(float)i*.03f;
+    FOC_ControllerVoltageStep(&c,&v);
+    CHECK(c.running && c.feedback_ready && !c.fault_flags);
+    CHECK(fabsf(c.algorithm.output.d_voltage*24-1)<2e-6f);
+    CHECK(fabsf(c.algorithm.output.q_voltage)<1e-6f);
+    CHECK(c.algorithm.parameters.d_controller.integral==.31f);
+    CHECK(c.algorithm.parameters.q_controller.integral==-.27f);
+    CHECK(c.algorithm.output.applied_d_reference==0 && c.algorithm.output.applied_q_reference==0);
+  }
+  for(unsigned fault=0;fault<8;fault++) {
+    safe=write_ok=1;
+    feedback.current_valid=feedback.angle_valid=feedback.reference_valid=1;
+    v.d_voltage_v=1; v.dc_bus_voltage_v=24;
+    FOC_ControllerInit(&c,&p,&port); FOC_ControllerStart(&c);
+    int before=disable_count;
+    if(fault==0) feedback.current_valid=0;
+    if(fault==1) feedback.angle_valid=0;
+    if(fault==2) feedback.reference_valid=0;
+    if(fault==3) safe=0;
+    if(fault==4) write_ok=0;
+    if(fault==5) v.d_voltage_v=NAN;
+    if(fault==6) v.dc_bus_voltage_v=0;
+    FOC_ControllerVoltageStep(&c,fault==7 ? NULL : &v);
+    CHECK(!c.running && !c.feedback_ready && c.fault_flags && disable_count>before);
+  }
+  safe=write_ok=1;
+  puts("PASS: voltage controller bypasses both PI loops and preserves feedback/power/PWM fault gates.");
+}
+
 int main(void)
 {
+  if(CURRENT_LIMIT_HARDWARE_ONLY) {
+    foc_parameters_t p=parameters(); p.current_limit=.01f;
+    foc_algorithm_t a; foc_input_t in={0};
+    in.current_valid=in.angle_valid=in.reference_valid=1;
+    in.d_reference=30; in.q_reference=-40;
+    FOC_AlgorithmInit(&a,&p); FOC_AlgorithmStep(&a,&in);
+    CHECK(a.output.valid && !a.output.reference_limited);
+    CHECK(a.output.applied_d_reference==30 && a.output.applied_q_reference==-40);
+    puts("PASS hardware current policy: d/q vector remains unclipped");
+  }
   void TestCurrentLoop(void);
   TestCurrentLoop();
+  test_single_pass_antiwindup();
+  test_linear_radial_saturation();
   test_linear_and_sectors();
   test_overmodulation_and_bounds();
   test_invalid();
   test_foc_and_faults();
+  test_fused_voltage_feedback();
+  test_voltage_controller_without_pi();
+  test_rotating_dq_current_closed_loop();
+  test_fixed_angle_d_voltage_commissioning();
   test_servo_fault_mapping();
   TestPwmSampling();
   TestWaveformGenerator();

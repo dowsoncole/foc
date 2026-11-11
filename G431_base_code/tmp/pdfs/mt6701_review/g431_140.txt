@@ -1,0 +1,74 @@
+Electrical characteristics STM32G431x6 STM32G431x8 STM32G431xB
+140/198 DS12589 Rev 6
+5.3.20 Voltage referenc e buffer characteristics
+          
+Table 72. VREFBUF characteristics(1) 
+Symbol Parameter Conditions Min Typ Max Unit
+VDDA
+Analog supply 
+voltage 
+Normal mode
+VRS = 00 2.4 - 3.6
+V
+VRS = 01 2.8 - 3.6
+VRS = 10 3.135 - 3.6
+Degraded mode(2)
+VRS= 00 1.65 - 2.4
+VRS = 01 1.65 - 2.8
+VRS= 10 1.65 - 3.135
+VREFBUF_
+OUT
+Voltage reference 
+output 
+Normal mode
+VRS= 00 2.044 2.048 2.052
+VRS= 01 2.496 2.5 2.504
+VRS
+ = 10 2.896 2.9 2.904
+Degraded mode(2)
+VRS= 00 V DDA -250 mV - V DDA
+VRS = 01 V DDA -250 mV - V DDA
+VRS = 10 V DDA -250 mV - V DDA
+VREFOUT_
+TEMP
+Voltage reference 
+output spread over 
+the temperature 
+range
+VDDA = 3V - -
+See 
+Figure 31, 
+Figure 32, 
+Figure 33
+mV
+TRIM Trim step 
+resolution -- ± 0 . 0 5 ± 0 . 1 %
+CL Load capacitor - 0.5 1 1.5 µF
+esr Equivalent Serial 
+Resistor of Cload -- - 2 Ω
+Iload Static load current - - - 6.5 mA
+Iline_reg
+(3)
+ Line regulation - - 1000 2000 ppm/V
+Iload_reg Load regulation 500 μA ≤ 
+Iload ≤4 mA
+Normal 
+mode -5 0 5 0 0 ppm/m
+A
+TCoeff
+Temperature 
+coefficient
+-40 °C < TJ < +125 °C - - Tcoeff_vr
+efint + 
+50(4)
+ppm/ °C
+0 °C < TJ < +50 °C - -
+PSRR Power supply 
+rejection
+DC 40 55 -
+dB
+100 kHz 25 40 -
+tSTART Start-up time
+CL = 0.5 µF(5) -3 0 0 3 5 0
+µsCL = 1.1 µF(5) -5 0 0 6 5 0
+CL = 1.5 µF(5) -6 5 0 8 0 0

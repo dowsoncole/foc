@@ -1,0 +1,86 @@
+DS12589 Rev 6 111/198
+STM32G431x6 STM32G431x8 STM32G431xB Electrical characteristics
+160
+5.3.14 I/O port characteristics
+General input/output characteristics
+Unless otherwise specified, the parameters given in Table 53 are derived from tests 
+performed under the conditions summarized in Table 17: General operating conditions. All 
+I/Os are designed as CMOS- and TTL-compliant.
+          
+Table 53. I/O static characteristics 
+Symbol Parameter Conditions Min Typ Max Unit
+VIL
+(1)(2)
+I/O input 
+low level 
+voltage 
+All except 
+FT_c 1.62 V<VDD<3.6 V - -
+0.3xVDD
+V
+0.39xVDD-0.06(3)
+FT_c 1.62 V<V DD<3.6 V - -
+0.3xVDD
+0.25xVDD
+VIH
+(1)(2)
+I/O input 
+high level 
+voltage 
+All except 
+FT_c 1.62 V<VDD<3.6 V
+0.7xVDD --
+V0.49xVDD +0.26(3) --
+FT_c 1.62 V<V DD<3.6 V 0.7xV DD --
+VHYS
+(3) Input 
+hysteresis
+TT_xx, 
+FT_xxx, 
+NRST
+1.62 V<VDD<3.6 V - 200 - mV
+Ileak
+Input 
+leakage 
+current(3)
+FT_xx 
+except 
+FT_c
+0 < VIN ≤ VDD - - ±100
+nA
+VDD ≤ VIN ≤ VDD+1 V - - 650 (4)
+VDD+1 V < VIN ≤ 5.5 V - - 200 (4)
+FT_c
+0 ≤ VIN ≤ VDDMAX - - 2000
+VDD ≤ VIN <0.5 V - - 3000
+FT_u, PC3
+0 ≤ VIN ≤ VDD - - ±150
+VDD ≤ VIN ≤ VDD+ 1 V - - ±2500
+VDD ≤ VIN ≤ 5.5 V - - ±250
+FT_d
+0 ≤ VIN ≤ VDD - - ±4500
+VDD + 1V ≤ VIN ≤ 5.5 V - - ±9000
+TT_xx
+0 ≤ VIN ≤ VDD - - ±150
+VDD ≤ VIN ≤ 3.6 V - - 2000
+RPU
+Weak pull-
+up 
+equivalent 
+resistor
+(5) 
+VIN = VSS 25 40 55
+kΩ
+RPD
+Weak pull-
+down 
+equivalent 
+resistor
+(5)
+VIN = VDD 25 40 55
+CIO
+I/O pin 
+capacitance
+I/O pin 
+capacitance -- 5 - p F
+1. Refer to Figure 25: I/O input characteristics

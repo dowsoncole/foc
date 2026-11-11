@@ -1,0 +1,35 @@
+DS12589 Rev 6 103/198
+STM32G431x6 STM32G431x8 STM32G431xB Electrical characteristics
+160
+5.3.8 Internal clock source characteristics
+The parameters given in Table 42 are derived from tests performed under ambient 
+temperature and supply voltage conditions summarized in Table 17: General operating 
+conditions. The provided curves are characterization results, not tested in production.
+High-speed internal (HSI16) RC oscillator
+          
+Table 42. HSI16 oscillator characteristics(1) 
+1. Guaranteed by characterization results.
+Symbol Parameter Conditions Min Typ Max Unit
+fHSI16 HSI16 Frequency V DD=3.0 V, TA=30 °C 15.88 - 16.08 MHz
+TRIM HSI16 user trimming step
+Trimming code is not a 
+multiple of 64 0.2 0.3 0.4
+%
+Trimming code is a 
+multiple of 64 -4 -6 -8
+DuCy(HSI16)(2)
+2. Guaranteed by design.
+Duty Cycle - 45 - 55 %
+∆Temp(HSI16) HSI16 oscillator frequency 
+drift over temperature
+TA= 0 to 85 °C -1 - 1 %
+TA= -40 to 125 °C -2 - 1.5 %
+∆VDD(HSI16) HSI16 oscillator frequency 
+drift over VDD
+VDD=1.62 V to 3.6 V -0.1 - 0.05 %
+tsu(HSI16)(2) HSI16 oscillator start-up 
+time -- 0 . 8 1 . 2 μs
+tstab(HSI16)(2) HSI16 oscillator 
+stabilization time -- 3 5 μs
+IDD(HSI16)(2) HSI16 oscillator power 
+consumption -- 1 5 5 1 9 0 μA

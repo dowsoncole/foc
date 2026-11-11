@@ -1,0 +1,21 @@
+DS12589 Rev 6 193/198
+STM32G431x6 STM32G431x8 STM32G431xB Package information
+193
+Assuming the following application conditions:
+Maximum ambient temperature TAmax = 100 °C (measured according to JESD51-2), 
+IDDmax = 20 mA, VDD = 3.5 V, maximum 20 I/Os used at the same time in output at low 
+level with IOL = 8 mA, VOL= 0.4 V
+PINTmax = 20 mA × 3.5 V= 70 mW
+PIOmax = 20 × 8 mA × 0.4 V = 64 mW
+This gives: PINTmax = 70 mW and PIOmax = 64 mW:
+PDmax = 70 + 64 = 134 mW
+Thus: PDmax = 134 mW
+Using the values obtained in TJmax is calculated as follows:
+– For LQFP100, 42 °C/W 
+T
+Jmax = 100 °C + (42 °C/W × 134 mW) = 100 °C + 5.628 °C = 105.628 °C
+This is above the range of the suffix 6 version parts (–40 < TJ < 105 °C).
+In this case, parts must be ordered at least with the temperature range suffix 3 (see 
+Section 7: Ordering information) unless we reduce the power dissipation in order to be able 
+to use suffix 6 parts.
+          

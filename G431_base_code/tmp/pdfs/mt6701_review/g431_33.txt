@@ -1,0 +1,52 @@
+DS12589 Rev 6 33/198
+STM32G431x6 STM32G431x8 STM32G431xB Functional overview
+43
+3.24.1 Advanced motor cont rol timer (TIM1, TIM8)
+The advanced motor control timers can each be seen as a four-phase  
+PWM multiplexed on 8 channels. They have complementary PWM outputs with 
+programmable inserted dead-times. They can also be seen as complete general-purpose 
+timers. 
+The 4 independent channels can be used for:
+• Input capture
+• Output compare
+• PWM generation (edge or center-aligned modes) with full modulation capability  
+(0-100%)
+• One-pulse mode output
+In debug mode, the advanced motor control timer counter can be frozen and the PWM 
+outputs disabled in order to turn off any power switches driven by these outputs.
+Many features are shared with the general-purpose TIMx timers (described in 
+Section 3.24.2) using the same architecture, so the advanced motor control timers can work 
+together with the TIMx timers via the Timer Link feature for synchronization or event 
+chaining.
+General-
+purpose TIM15 16-bit Up
+Any integer 
+between 1 and 
+65536
+Yes 2 1
+General-
+purpose TIM16, TIM17 16-bit Up
+Any integer 
+between 1 and 
+65536
+Yes 1 1
+Basic TIM6, TIM7 16-bit Up
+Any integer 
+between 1 and 
+65536
+Yes 0 No
+Table 7. Timer feature comparison (continued)
+Timer type Timer Counter 
+resolution
+Counter 
+type
+Prescaler 
+factor
+DMA 
+request 
+generation
+Capture/
+compare 
+channels
+Complementary 
+outputs

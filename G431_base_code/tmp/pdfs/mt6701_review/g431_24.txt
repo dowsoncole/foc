@@ -1,0 +1,11 @@
+Functional overview STM32G431x6 STM32G431x8 STM32G431xB
+24/198 DS12589 Rev 6
+3.11.6 V BAT operation
+The VBAT pin allows to power the device VBAT domain from an external battery, an external 
+supercapacitor, or from VDD when there is no external battery and when an external 
+supercapacitor is present. The VBAT pin supplies the RTC with LSE and the backup 
+registers. Three anti-tamper detection pins are available in VBAT mode.
+The VBAT operation is automatically activated when VDD is not present. An internal VBAT 
+battery charging circuit is embedded and can be activated when VDD is present.
+Note: When the microcontroller is supplied from VBAT, neither external interrupts nor RTC 
+alarm/events exit the microcontroller from the VBAT operation.

@@ -1,0 +1,11 @@
+9
+Timing Parameters：
+Parameters Symbol Min. Typ. Max. Clock period 𝐶 400 ns - 14 μs Clock frequency 1/𝐶 110 kHz - 1.5 MHz
+(1) Transmit timeout  - 10 μs -
+Pause duration  20 μs - - Data format：
+Bits b(23 + X) : b(8 + X) b(7 + X) : b8 b7 b6 b5 : b0
+Length 16 bits X bits 1bit 1bit 6 bits
+Data Multi-turn count
+(1) Angle Error bit Warning bit Status bit
+(1) Multi-turn count is supported only in standard multi-turn, battery multi-turn, and flash multi-turn versions. For details of the status bits, see the following Status Bits section. S
+I

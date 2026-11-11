@@ -1,0 +1,22 @@
+Electrical characteristics STM32G431x6 STM32G431x8 STM32G431xB
+96/198 DS12589 Rev 6
+APB2
+SYSCFG/VREFBUF/COMP 1.94 1.81 1.49 1.82 
+µA/MHz
+TIM1 12.00 11.16 9.20 10.41 
+SPI1 2.47 2.32 1.92 2.18 
+TIM8 11.65 10.83 8.93 10.17 
+USART1 clock domain 2.84 2.65 2.18 2.48 
+USART1 independent clock domain 7.01 6.53 5.38 6.17 
+SPI4 2.47 2.32 1.92 2.18 
+TIM15 6.00 5.57 4.61 5.26 
+TIM16 4.18 3.89 3.20 3.57 
+TIM17 4.37 4.06 3.33 3.76 
+SAI1 clock domain 3.08 2.88 2.36 2.79 
+SAI1 independent clock domain 3.07 2.84 2.35 2.63 
+ALL APB2 on 62.79 58 .41 52.90 53.64 
+ALL peripherals 250.00 210.44 179.05 225.00
+Table 34. Peripheral current consumption (continued)
+BUS Peripheral Range 1 
+Boost Mode Range 1 Range 2 Low-power 
+run and sleep Unit

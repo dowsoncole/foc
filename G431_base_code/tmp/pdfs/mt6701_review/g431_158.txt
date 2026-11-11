@@ -1,0 +1,52 @@
+Electrical characteristics STM32G431x6 STM32G431x8 STM32G431xB
+158/198 DS12589 Rev 6
+Figure 38. SAI master timing waveforms
+Figure 39. SAI slave timing waveforms
+CAN (controller area network) interface
+Refer to Section 5.3.14: I/O port characteristics for more details on the input/output alternate 
+function characteristics (FDCANx_TX and FDCANx_RX).
+tv(SD_A_MT) Data output valid time
+Master transmitter (after enable edge) 
+2.7 V ≤ VDD ≤ 3.6 V -1 4
+ns
+Master transmitter (after enable edge) 
+1.71 V ≤ VDD ≤ 3.6 V -2 1
+th(SD_A_MT) Data output hold time Master transmitter (after enable edge) 10 - ns
+1. Guaranteed by characterization results.
+2. APB clock frequency must be at least twice SAI clock frequency.
+Table 85. SAI characteristics(1) (continued)
+Symbol Parameter Conditions Min Max Unit 
+MS32771V1
+SAI_SCK_X
+SAI_FS_X
+(output)
+1/fSCK
+SAI_SD_X
+(transmit)
+tv(FS)
+Slot n
+SAI_SD_X
+(receive)
+th(FS)
+Slot n+2
+tv(SD_MT) th(SD_MT)
+Slot n
+tsu(SD_MR) th(SD_MR)
+MS32772V1
+SAI_SCK_X
+SAI_FS_X
+(input)
+SAI_SD_X
+(transmit)
+tsu(FS)
+Slot n
+SAI_SD_X
+(receive)
+tw(CKH_X) th(FS)
+Slot n+2
+tv(SD_ST) th(SD_ST)
+Slot n
+tsu(SD_SR)
+tw(CKL_X)
+th(SD_SR)
+1/fSCK

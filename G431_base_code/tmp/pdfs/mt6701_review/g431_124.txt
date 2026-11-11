@@ -1,0 +1,34 @@
+Electrical characteristics STM32G431x6 STM32G431x8 STM32G431xB
+124/198 DS12589 Rev 6
+          
+THD
+Total 
+harmonic 
+distortion
+Single ADC operation ADC clock 
+frequency ≤ 60 MHz,
+V
+DDA = VREF+ = 3 V, TA = 
+25 °C
+Continuous mode, sampling 
+rate:
+Fast channels@4Msps
+Slow channels@2Msps
+Single 
+ended
+Fast channel (max speed) - -73 -72
+dB
+Slow channel (max speed) - -73 -72
+Differential
+Fast channel (max speed) - -73 -72
+Slow channel (max speed) - -73 -72
+1. Evaluated by characteriza tion – Not tested in production.
+2. ADC DC accuracy values are measured after internal calibration.
+3. ADC accuracy vs. negative Injection Current: Injecting negativ e current on any analog input pins should be avoided as this 
+significantly reduces the accuracy of the conversion being performed on another analog input. It is recommended to add a 
+Schottky diode (pin to ground) to analog pins which may potentially inject negative current.
+4. The I/O analog switch voltage booster is enabled when V
+DDA < 2.4 V (BOOSTEN = 1 in the SYSCFG_CFGR1 when 
+VDDA < 2.4 V). It is disabled when VDDA ≥ 2.4 V. No oversampling.
+Table 62. ADC accuracy - limited test conditions 1(1)(2)(3) (continued)
+Symbol Parameter Conditions (4) Min Typ Max Unit

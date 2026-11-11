@@ -1,0 +1,52 @@
+Electrical characteristics STM32G431x6 STM32G431x8 STM32G431xB
+104/198 DS12589 Rev 6
+Figure 23. HSI16 frequency versus temperature
+High-speed internal 48 MHz (HSI48) RC oscillator
+          
+Table 43. HSI48 oscillator characteristics(1) 
+Symbol Parameter Conditions Min Typ Max Unit
+fHSI48 HSI48 Frequency V DD=3.0V, TA=30°C - 48 - MHz
+TRIM HSI48 user trimming step - - 0.11 (2) 0.18(2) %
+USER TRIM 
+COVERAGE
+HSI48 user trimming 
+coverage ±32 steps ±3 (3) ±3.5(3) -%
+DuCy(HSI48) Duty Cycle - 45 (2) -5 5 (2) %
+ACCHSI48_REL
+Accuracy of the HSI48 
+oscillator over temperature 
+(factory calibrated)
+VDD = 3.0 V to 3.6 V, 
+TA = –15 to 85 °C -- ± 3 (3)
+%
+VDD = 1.65 V to 3.6 V, 
+TA = –40 to 125 °C -- ± 4 . 5 (3)
+DVDD(HSI48) HSI48 oscillator frequency 
+drift with VDD
+VDD = 3 V to 3.6 V - 0.025 (3) 0.05(3)
+%
+VDD = 1.65 V to 3.6 V - 0.05 (3) 0.1(3)
+tsu(HSI48) HSI48 oscillator start-up 
+time -- 2 . 5 (2) 6(2) μs
+IDD(HSI48) HSI48 oscillator power 
+consumption -- 3 4 0 (2) 380(2) μA
+MSv39299V2
+15.6
+15.7
+15.8
+15.9
+16
+16.1
+16.2
+16.3
+16.4
+- 4 0 - 2 00 2 04 06 08 0 1 0 0 1 2 0
+MHz
+°C
+Mean min max
++2 %
++1.5 %
++1 %
+-1 %
+-1.5 %
+-2 %

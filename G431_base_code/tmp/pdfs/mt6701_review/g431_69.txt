@@ -1,0 +1,43 @@
+DS12589 Rev 6 69/198
+STM32G431x6 STM32G431x8 STM32G431xB Electrical characteristics
+160
+5.1.7 Current consumption measurement
+Figure 17. Current consumption measurement
+The IDD_ALL parameters given in Table 21 to Table 24 represent the total MCU consumption 
+including the current supplying VDD, VDDA and VBAT.
+5.2 Absolute maximum ratings
+Stresses above the absolute maximum ratings listed in Table 14: Voltage characteristics, 
+Table 15: Current characteristics and Table 16: Thermal characteristics may cause 
+permanent damage to the device. These are stress ratings only and functional operation of 
+the device at these conditions is not implied. Exposure to maximum rating conditions for 
+extended periods may affect device reliability. Exposure to maximum rating conditions for 
+extended periods may affect device reliability. Device mission profile (application conditions) 
+is compliant with JEDEC JESD47 qualification standard, extended mission profiles are 
+available on demand.
+          
+MS60200V1
+IDD_VBAT
+VBAT
+IDD
+VDD
+IDDA
+VDDA
+Table 14. Voltage characteristics(1) 
+1. All main power (V DD, VDDA, VBAT) and ground (VSS, VSSA) pins must always be connected to the external 
+power supply, in the permitted range.
+Symbol Ratings Min Max Unit
+VDD - VSS
+External main supply voltage (including VDD, 
+VDDA, VBAT and VREF+) -0.3 4.0
+V
+VIN(2)
+Input voltage on FT_xxx pins except FT_c pins VSS-0.3 min (VDD, VDDA) 
++ 4.0(3)(4)
+Input voltage on FT_c pins V SS-0.3 5.5
+Input voltage on TT_xx pins V SS-0.3 4.0
+Input voltage on any other pins V SS-0.3 4.0
+|∆VDDx| Variations between different VDDX power pins of 
+the same domain -5 0
+mV
+|VSSx-VSS| Variations between all the different ground pins(5) -5 0
+VREF+-VDDA Allowed voltage difference for VREF+ > VDDA -0 . 4 V

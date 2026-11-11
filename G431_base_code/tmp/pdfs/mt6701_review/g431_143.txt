@@ -1,0 +1,55 @@
+DS12589 Rev 6 143/198
+STM32G431x6 STM32G431x8 STM32G431xB Electrical characteristics
+160
+5.3.21 Comparator characteristics
+          
+Table 73. COMP characteristics(1) 
+Symbol Parameter Conditions Min Typ Max Unit
+VDDA Analog supply voltage - 1.62 - 3.6
+VVIN
+Comparator input voltage 
+range -0 - V DDA
+VBG
+(2) Scaler input voltage - VREFINT
+VSC
+(3) Scaler offset voltage - - ±5 ±10 mV
+IDDA(SCALER) Scaler static consumption from 
+VDDA
+BRG_EN=0 (bridge disable) - 200 300 nA
+BRG_EN=1 (bridge enable) - 0.8 1 µA
+tSTART_SCALER Scaler startup time - - 100 200 µs
+tSTART
+Comparator startup time to 
+reach propagation delay 
+specification
+-- - 5 µ s
+tD
+(4) Propagation delay for 200 mV 
+step with 100 mV overdrive
+50pF load on 
+output
+VDDA < 2.7 V - - 35 ns
+VDDA ≥2.7 V - 16.7 31 ns
+Voffset
+(3) Comparator offset error Full VDDA voltage range, full 
+temperature range -9 -6/+2 3 mV
+Vhys Comparator hysteresis
+HYST[2:0] = 0 - 0 -
+mV
+HYST[2:0] =1 4 9 16
+HYST[2:0] = 2 7 18 32
+HYST[2:0] = 3 11 27 47
+HYST[2:0] = 4 15 36 63
+HYST[2:0] = 5 19 45 79
+HYST[2:0] = 6 23 54 95
+HYST[2:0] = 7 26 63 110
+I
+DDA(COMP) Comparator consumption from 
+VDDA 
+Static - 450 720
+µAWith 50 kHz ±100 mV overdrive 
+square signal -4 5 0-
+1. Guaranteed by design, unless otherwise specified.
+2. Refer to Table 20: Embedded internal voltage reference.
+3. Guaranteed by characterization results.
+4. Typical value (3V) is an average for all comparators propagation delay.

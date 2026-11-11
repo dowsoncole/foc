@@ -48,6 +48,9 @@ extern UART_HandleTypeDef huart1;
 
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
+#ifndef FOC_TARGET_IRQ_PROFILE
+#define FOC_TARGET_IRQ_PROFILE 0
+#endif
 
 /* USER CODE END EM */
 

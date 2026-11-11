@@ -1,0 +1,59 @@
+DS12589 Rev 6 155/198
+STM32G431x6 STM32G431x8 STM32G431xB Electrical characteristics
+160
+I2S characteristics
+Unless otherwise specified, the parameters given in Table 84 for I2S are derived from tests 
+performed under the ambient temperature, fPCLKx frequency and VDD supply voltage 
+conditions summarized in Table 17: General operating conditions, with the following 
+configuration:
+• Output speed is set to OSPEEDRy[1:0] = 10
+• Capacitive load C=30pF
+• Measurement points are done at CMOS levels: 0.5 VDD
+Refer to Section 5.3.14: I/O port characteristics for more details on the input/output alternate 
+function characteristics (CK,SD,WS).
+          
+Note: Refer to the reference manual RM0440 "STM32G4 Series advanced Arm ®-based 32-bit 
+MCUs" I2S section for more details about the sampling frequency (Fs), fMCK, fCK, DCK 
+values reflect only the digital peripheral behavior, source clock precision might slightly 
+change the values DCK depends mainly on ODD bit value. Digital contribution leads to a min 
+of (I2SDIV/(2*I2SDIV+ODD) and a max (I2SDIV+ODD)/(2*I2SDIV+ODD) and Fs max 
+supported for each mode/condition.
+Table 84. I2S characteristics(1) 
+Symbol Parameter Conditions Min Max Unit 
+fMCLK
+I2S Main clock 
+output - 256x8 K 256 *Fs (2) MHz
+fCK I2S clock frequency
+Master data - 64xFs
+MHz
+Slave data - 64xFs
+DCK
+I2S clock frequency 
+duty cycle Slave receiver 30 70 %
+tv(WS) WS valid time Master mode - 6
+ns
+th(WS) WS hold time 
+Master mode 3 -
+Slave mode 2 -
+tsu(WS) WS setup time Slave mode 4 -
+tsu(SD_MR) Data input setup 
+time 
+Master receiver 3 -
+tsu(SD_SR) Slave receiver 4 -
+th(SD_MR)
+Data input hold time 
+Master receiver 4 -
+th(SD_SR) Slave receiver 2 -
+tv(SD_ST) Data output valid 
+time
+Slave transmitter (after 
+enable edge)
+2.7 V ≤ VDD ≤ 3.6 V - 15
+1.65 V ≤ VDD ≤ 3.6 V - 22
+tv(SD_MT) Master transmitter (after enable edge) - 3
+th(SD_ST) Data output hold 
+time
+Slave transmitter (after enable edge) 7 -
+th(SD_MT) Master transmitter (after enable edge) 1 -
+1. Guaranteed by characterization re sults, not tested in production.
+2. 256xFs maximum is 49.152 MHz.

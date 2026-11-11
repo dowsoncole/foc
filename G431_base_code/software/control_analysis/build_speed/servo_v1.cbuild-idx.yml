@@ -1,0 +1,17 @@
+build-idx:
+  generated-by: csolution version 2.15.0
+  csolution: ../../servo_v1/MDK-ARM/servo_v1.csolution.yml
+  tmpdir: tmp
+  cprojects:
+    - cproject: ../../servo_v1/MDK-ARM/servo_v1.cproject.yml
+  cbuilds:
+    - cbuild: out/servo_v1/servo_v1/servo_v1+servo_v1.cbuild.yml
+      project: servo_v1
+      configuration: +servo_v1
+      messages:
+        info:
+          - servo_v1.cbuild-pack.yml - file is already up-to-date
+          - servo_v1+servo_v1.cbuild.yml - file is already up-to-date
+      packs-unused:
+        - pack: ARM::CMSIS-DSP@1.16.2
+        - pack: ARM::CMSIS-NN@4.1.0

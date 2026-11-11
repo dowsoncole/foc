@@ -1,0 +1,78 @@
+Pinouts and pin description STM32G431x6 STM32G431x8 STM32G431xB
+58/198 DS12589 Rev 6
+--- - - 5 4 A 6 68 81 PC12 I/O FT -
+TIM8_CH3N,
+SPI3_MOSI/
+I2S3_SD,
+USART3_CK,
+UCPD1_FRSTX,
+EVENTOUT
+-
+--- - - -- 69 82 PD0 I/O FT -
+TIM8_CH4N, 
+FDCAN1_RX, 
+EVENTOUT
+-
+--- - - -- 70 83 PD1 I/O FT -
+TIM8_CH4, 
+TIM8_BKIN2, 
+FDCAN1_TX, 
+EVENTOUT
+-
+--- - - 5 5 B 5 71 84 PD2 I/O FT - TIM3_ETR, TIM8_BKIN, 
+EVENTOUT -
+--- - - -- - 85 PD3 I/O FT -
+TIM2_CH1/
+TIM2_ETR,
+USART2_CTS,
+EVENTOUT
+-
+--- - - -- - 86 PD4 I/O FT -
+TIM2_CH2, 
+USART2_RTS_DE,
+EVENTOUT
+-
+--- - - -- - 87 PD5 I/O FT - USART2_TX, 
+EVENTOUT -
+--- - - -- - 88 PD6 I/O FT -
+TIM2_CH4, 
+SAI1_D1, USART2_RX,
+SAI1_SD_A,
+EVENTOUT
+-
+--- - - -- - 89 PD7 I/O FT -
+TIM2_CH3, 
+USART2_CK, 
+EVENTOUT
+-
+26 26 41 40 A3 56 A5 72 90 PB3 I/O FT (5)
+JTDO-TRACESWO, 
+TIM2_CH2, TIM4_ETR, 
+USB_CRS_SYNC, 
+TIM8_CH1N, 
+SPI1_SCK, SPI3_SCK/
+I2S3_CK,
+USART2_TX,
+TIM3_ETR,
+SAI1_SCK_B,
+EVENTOUT
+-
+Table 12. STM32G431x6/x8/xB pin definition(1) (continued)
+Pin Number
+Pin name 
+(function 
+after reset)
+Pin type
+I/O structure
+Notes
+Alternate function Additional 
+functions
+UFQFPN32
+LQFP32
+UFQFPN48
+LQFP48
+WLCSP49
+LQFP64
+UFBGA64
+LQFP80
+LQFP100

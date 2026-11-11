@@ -1,0 +1,55 @@
+Electrical characteristics STM32G431x6 STM32G431x8 STM32G431xB
+102/198 DS12589 Rev 6
+          
+Note: For information on selectin g the crystal, refer to the application note AN2867 “Oscillator 
+design guide for ST microcontrollers” available from the ST website www.st.com.
+Figure 22. Typical application with a 32.768 kHz crystal
+Note: An external resistor is not required between OSC32_IN and OSC32_OUT and it is forbidden 
+to add one.
+Table 41. LSE oscillator characteristics (fLSE = 32.768 kHz)(1) 
+1. Guaranteed by design.
+Symbol Parameter Conditions (2)
+2. Refer to the note and caution paragraphs below the table, and to the application note AN2867 “Oscillator 
+design guide for ST microcontrollers”.
+Min Typ Max Unit
+IDD(LSE) LSE current consumption
+LSEDRV[1:0] = 00  
+Low drive capability -2 5 0-
+nA
+LSEDRV[1:0] = 01  
+Medium low drive capability -3 1 5-
+LSEDRV[1:0] = 10  
+Medium high drive capability -5 0 0-
+LSEDRV[1:0] = 11  
+High drive capability -6 3 0-
+Gmcritmax
+Maximum critical crystal 
+gm
+LSEDRV[1:0] = 00 
+Low drive capability -- 0 . 5
+µA/V
+LSEDRV[1:0] = 01 
+Medium low drive capability -- 0 . 7 5
+LSEDRV[1:0] = 10 
+Medium high drive capability -- 1 . 7
+LSEDRV[1:0] = 11 
+High drive capability -- 2 . 7
+tSU(LSE)
+(3)
+3.  t SU(LSE) is the startup time measured from the moment it is enabled (by software) to a stabilized 
+32.768 kHz oscillation is reached. This value is measured for a standard crystal and it can vary significantly 
+with the crystal manufacturer
+Startup time  V DD is stabilized - 2 - s
+MS30253V2
+OSC32_IN
+OSC32_OUT
+Drive 
+programmable 
+amplifier
+fLSE
+32.768 kHz 
+resonator
+Resonator with integrated 
+capacitors
+CL1
+CL2

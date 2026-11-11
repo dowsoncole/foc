@@ -1,0 +1,49 @@
+13
+Supported Baud Rate:
+Code A M V
+Baud rate (Mbps) 0.1152 2.5 5
+Sequence chart:
+Command B0 B1 B(N-1)
+(1) The current angular position data is latched at the red point. Command and Data:
+Com- mand
+Function
+Output
+parameter
+N
+Return Data（N Bytes）
+B0 B1 B2 B3 B4 B5 B6 B7
+0x30 set Zero
+(1) - 2 C CRC
+0x31 get Position
+24 4 A2 A1 A0 CRC
+24M
+24BM 6 M1 M0 A2 A1 A0 CRC
+24FM
+0x64 get Position
++ Status
+24 5 A2 A1 A0 S CRC
+24M
+7 M1 M0 A2 A1 A0 S CRC
+24BM
+24FM
+24BM
+24FM
+(1) Zero setting requires sending commands “0x31” and “0x30” alternately for 10 consecutive cycles. Zero setting is triggered when command “0x30” returns a count value of 10. In the table above, the letter definitions are as follows:
+M A C S CRC
+Multi-turn Angular Position
+Zero-Setting
+Counter Value
+Status CRC check
+(1)
+For a detailed description of the status bits, refer to Status section. (1) CRC byte (CRC polynomial is x
+8+x
+7+x
+4+x
+2+x
+1+1, See Appendix for calculation method CRC-8 table x8+x7+x4+x2+x1+1)
+Example (24BM):
+If command 0x31 is sent and uint8_t Buffer[7] is received:
+In use：
+uint16_t multi = Buffer[0] << 8 | Buffer[1]; uint32_t angle = Buffer[2] << 16 | Buffer[3] << 8 | Buffer[4];
+float angleFloat = angle / (float)(1 << 24) * 360;
+RS485/RS42

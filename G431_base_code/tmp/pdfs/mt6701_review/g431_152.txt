@@ -1,0 +1,53 @@
+Electrical characteristics STM32G431x6 STM32G431x8 STM32G431xB
+152/198 DS12589 Rev 6
+          
+Table 83. SPI characteristics(1) 
+Symbol Parameter Conditions Min Typ Max (2) Unit
+    fSCK
+1/tc(SCK)
+SPI clock frequency
+Master mode 
+2.7 V < VDD  < 3.6 V
+Voltage Range V1
+--
+75
+MHz
+Master mode 
+1.71 V < VDD  < 3.6 V
+Voltage Range V1
+50
+Master transmitter mode 
+1.71 V < VDD  < 3.6 V
+Voltage Range V1
+50
+Slave receiver mode 
+1.71 V < VDD  < 3.6 V
+Voltage Range V1
+50
+Slave mode transmitter/full duplex
+2.7 V < VDD  < 3.6 V
+Voltage Range V1
+41
+Slave mode transmitter/full duplex
+1.71 V < VDD  < 3.6 V
+Voltage Range V1
+27
+1.71 V < VDD  < 3.6 V 
+Voltage Range V2 13
+tsu(NSS) NSS setup time Slave mode 4*T pclk -- -
+th(NSS) NSS hold time Slave mode 2*T pclk -- -
+tw(SCKH)
+tw(SCKL)
+SCK high and low time Master mode, SPI prescaler = 2 T pclk-1 T pclk Tpclk+1 ns
+tsu(MI)
+Data input setup time
+Master mode 4 - -
+ns
+tsu(SI) Slave mode 3 - -
+th(MI)
+Data input hold time
+Master mode 4 - -
+ns
+th(SI) Slave mode 1 - -
+ta(SO) Data output access time Slave mode 9 - 34 ns
+tdis(SO) Data output disable time Slave mode 9 - 16 ns

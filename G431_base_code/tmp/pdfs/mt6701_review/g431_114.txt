@@ -1,0 +1,65 @@
+Electrical characteristics STM32G431x6 STM32G431x8 STM32G431xB
+114/198 DS12589 Rev 6
+          
+Table 55. I/O (except FT_c) AC characteristics(1) (2) 
+Speed Symbol Parameter Conditions Min Max Unit
+00
+Fmax Maximum 
+frequency
+C=50 pF, 2.7 V≤VDD≤3.6 V - 5
+MHz
+C=50 pF, 1.62 V≤VDD≤2.7 V - 1
+C=10 pF, 2.7 V≤VDD≤3.6 V - 10
+C=10 pF, 1.62 V≤VDD≤2.7 V - 1.5
+Tr/Tf Output rise and 
+fall time
+C=50 pF, 2.7 V≤VDD≤3.6 V - 25
+ns
+C=50 pF, 1.62 V≤VDD≤2.7 V - 52
+C=10 pF, 2.7 V≤VDD≤3.6 V - 17
+C=10 pF, 1.62 V≤VDD≤2.7 V - 37
+01
+Fmax Maximum 
+frequency
+C=50 pF, 2.7 V≤VDD≤3.6 V - 25
+MHz
+C=50 pF, 1.62 V≤VDD≤2.7 V - 10
+C=10 pF, 2.7 V≤VDD≤3.6 V - 50
+C=10 pF, 1.62 V≤VDD≤2.7 V - 15
+Tr/Tf Output rise and 
+fall time
+C=50 pF, 2.7 V≤VDD≤3.6 V - 9
+ns
+C=50 pF, 1.62 V≤VDD≤2.7 V - 16
+C=10 pF, 2.7 V≤VDD≤3.6 V - 4.5
+C=10 pF, 1.62 V≤VDD≤2.7 V - 9
+10
+Fmax Maximum 
+frequency
+C=50 pF, 2.7 V≤VDD≤3.6 V - 50
+MHz
+C=50 pF, 1.62 V≤VDD≤2.7 V - 25
+C=10 pF, 2.7 V≤VDD≤3.6 V - 100 (3)
+C=10 pF, 1.62 V≤VDD≤2.7 V - 37.5
+Tr/Tf Output rise and 
+fall time
+C=50 pF, 2.7 V≤VDD≤3.6 V - 5.8
+ns
+C=50 pF, 1.62 V≤VDD≤2.7 V - 11
+C=10 pF, 2.7 V≤VDD≤3.6 V - 2.5
+C=10 pF, 1.62 V≤VDD≤2.7 V - 5
+11
+Fmax Maximum 
+frequency
+C=30 pF, 2.7 V≤VDD≤3.6 V - 120 (3)
+MHz
+C=30 pF, 1.62 V≤VDD≤2.7 V - 50
+C=10 pF, 2.7 V≤VDD≤3.6 V - 180 (3)
+C=10 pF, 1.62 V≤VDD≤2.7 V - 75
+Tr/Tf Output rise and 
+fall time(4)
+C=30 pF, 2.7 V≤VDD≤3.6 V - 3.3
+ns
+C=30 pF, 1.62 V≤VDD≤2.7 V - 6
+C=10 pF, 2.7 V≤VDD≤3.6 V - 1.7
+C=10 pF, 1.62 V≤VDD≤2.7 V - 3.3

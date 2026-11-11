@@ -1,0 +1,36 @@
+Ordering information STM32G431x6 STM32G431x8 STM32G431xB
+194/198 DS12589 Rev 6
+7 Ordering information
+          
+          
+For a list of available options (memory, package, and so on) or for further information on any 
+aspect of this device, contact the nearest ST sales office.
+Table 101. Ordering information scheme 
+Example:                                                         STM32   G      431      V        B        T        6     xxx
+Device family
+STM32 = Arm-based 32-bit microcontroller
+Product type
+G = General-purpose
+Sub-family
+431 = STM32G431x6/x8/xB
+Pin count
+K = 32 pins
+C = 48/49 pins
+R = 64 pins
+M = 80 pins
+V = 100 pins
+Code size
+6 = 32 Kbytes
+8 = 64 Kbytes
+B = 128 Kbytes
+Package
+I = UFBGA
+T = LQFP
+U = UFQFPN
+Y = WLCSP
+Temperature range
+6 = Industrial temperature range, - 40 to 85 °C (105 °C junction)
+3 = Industrial temperature range, - 40 to 125 °C (130 °C junction)
+Options
+xxx = programmed parts
+TR = tape and reel

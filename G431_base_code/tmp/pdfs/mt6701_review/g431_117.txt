@@ -1,0 +1,40 @@
+DS12589 Rev 6 117/198
+STM32G431x6 STM32G431x8 STM32G431xB Electrical characteristics
+160
+Figure 27. Recommended NRST pin protection 
+1. The reset network protects t he device against parasitic resets.
+2. The user must ensure that the level on the NRST pin can go below the V IL(NRST) max level specified in 
+Table 57: NRST pin characteristics. Otherwise the reset is not taken into account by the device.
+3. The external capacitor on NRST must be placed as close as possible to the device.
+5.3.16 Extended interrupt and event cont roller input (EXTI) characteristics
+The pulse on the interrupt input must have a minimal length in order to guarantee that it is 
+detected by the event controller.
+          
+5.3.17 Analog switches booster
+          
+MS19878V3
+RPU
+VDD
+Internal reset
+External
+reset circuit(1)
+NRST(2)
+Filter
+0.1 μF
+Table 58. EXTI input characteristics(1) 
+1. Guaranteed by design.
+Symbol Parameter Conditions Min Typ Max Unit
+PLEC Pulse length to event 
+controller -2 0 - - n s
+Table 59. Analog switches booster characteristics(1) 
+1. Guaranteed by design.
+Symbol Parameter Min Typ Max Unit
+VDD Supply voltage 1.62 - 3.6 V
+tSU(BOOST) Booster startup time - - 240 µs
+IDD(BOOST)
+Booster consumption for
+1.62 V ≤ VDD ≤ 2.0 V -- 2 5 0
+µABooster consumption for
+2.0 V ≤ VDD ≤ 2.7 V -- 5 0 0
+Booster consumption for
+2.7 V ≤ VDD ≤ 3.6 V -- 9 0 0

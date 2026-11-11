@@ -1,0 +1,42 @@
+Package information STM32G431x6 STM32G431x8 STM32G431xB
+162/198 DS12589 Rev 6
+          
+Figure 41. UFQFPN32 - Recommended footprint
+1. Dimensions are expr essed in millimeters.
+Table 89. UFQFPN32 - Mechanical data 
+Symbol
+millimeters inches (1)
+1. Values in inches are converted from mm and rounded to 4 decimal digits.
+Min Typ Max Min Typ Max
+A 0.500 0.550 0.600 0.0197  0.0217 0.0236
+A1 - - 0.050 - - 0.0020
+A3  - 0.152  -  - 0.0060 -
+b 0.180 0.230 0.280 0.0071 0.0091 0.0110
+D 4.900 5.000 5.100 0.1929 0.1969 0.2008
+D1 3.400 3.500 3.600 0.1339 0.1378 0.1417
+D2 3.400 3.500 3.600 0.1339 0.1378 0.1417
+E 4.900 5.000 5.100 0.1929 0.1969 0.2008
+E1 3.400 3.500 3.600 0.1339 0.1378 0.1417
+E2 3.400 3.500 3.600 0.1339 0.1378 0.1417
+e  - 0.500  -  -  0.0197  -
+L 0.300 0.400 0.500 0.0118 0.0157 0.0197
+ddd - - 0.080 - - 0.0031
+A0B8_FP_V2
+5.30
+3.80
+0.60
+3.45
+0.50
+3.45
+3.80
+0.75
+3.80
+0.30
+5.30
+16
+17
+9
+8
+1
+2532
+24

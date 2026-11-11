@@ -1,0 +1,69 @@
+DS12589 Rev 6 113/198
+STM32G431x6 STM32G431x8 STM32G431xB Electrical characteristics
+160
+In the user application, the number of I/O pins which can drive current must be limited to 
+respect the absolute maximum rating specified in Section 5.2:
+• The sum of the currents sourced by all the I/Os on VDD, plus the maximum 
+consumption of the MCU sourced on VDD, cannot exceed the absolute maximum rating 
+ΣIVDD (see Table 14: Voltage characteristics).
+• The sum of the currents sunk by all the I/Os on VSS, plus the maximum consumption of 
+the MCU sunk on VSS, cannot exceed the absolute maximum rating ΣIVSS (see 
+Table 14: Voltage characteristics). 
+Output voltage levels
+Unless otherwise specified, the parameters given in the table below are derived from tests 
+performed under the ambient temperature and supply voltage conditions summarized in 
+Table 17: General operating conditions. All I/Os are CMOS- and TTL-compliant (FT OR TT 
+unless otherwise specified).
+          
+Input/output AC characteristics
+The definition and values of input/output AC characteristics are given in Figure 26 and 
+Table 55, respectively.
+Unless otherwise specified, the parameters given are derived from tests performed under 
+the ambient temperature and supply voltage conditions summarized in Table 17: General 
+operating conditions.
+Table 54. Output voltage characteristics(1)(2) 
+Symbol Parameter Conditions Min Max Unit
+VOL
+(3) Output low level voltage for an I/O pin CMOS port  
+|IIO| = 2 mA for FT_c  
+I/Os = 8 mA for other I/Os VDD 
+≥ 2.7 V
+-0 . 4
+V
+VOH
+(3) Output high level voltage for an I/O pin V DD-0.4 -
+VOL
+(3) Output low level voltage for an I/O pin TTL port  
+|IIO| = 2 mA for FT_c  
+I/Os = 8 mA for other I/Os 
+VDD ≥ 2.7 V
+-0 . 4
+VOH
+(3) Output high level voltage for an I/O pin 2.4 -
+VOL
+(3) Output low level voltage for an I/O pin All I/Os except FT_c  
+|IIO| = 20 mA 
+VDD ≥ 2.7 V
+-1 . 3
+VOH
+(3) Output high level voltage for an I/O pin V DD-1.3 -
+VOL
+(3) Output low level voltage for an I/O pin |I IO| = 1 mA for FT_c  
+I/Os = 4 mA for other I/Os 
+VDD ≥ 1.62 V
+-0 . 4
+VOH
+(3) Output high level voltage for an I/O pin V DD-0.45 -
+VOLFM+(3)
+Output low level voltage for an FT I/O 
+pin in FM+ mode (FT I/O with “f” 
+option)
+|IIO| = 20 mA 
+VDD ≥ 2.7 V -0 . 4
+|IIO| = 10 mA 
+VDD ≥ 1.62 V -0 . 4
+1. The I IO current sourced or sunk by the device must always respect the absolute maximum rating specified in Table 14: 
+Voltage characteristics, and the sum of the currents sourced or sunk by all the I/Os (I/O ports and control pins) must always 
+respect the absolute maximum ratings ΣIIO.
+2. TTL and CMOS outputs are compatible with JEDEC standards JESD36 and JESD52.
+3. Guaranteed by design.

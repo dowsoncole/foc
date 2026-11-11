@@ -1,0 +1,9 @@
+19
+Period Periodic Output protocol Interface
+Electrical connection diagram:
+Encoder Controller
+The interface uses a two-wire differential A/B signal configuration. Termination resistors are required on
+both lines, and a termination resistor should be added on the controller side. This protocol is based on the RS422 protocol. The only difference is that the encoder actively transmits data
+through TX at a fixed interval of 1 ms and does not respond to data on the RX line. Internally, the encoder
+periodically triggers command “d” (0x64) to transmit the corresponding command data, refer to
+RS485/RS422 protocol interface section for details. PERIOD

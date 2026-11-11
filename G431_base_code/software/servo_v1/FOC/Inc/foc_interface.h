@@ -82,6 +82,15 @@ void FOC_ControllerStop(foc_controller_t *controller);
    后台 Servo Manager 负责状态切换、上报和复位策略。 */
 void FOC_ControllerStep(foc_controller_t *controller);
 
+/* Physical volts, consumed AFTER read_feedback has advanced the bounded
+   trajectory. Current/angle/reference, power-stage and PWM gates are shared
+   with ControllerStep; current is telemetry only and no PI is evaluated. */
+typedef struct {
+  float d_voltage_v, q_voltage_v, dc_bus_voltage_v;
+} foc_voltage_command_t;
+void FOC_ControllerVoltageStep(foc_controller_t *controller,
+                                const foc_voltage_command_t *command);
+
 /* 故障只允许在停止状态由 Servo Manager 显式清除。 */
 void FOC_ControllerClearFaults(foc_controller_t *controller);
 foc_fault_flags_t FOC_ControllerGetFaults(const foc_controller_t *controller);

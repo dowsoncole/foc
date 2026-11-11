@@ -1,0 +1,23 @@
+1
+MPT Magnetic Encoder
+Compact MPT magnetic encoder featuring an ultra-small form factor, based on KingKong Technology’s proprietary pattern magnetic
+technology. It delivers high-precision measurement within extremely
+limited space, achieving optical-level resolution and accuracy, while
+maintaining strong resistance to environmental interference. The MPT is based on magnetoelectric sensing technology and features
+proprietary interference shielding. Multiple high-precision magnetic field
+sensors are integrated inside the encoder to detect variations in the
+magnetic field of the rotor magnet ring. Combined with KingKong
+Technology’s precision calibration process, each unit is individually
+calibrated at the factory with unique magnetic field data to ensure
+optimal measurement accuracy. The unique rotor-stator tolerance-matching mounting method simplifies
+installation while ensuring measurement precision. The separated magnetoelectric design allows the encoder to effectively
+resist external disturbances such as vibration, dust, and oil
+contamination. Even under ultra-high-speed operation, accuracy and
+service life remain unaffected. The ultra-thin design with a hollow shaft makes it easy to integrate into
+a wide range of applications.
+● 24-bit absolute output ● ±0.01° accuracy ● Ultra-compact (Ring width 5mm) ● Models for every 5mm on diameter ● Stator and rotor tolerance fit
+mounting ● Magnetic interference shielding ● Hollow structure ● Permissible speed 8,000 rpm
+● Battery mode speed: 3,000 rpm
+● Multi-turn with battery mode or
+flash ● Various output interfaces ● Resistance to various
+environmental disturbances

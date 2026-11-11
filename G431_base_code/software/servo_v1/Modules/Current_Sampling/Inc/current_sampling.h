@@ -16,6 +16,14 @@ extern "C" {
 
 #include <stdint.h>
 
+/* Replacement PCB, MT6701 SSI active, MOE=0, 10 kHz, 2026-10-26.
+   Two independent 1024-sample windows: U=1892.974/1892.964,
+   V=1891.796/1891.876 ADC counts. Evidence:
+   control_analysis/results/mt6701_speed_scan_20261026/off_adc_noise*.bin.
+   Analog-chain or PCB changes require a new OFF calibration. */
+#define CURRENT_SAMPLING_BOARD_OFFSET_U 1893U
+#define CURRENT_SAMPLING_BOARD_OFFSET_V 1892U
+
 typedef enum
 {
   CURRENT_SAMPLING_PHASE_U = 0,
@@ -57,13 +65,28 @@ typedef struct
   uint32_t calibration_deadline_ms;
   volatile uint64_t calibration_sum_u;
   volatile uint64_t calibration_sum_v;
+  /* 最近一次零点采集窗口的原始码范围，供 Watch 判断模拟链噪声/开关干扰。
+     offset 只有在完整采满 target 后才会更新。 */
+  volatile uint16_t calibration_min_u;
+  volatile uint16_t calibration_max_u;
+  volatile uint16_t calibration_min_v;
+  volatile uint16_t calibration_max_v;
 } current_sampling_t;
 
 typedef void (*current_sampling_conversion_callback_t)(void *context);
 
 extern current_sampling_t g_current_sampling;
+/* Normal external-trigger JEOS path: copy JDR1/2, clear old completion flags,
+   then dispatch FOC. Other/error IRQ sources still go through the HAL. */
+void CurrentSampling_InjectedFastIrq(void);
 
-/** 请求一次异步零点校准；调用者必须确保三相电流为零，推荐保持 MOE 关闭。 */
+/** Load saved offsets at startup with MOE off and calibration still IDLE.
+    Returns 0 without changing state if the recorded configuration mismatches.
+    Does not collect samples, enable output, or clear a calibration error. */
+uint8_t CurrentSampling_LoadBoardCalibration(void);
+
+/** 模拟链稳定后请求约 1 ms 异步零点校准（20 kHz 下 20 帧）。
+    必须保持 MOE 关闭、三相电流为零；失败不提交新零偏。 */
 void CurrentSampling_RequestCalibration(void);
 
 /** 在主循环或应用任务中周期调用，不阻塞 FOC。 */
@@ -71,13 +94,14 @@ void CurrentSampling_Service(void);
 
 current_sampling_cal_state_t CurrentSampling_GetCalibrationState(void);
 
-/** 返回指定相的 16 倍过采样原始累加值，范围约 0..65520。 */
+/** 返回指定相的右对齐 12 位 ADC 原始码，范围 0..4095。 */
 uint16_t CurrentSampling_GetRaw(current_sampling_phase_t phase);
 
 /** 返回减去零点后的实际电流，单位 A。 */
 float CurrentSampling_GetCurrentA(current_sampling_phase_t phase);
 
-/** 给 FOC 使用的三相标定 S16 电流反馈，范围 -32768..32767。 */
+/** 旧的原始码域 S16 诊断接口，范围 -32768..32767，不带 U/V 安培比例。
+    当前 FOC 使用 CurrentSampling_ReadFeedback_A()，不要把本接口当作物理 A。 */
 void CurrentSampling_ReadFeedback_s16(int16_t *phase_u_s16,
                                       int16_t *phase_v_s16,
                                       int16_t *phase_w_s16);

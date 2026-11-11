@@ -77,7 +77,7 @@
 #define __DECIMAL_DIG__ __LDBL_DECIMAL_DIG__
 #define __ELF__ 1
 #define __ESCAPE__ 
-#define __FINITE_MATH_ONLY__ 1
+#define __FINITE_MATH_ONLY__ 0
 #define __FLT16_DECIMAL_DIG__ 5
 #define __FLT16_DENORM_MIN__ 5.9604644775390625e-8F16
 #define __FLT16_DIG__ 3

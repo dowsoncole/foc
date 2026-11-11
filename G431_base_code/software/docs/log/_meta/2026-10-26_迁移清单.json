@@ -1,0 +1,1308 @@
+{
+  "date": "2026-10-26",
+  "baseline": "873e79473c8aa3accf8482f3019dae4c45381bd0",
+  "records": [
+    {
+      "source": "README.md",
+      "destination": "software/docs/log/未注明日期_基础固件架构与审查历史记录.md",
+      "action": "copy",
+      "kind": "历史审查与设计",
+      "source_sha256": "1D0BC1C77129995D646179EF7923408317F404D0B0BE510009928F39942C1E3C",
+      "original_characters": 65696,
+      "archived_characters": 65882,
+      "archived_sha256": "68A99895EE1DB9E649CAC42769F2062AFE13AA6EE6D3EF258809737B2186FE8B"
+    },
+    {
+      "source": "ADC采样配置审查报告.md",
+      "destination": "software/docs/log/未注明日期_ADC采样配置静态审查.md",
+      "action": "move",
+      "kind": "代码审查",
+      "source_sha256": "4561665AA465794B94CEBD40B247F3481A2DB0BD7F4A13457072986F38ED3B47",
+      "original_characters": 2476,
+      "archived_characters": 2670,
+      "archived_sha256": "240DBD0BC8D1670ADB7EE780098036AC9A19C3ECD1B7BDBAB68A96D02C57A9B4"
+    },
+    {
+      "source": "software/servo_v1/MDK-ARM/docs/代码审查报告.md",
+      "destination": "software/docs/log/2026-10-16_伺服固件全模块代码审查.md",
+      "action": "move",
+      "kind": "代码审查",
+      "source_sha256": "752AB211823056B4AD423C39B582DE125311D5CBD395072E46E715DB8A1B368E",
+      "original_characters": 6897,
+      "archived_characters": 7117,
+      "archived_sha256": "F6FE8934E31E13857A1B1148CFAD90E10A2EAA84FAB380A7E8B15A9D09C01E5C"
+    },
+    {
+      "source": "software/servo_v1/MDK-ARM/docs/review_report_2026-10-17.md",
+      "destination": "software/docs/log/2026-10-17_FOC与采样链路代码审查.md",
+      "action": "move",
+      "kind": "代码审查",
+      "source_sha256": "045892BED68CE9CC3C48F1928A56F255972408B76510A764AA9B33F9E99BAC38",
+      "original_characters": 2047,
+      "archived_characters": 2285,
+      "archived_sha256": "4A3EEDCE8A9484F7C788F8FCAD15E7C89215A0EA79216D37A400844006339928"
+    },
+    {
+      "source": "software/servo_v1/MDK-ARM/docs/review_report_2026-10-18.md",
+      "destination": "software/docs/log/2026-10-18_FOC增量审查与问题跟踪.md",
+      "action": "move",
+      "kind": "代码审查",
+      "source_sha256": "D7723BA80C49334B9EA9246607570E5F6CA871D8227509399CA6613C68F3A8E5",
+      "original_characters": 2136,
+      "archived_characters": 2374,
+      "archived_sha256": "DBD67777CEEEC3D535B70FA56A0B8943E1DF38D5372BEA051449C439CEDA5790"
+    },
+    {
+      "source": "software/servo_v1/MDK-ARM/docs/review_report_2026-10-19.md",
+      "destination": "software/docs/log/2026-10-19_模式切换与波形链路代码审查.md",
+      "action": "move",
+      "kind": "代码审查",
+      "source_sha256": "D2597DE81410809105A1F608839960C47718759DDBB1799D524A642F2A987D2E",
+      "original_characters": 2640,
+      "archived_characters": 2878,
+      "archived_sha256": "39CF02CCCC8E0611E6F32065E2EFCA5CED79F0C89BBF69E73B7179902A765FEA"
+    },
+    {
+      "source": "software/servo_v1/MDK-ARM/docs/daily_changes_2026-10-18.md",
+      "destination": "software/docs/log/2026-10-18_伺服状态管理_SVPWM过调制与动态采样开发日志.md",
+      "action": "move",
+      "kind": "开发调试记录",
+      "source_sha256": "EA6452B29DFA67DDB51876FB5368728FFCDF4587F452B57609A183F5436213EF",
+      "original_characters": 24211,
+      "archived_characters": 24452,
+      "archived_sha256": "FA8E0F24FD0343BA9111335E9C9876228A19CF1B1DC20EEA3E332C2781AC6730"
+    },
+    {
+      "source": "software/servo_v1/MDK-ARM/docs/daily_changes_2026-10-19.md",
+      "destination": "software/docs/log/2026-10-19_FOC电压开环实机运行与时序验证日志.md",
+      "action": "move",
+      "kind": "开发调试记录",
+      "source_sha256": "9DDC74863BB1B56732811D76CD0A0C9CFD92548D636778F3344283252334E304",
+      "original_characters": 9522,
+      "archived_characters": 9762,
+      "archived_sha256": "EFA4313E5D19140B2927D7674F80F61E84FA40B4F4484155AC9A9FF29B7783DA"
+    },
+    {
+      "source": "software/servo_v1/MDK-ARM/docs/daily_changes_2026-10-19_afternoon.md",
+      "destination": "software/docs/log/2026-10-19_下午_控制模式统一与波形链路开发日志.md",
+      "action": "move",
+      "kind": "开发调试记录",
+      "source_sha256": "C9E8327DE72F4143A35239A476DFA12D5E3D7107BE7AEE62391B9FCBF4333B09",
+      "original_characters": 10671,
+      "archived_characters": 10913,
+      "archived_sha256": "5B8767FB1B3D22871A13F370AE1A7B8B0E10CFD81102479FA5A02F54C2CC5D29"
+    },
+    {
+      "source": "software/servo_v1/MDK-ARM/docs/current_open_loop_dq_closed_loop_fix.md",
+      "destination": "software/docs/log/未注明日期_DQ电流闭环极性与采样时序修复记录.md",
+      "action": "move",
+      "kind": "开发调试记录",
+      "source_sha256": "F95F279361B65B9646DB0344629211EDEBFAB23BAE5BD85D82A0AE4F3042CD37",
+      "original_characters": 6961,
+      "archived_characters": 7213,
+      "archived_sha256": "5320F0F5CD9CE6D2E54387D86BD0541D51176938F3044C7846AB412B95A9DC92"
+    },
+    {
+      "source": "software/servo_v1/MDK-ARM/docs/电流采样校准启动设计.md",
+      "destination": "software/docs/log/未注明日期_电流校准启动与复位尖峰设计排查记录.md",
+      "action": "move",
+      "kind": "设计与排查",
+      "source_sha256": "D59AA54A9AEB5880D22FF37B35C1BFF89CDFD36F30C3072C4A9E8640668F29B9",
+      "original_characters": 5343,
+      "archived_characters": 5568,
+      "archived_sha256": "60A3F94B374A75F762E15147790C7BA6FAE262940BD1AF42B0E74A36BCB20AF0"
+    },
+    {
+      "source": "software/servo_v1/MDK-ARM/docs/issue.md",
+      "destination": "software/docs/log/未注明日期_采样_FOC_编码器与测试待办跟踪.md",
+      "action": "move",
+      "kind": "历史问题跟踪",
+      "source_sha256": "5825F3BF7921E46AE62C546F02D92125533553D7B540BB0C6C76FC91289F26F9",
+      "original_characters": 2237,
+      "archived_characters": 2492,
+      "archived_sha256": "6AB9100ACDEAEAC29D160476DE13494388C17569CBA6A5C325AE51B67907011A"
+    },
+    {
+      "source": "software/servo_v1/MDK-ARM/docs/电流环速度环验收标准.md",
+      "destination": "software/docs/log/2026-10-23_电流环与速度环验收方案及记录模板.md",
+      "action": "move",
+      "kind": "历史验收方案",
+      "source_sha256": "B81AF1742DB16D2E097A5651FBCC3A8250A3F9DF1CFD6CA98F6DEB8C92B2BC4E",
+      "original_characters": 9544,
+      "archived_characters": 9813,
+      "archived_sha256": "0AD8A96BCDCC9DA0D086A292B1868D7CE249925BA852F63A567D37C3C1054AD8"
+    },
+    {
+      "source": "software/servo_v1/MDK-ARM/docs/output_position_mpt.md",
+      "destination": "software/docs/log/2026-10-26_MPT输出轴位置闭环接入与实机验收.md",
+      "action": "move",
+      "kind": "开发调试记录",
+      "source_sha256": "0E21AF0810322F5A937893C6A56A95D0FE6E19076AC48ABBDD4E102F74011E68",
+      "original_characters": 10401,
+      "archived_characters": 10636,
+      "archived_sha256": "2B3A79747763D892203347D0CCD6157DD489E0749BAB15A77976C6557E0E87D0"
+    },
+    {
+      "source": "software/servo_v1/MDK-ARM/docs/encoder/encoder_analysis_log_2026-10-20.md",
+      "destination": "software/docs/log/2026-10-20_编码器分层接口与测速方案分析记录.md",
+      "action": "move",
+      "kind": "设计分析",
+      "source_sha256": "95DF73BC43C20DCBA146B7372617E9B5752B8797393CD7744C6D8CD8D32C6FF2",
+      "original_characters": 14557,
+      "archived_characters": 14810,
+      "archived_sha256": "20654695B1A6565FB21A41419A098E03B1CC1BFE822E872C023AB64870090488"
+    },
+    {
+      "source": "software/servo_v1/MDK-ARM/docs/encoder/spi_logic_analysis_2026-10-22.md",
+      "destination": "software/docs/log/2026-10-22至2026-10-24_MT6835通讯异常与高速时序调试日志.md",
+      "action": "move",
+      "kind": "开发调试记录",
+      "source_sha256": "62ECE436AABA3646D4A369A3FE023233A301AC729776ABF2BF839983E2271BE9",
+      "original_characters": 90022,
+      "archived_characters": 90275,
+      "archived_sha256": "D23DE2A98C17E719B873214BD4C0A23EB16A59D3D21596285AA0E59F3611AE13"
+    },
+    {
+      "source": "software/servo_v1/MDK-ARM/docs/字段/编码器结构体字段说明.md",
+      "destination": "software/docs/log/2026-10-22_SPI提速与编码器隔离调试补充记录.md",
+      "action": "extract",
+      "kind": "历史调试摘录",
+      "source_sha256": "F72EAE65651FE42D0203C1D76B7EEB91044A27403CACEB530D10068834893F23",
+      "source_lines": "310-450",
+      "original_characters": 16299,
+      "archived_characters": 5826,
+      "archived_sha256": "1D7B0AD9D6C9ACCF667D4E0B85AF3C0CF4B54AE9D2157C70D2658E7C72855AF6"
+    },
+    {
+      "source": "software/servo_v1/Tests/mt6701_spi3_test.md",
+      "destination": "software/docs/log/2026-10-23_MT6701_SPI3通信方案与实测日志.md",
+      "action": "move",
+      "kind": "开发调试记录",
+      "source_sha256": "0596D0CA5D2250FE10A5817E62385AA98120847D271B3218EE2A003BACDA237B",
+      "original_characters": 2990,
+      "archived_characters": 3170,
+      "archived_sha256": "E32DCBE13FE47D4FF3CCB23A222BA93E710F3B7D9A0136ABAC8FE2FDD144BC9B"
+    },
+    {
+      "source": "software/servo_v1/FOC/README.md",
+      "destination": "software/docs/log/未注明日期_过调制与动态电流采样设计验证记录.md",
+      "action": "move",
+      "kind": "设计与验证",
+      "source_sha256": "17EF06F10EE6C6A6BDE2382288F637971BF580E3E257112D9F5202886E8A7278",
+      "original_characters": 4722,
+      "archived_characters": 4934,
+      "archived_sha256": "F1D795A45A647BCE99D1FA57290DFB565FBE1E1CBB471CD8DD4D60B99B05AEE5"
+    },
+    {
+      "source": "software/servo_v1/2026-10-22_文档汇总/2026-10-22_文档汇总/2026-10-22_代码审查报告.md",
+      "destination": "software/docs/log/2026-10-22_文档汇总代码审查记录.md",
+      "action": "move",
+      "kind": "代码审查",
+      "source_sha256": "A971BE7D2EC7E54EEAB26A88E288C6739473BF80560B83B21D55A9698A6C4C80",
+      "original_characters": 7849,
+      "archived_characters": 8296,
+      "archived_sha256": "5BD73227A7123130AB99350BF1FE08BD451BAE2809847EC058BE004E501702A9"
+    },
+    {
+      "source": "software/servo_v1/2026-10-22_文档汇总/2026-10-22_文档汇总/2026-10-22_验证记录.md",
+      "destination": "software/docs/log/2026-10-22_文档汇总验证与证据记录.md",
+      "action": "move",
+      "kind": "验证记录",
+      "source_sha256": "DADD2960931AAB15A997C51F32D71E93751246FAEB3A5AD65FF1B436F0B5A8E9",
+      "original_characters": 6457,
+      "archived_characters": 6753,
+      "archived_sha256": "5C0228C5A2B8F093CD089C952D0E1FE15E8006C86BCA0F4A95FC859259443246"
+    },
+    {
+      "source": "software/servo_v1/2026-10-22_文档汇总/2026-10-22_文档汇总/闭环整定模块实施路径.md",
+      "destination": "software/docs/log/2026-10-22_闭环整定模块实施方案_规划记录.md",
+      "action": "move",
+      "kind": "历史规划",
+      "source_sha256": "BA4533054AD26748617DD349F5FEC4A6CC7540D2F6D9F94726B4359CA71A755C",
+      "original_characters": 14148,
+      "archived_characters": 14567,
+      "archived_sha256": "F8717184F7FFD39E2A32475011D9C359273B37D154C2A4AD68693D1A3B3B4590"
+    },
+    {
+      "source": "software/servo_v1/2026-10-22_文档汇总/2026-10-22_文档汇总/系统性能评估模块实施路径.md",
+      "destination": "software/docs/log/2026-10-22_系统性能评估实施方案_规划记录.md",
+      "action": "move",
+      "kind": "历史规划",
+      "source_sha256": "5DF022B8BC4E19E47393EB1463DEE7D1653A0A74B7E927EA94DD574D65C1368D",
+      "original_characters": 10326,
+      "archived_characters": 10731,
+      "archived_sha256": "6F1912BB3334C0820A0994FA4BC1D107331E7337A63AB23DB31DA2B685C1C3B9"
+    },
+    {
+      "source": "software/servo_v1/2026-10-22_文档汇总/2026-10-22_文档汇总/故障保护模块实施路径.md",
+      "destination": "software/docs/log/2026-10-22_故障保护模块实施方案_规划记录.md",
+      "action": "move",
+      "kind": "历史规划",
+      "source_sha256": "87E703D95C7CCAA64DD75C1598B99B2A0E26BD311DFE0CDA5D7D8688B31517CC",
+      "original_characters": 8348,
+      "archived_characters": 8680,
+      "archived_sha256": "D8B4317B0D2F148F2BA30BF57DB98A92EC41AB02AC65C73C7C97DBA22F67A58A"
+    },
+    {
+      "source": "software/servo_v1/2026-10-22_文档汇总/2026-10-22_文档汇总/串口PC通讯模块实施路径.md",
+      "destination": "software/docs/log/2026-10-22_串口PC通讯实施方案_规划记录.md",
+      "action": "move",
+      "kind": "历史规划",
+      "source_sha256": "5263D5FCF9F07B8738EA74C26675C583A9EB8940ED771FADA7F4637CE649F740",
+      "original_characters": 10037,
+      "archived_characters": 10357,
+      "archived_sha256": "B78F569131A5376BB9ECE5376AFCE94663AC7FE4724BBC7B75AC649F5691F16A"
+    },
+    {
+      "source": "software/servo_v1/2026-10-22_文档汇总/2026-10-22_文档汇总/上位机读写参数表.md",
+      "destination": "software/docs/log/2026-10-22_上位机参数字典草案_规划记录.md",
+      "action": "move",
+      "kind": "历史规划",
+      "source_sha256": "99DA72CB51AB1243F4205D60D8DF34B8DD2335D5B1D0ECEDA6912B538B842F57",
+      "original_characters": 53465,
+      "archived_characters": 53989,
+      "archived_sha256": "994F3BF35D2499DA4DBB1240BB8DD9CBF40EBA48E4E6E1F565ECD9B3F2378F38"
+    },
+    {
+      "source": "software/control_analysis/2026-10-20_ADC配置对比实测.md",
+      "destination": "software/docs/log/2026-10-20_ADC配置对比实测.md",
+      "action": "move",
+      "kind": "开发调试记录",
+      "source_sha256": "F750E0B875488CB72970B04E6D0C74EBFC2BBCE1BAD9AF64342A45C3DFE66221",
+      "original_characters": 3555,
+      "archived_characters": 3875,
+      "archived_sha256": "0C2F483998FFFA943D7FDCE6B85F6333C670D64548A1C9410C94F6DE4F920A73"
+    },
+    {
+      "source": "software/control_analysis/2026-10-20_Q轴顶格与RS485截帧排查.md",
+      "destination": "software/docs/log/2026-10-20_Q轴顶格与RS485截帧排查.md",
+      "action": "move",
+      "kind": "开发调试记录",
+      "source_sha256": "2E9CF81658B1E7D2031FC4384D57A571F73A66B3301CE90F33C3F437EDCF3B3D",
+      "original_characters": 1747,
+      "archived_characters": 2072,
+      "archived_sha256": "CD43EB11F30325B95D514C02134F4F7A1A76F2F6C68B39D8C53F11CD6C5E8EB0"
+    },
+    {
+      "source": "software/control_analysis/2026-10-20_固定零电角度DQ电流环工作日志.md",
+      "destination": "software/docs/log/2026-10-20_固定零电角度DQ电流环工作日志.md",
+      "action": "move",
+      "kind": "开发调试记录",
+      "source_sha256": "C7203BC56DD5F067D85C22FBAD7EE3CDE11A7EF217EFE6751BEC30F3F53E4917",
+      "original_characters": 11204,
+      "archived_characters": 11530,
+      "archived_sha256": "E710D19E25DD771AEB6F35088610F4FC5475C12FE6CF5ABE2E43EE97944845D2"
+    },
+    {
+      "source": "software/control_analysis/2026-10-20_实机下载与保护停机记录.md",
+      "destination": "software/docs/log/2026-10-20_实机下载与保护停机记录.md",
+      "action": "move",
+      "kind": "开发调试记录",
+      "source_sha256": "350196AB39A64659524B1F14F45BD2DF1CC7D952E2B22B733A6DE0410980A008",
+      "original_characters": 4037,
+      "archived_characters": 4359,
+      "archived_sha256": "5D22030483541964B18BCD98CB8E5C4E68C7BF9F6C2E7AF3968301E46734E006"
+    },
+    {
+      "source": "software/control_analysis/2026-10-20_零给定与串口波形核查.md",
+      "destination": "software/docs/log/2026-10-20_零给定与串口波形核查.md",
+      "action": "move",
+      "kind": "开发调试记录",
+      "source_sha256": "26722AFB9DA0A4EBE73610FFEF25F7919CBDF66DFA3CBC8AF51C44AB2F873E75",
+      "original_characters": 1986,
+      "archived_characters": 2307,
+      "archived_sha256": "D243F81E0C647F5E1622963601104355E9F58245DDF8E4B7EF73FCA3E2EE0EFF"
+    },
+    {
+      "source": "software/control_analysis/2026-10-21_PI候选实测比较与续测状态.md",
+      "destination": "software/docs/log/2026-10-21_PI候选实测比较与续测状态.md",
+      "action": "move",
+      "kind": "开发调试记录",
+      "source_sha256": "43976A4E3972FAD9DD21ABE13FC2E0EAEF722E25A0D8C879A8B0C179946CD359",
+      "original_characters": 3040,
+      "archived_characters": 3364,
+      "archived_sha256": "ACD09894F974AC2295417F737064DDA142C47DE2C46A71725D014FBD2C736E15"
+    },
+    {
+      "source": "software/control_analysis/2026-10-21_启动0x0A修复与高速编码器排查.md",
+      "destination": "software/docs/log/2026-10-21_启动0x0A修复与高速编码器排查.md",
+      "action": "move",
+      "kind": "开发调试记录",
+      "source_sha256": "E997610078129D4A6111BE8F4A7354943B92326752597251EC2E55B5ABFF57AB",
+      "original_characters": 20772,
+      "archived_characters": 21465,
+      "archived_sha256": "E8C794E0575465EC7EB7462AFAC392517AE7006A156CB7DECD5FE1492A1C494A"
+    },
+    {
+      "source": "software/control_analysis/2026-10-21_持续速度闭环与15A保护调试日志.md",
+      "destination": "software/docs/log/2026-10-21_持续速度闭环与15A保护调试日志.md",
+      "action": "move",
+      "kind": "开发调试记录",
+      "source_sha256": "83C578221D20C4BB857D5F3194A3B9AE19FCC61BCD14AF959FFA017F0D932E6D",
+      "original_characters": 13789,
+      "archived_characters": 14116,
+      "archived_sha256": "5F961D816B973C3E33D7A3EB7B4CFE0B90C361F91D6533A2D6B5AC06EDB348D0"
+    },
+    {
+      "source": "software/control_analysis/2026-10-21_控制周期修复与重新整定日志.md",
+      "destination": "software/docs/log/2026-10-21_控制周期修复与重新整定日志.md",
+      "action": "move",
+      "kind": "开发调试记录",
+      "source_sha256": "43D70C5B7CC36E74D9C1EFF467980B688451D96FC60AECD44152C68E6596EFB1",
+      "original_characters": 4586,
+      "archived_characters": 4910,
+      "archived_sha256": "BFA97A1F733718A74335299E1EB1714521B08E7336931653AED0EFFC463B72F4"
+    },
+    {
+      "source": "software/control_analysis/2026-10-21_速度闭环详细工作日志.md",
+      "destination": "software/docs/log/2026-10-21_速度闭环详细工作日志.md",
+      "action": "move",
+      "kind": "开发调试记录",
+      "source_sha256": "27BD146AC32F60B363580E095E2EE742B37C46C21BFBF6282B1A8EA5EFCF4C91",
+      "original_characters": 27955,
+      "archived_characters": 28274,
+      "archived_sha256": "51BD0D4CEDA80BC6A1CB22FC4F0071218D6C1CC9C518A756D0D8C9ABF7F4E5DC"
+    },
+    {
+      "source": "software/control_analysis/2026-10-22_2500rpm停机与高速反馈时序排查.md",
+      "destination": "software/docs/log/2026-10-22_2500rpm停机与高速反馈时序排查.md",
+      "action": "move",
+      "kind": "开发调试记录",
+      "source_sha256": "059795818F36B889A3E917F436D63894ACF9262E24FE8CA4DFD10988F3B34662",
+      "original_characters": 14522,
+      "archived_characters": 14849,
+      "archived_sha256": "0DB5C26B5094A4CF9F6A79DE89AFCB4AF989F5A377FCD7A687A0115FF597D0FD"
+    },
+    {
+      "source": "software/control_analysis/2026-10-22_PA0编码器通讯标记与逻辑分析仪核对.md",
+      "destination": "software/docs/log/2026-10-22_PA0编码器通讯标记与逻辑分析仪核对.md",
+      "action": "move",
+      "kind": "开发调试记录",
+      "source_sha256": "DB35CD6D4C7AC9A79FB2AFC2C0A917C7C831241D4FE26FD3F8B0FBCD0026390C",
+      "original_characters": 6544,
+      "archived_characters": 6873,
+      "archived_sha256": "97560F8AEEAFD1D9A440DE72E207DAA8BA4CFA8B8F0BC81302E4D65436B026C1"
+    },
+    {
+      "source": "software/control_analysis/2026-10-22_取消连续速度相电流软件跳闸.md",
+      "destination": "software/docs/log/2026-10-22_取消连续速度相电流软件跳闸.md",
+      "action": "move",
+      "kind": "开发调试记录",
+      "source_sha256": "CD62129F257A9ABA2DA8DCAB4763429C9F71AAE0F1A5E8D27402A83C84C9FB05",
+      "original_characters": 4928,
+      "archived_characters": 5342,
+      "archived_sha256": "DAB27AFE59133708B52C752DCDCEFE6B04E3626DAA2E3C83EF3926ADA6C32B7B"
+    },
+    {
+      "source": "software/control_analysis/MATLAB辨识与整定结果.md",
+      "destination": "software/docs/log/未注明日期_MATLAB速度辨识与整定结果汇总.md",
+      "action": "move",
+      "kind": "辨识结果",
+      "source_sha256": "805F6C6F11409B2B0AB4442DFD606AED5F196FF9DB4FDEE1CBDF3F701232D5DF",
+      "original_characters": 1707,
+      "archived_characters": 2133,
+      "archived_sha256": "2A2D951AB3AC8A3DB4E0655A30C69ABD1F60C2855FB507090F33DFC9F93BA92D"
+    },
+    {
+      "source": "software/control_analysis/results/encoder_lifecycle_fix_20261022/README.md",
+      "destination": "software/docs/log/2026-10-22_SPI_DMA生命周期恢复修复交付记录.md",
+      "action": "move",
+      "kind": "修复交付",
+      "source_sha256": "9CFD17130D5AB4D8ABFC2D5AD8452446554A9238CA5EFE90D9C1EAA4E78F5522",
+      "original_characters": 2240,
+      "archived_characters": 2584,
+      "archived_sha256": "4BBCEC4979AC0E44DBA65445C4E290B17074878AD101C65545760C6DEE5EE539"
+    },
+    {
+      "source": "software/control_analysis/results/encoder_lifecycle_fix_20261022/analysis_before_review.md",
+      "destination": "software/docs/log/2026-10-22_SPI逻辑分析初稿_已被复核修正.md",
+      "action": "move",
+      "kind": "历史诊断初稿",
+      "source_sha256": "3C64C7A9887A10E22A3F99B7B9773A1F43DABF09552D39423E33172874479E84",
+      "original_characters": 7264,
+      "archived_characters": 7626,
+      "archived_sha256": "135470D21960CAD6E8263DACA811E950A99A5BE1B9ADA3ADD90240121D06F0F6"
+    },
+    {
+      "source": "software/control_analysis/results/encoder_lifecycle_fix_20261022/analysis_reviewed.md",
+      "destination": "software/docs/log/2026-10-22_SPI逻辑分析复核与恢复修复记录.md",
+      "action": "move",
+      "kind": "诊断复核",
+      "source_sha256": "E7C09EECF47E0618EDF66454A4CBBBB58B7851A64DDF29ECDB6847CB3C7C8982",
+      "original_characters": 7981,
+      "archived_characters": 8336,
+      "archived_sha256": "602C7953A7B27179473FBA6709C2A1F6A1EFA82D0D27247B0EA17F6618B51F63"
+    },
+    {
+      "source": "software/control_analysis/results/highspeed_7500_20261022/README.md",
+      "destination": "software/docs/log/2026-10-22_7500rpm速度闭环实板验收记录.md",
+      "action": "move",
+      "kind": "实板验收",
+      "source_sha256": "509A5C1D543C711037D7E63E3F11A3DA7E202CEB83381F6C82BCB3D6EFDABCA5",
+      "original_characters": 1684,
+      "archived_characters": 2014,
+      "archived_sha256": "907D9774705C1A23D465ECE015E3FF9154F8288E0777F64556031DBC02E4E956"
+    },
+    {
+      "source": "software/control_analysis/results/highspeed_7500_release_20261022/README.md",
+      "destination": "software/docs/log/2026-10-22_7500rpm速度闭环发布副本验收记录.md",
+      "action": "move",
+      "kind": "实板验收副本",
+      "source_sha256": "509A5C1D543C711037D7E63E3F11A3DA7E202CEB83381F6C82BCB3D6EFDABCA5",
+      "original_characters": 1684,
+      "archived_characters": 2032,
+      "archived_sha256": "6C1AA49D7AFC28579B3AC8FA87702338D9311322563DC99211E4DD0A2F57F966"
+    },
+    {
+      "source": "software/control_analysis/results/highspeed_7500_release_20261022/report.md",
+      "destination": "software/docs/log/2026-10-22_7500rpm发布时SPI诊断记录.md",
+      "action": "move",
+      "kind": "历史诊断",
+      "source_sha256": "E6012AF5396C36B23940FE7F4C95A2BF0F5ABBE6BC7C179D1C129768826A74FF",
+      "original_characters": 15195,
+      "archived_characters": 15541,
+      "archived_sha256": "3D4F58D92F2FFFAA54A44AF44FDD011E04859B29902EE8A9CC01E592C77D4729"
+    },
+    {
+      "source": "software/control_analysis/results/highspeed_i2t_6arms_18arms_5s_20261022/README.md",
+      "destination": "software/docs/log/2026-10-22_I2t过载保护候选构建与软件验证.md",
+      "action": "move",
+      "kind": "候选验证",
+      "source_sha256": "20488F3F3D2909CF4768F21B6AFC13BE5934379A74B9ADAED1D99699B6006D53",
+      "original_characters": 2070,
+      "archived_characters": 2430,
+      "archived_sha256": "CFB27214EE148D6A0B9A66BF8ADE3B76F6F50D07253B81DDE5EB02A5B010A521"
+    },
+    {
+      "source": "software/control_analysis/results/highspeed_csfirst_20261023/README.md",
+      "destination": "software/docs/log/2026-10-23_CS优先候选启动过流与零位漂移记录.md",
+      "action": "move",
+      "kind": "失败记录",
+      "source_sha256": "971AFCC09051215615DAB28B88EE938BB5BC3676DA269CCF3A4C45A2AAD1D0DF",
+      "original_characters": 294,
+      "archived_characters": 630,
+      "archived_sha256": "9A34CD8D955E04CD1DC1B4C461FD28A012C9C233B172053AFEDF691C5C5106FE"
+    },
+    {
+      "source": "software/control_analysis/results/highspeed_diagnosis_20261023/README.md",
+      "destination": "software/docs/log/2026-10-23_8200rpm续测与机械零位漂移排查.md",
+      "action": "move",
+      "kind": "实机排查",
+      "source_sha256": "0757B4F1DAA547E33516BC7A04477C21A80413ADDF92CDE376C5FA9861285B15",
+      "original_characters": 2071,
+      "archived_characters": 2411,
+      "archived_sha256": "6CC690C741AAC1EA1447EB1514125977A4EF0944A85AB438EF1C1B490C353982"
+    },
+    {
+      "source": "software/control_analysis/results/glued_slew_medium_20261023/README.md",
+      "destination": "software/docs/log/2026-10-23_GPIO边沿速率对照与高速故障记录.md",
+      "action": "move",
+      "kind": "对照试验",
+      "source_sha256": "3922B4C64AEF58BA178DBDF6E0A9F15374C23DFFF1D790FF8E16EC441AB7DC2A",
+      "original_characters": 1657,
+      "archived_characters": 1993,
+      "archived_sha256": "97D0E0FE3A534C869ECA45BD52B6F2A0CA40C5DEF04B960D58DF57E791971F5A"
+    },
+    {
+      "source": "software/control_analysis/results/secured_align3a_slow_20261023/README.md",
+      "destination": "software/docs/log/2026-10-23_3A慢斜坡对齐候选与验证记录.md",
+      "action": "move",
+      "kind": "候选验证",
+      "source_sha256": "D809B412A3CFC07AFF023E378C23997ED19CB2213A9CE4F4B70F6681B55EBBDF",
+      "original_characters": 1328,
+      "archived_characters": 1670,
+      "archived_sha256": "698230D221BDDF0C0552AC8FD9F455336B180E1B0702E984AD62FEE04AB35609"
+    },
+    {
+      "source": "software/control_analysis/results/zero_bidirectional_candidate_20261023/README.md",
+      "destination": "software/docs/log/2026-10-23_双向零位首版候选启动超时记录.md",
+      "action": "move",
+      "kind": "失败记录",
+      "source_sha256": "73E6DE0D483FA87C4EA248AC8D568C1133C5AFC3A2E2DF6178219DD7BF567DD7",
+      "original_characters": 117,
+      "archived_characters": 475,
+      "archived_sha256": "27FC05DA3191B2A0A44EC41E1E276A7D9AE25894AE14DFEEB9B78B1778F3DB24"
+    },
+    {
+      "source": "software/control_analysis/results/zero_bidirectional_readyfix_20261023/README.md",
+      "destination": "software/docs/log/2026-10-23_双向零位诊断就绪流程修复记录.md",
+      "action": "move",
+      "kind": "修复记录",
+      "source_sha256": "2DA18B2F8C6D5DA5180ACED6274EA412A729D0E040CC3E8BD52F26DF50A24D6E",
+      "original_characters": 665,
+      "archived_characters": 1021,
+      "archived_sha256": "E843442A2578128633866C32556E39A8B577C7189150475BB540F58D326291DF"
+    },
+    {
+      "source": "software/control_analysis/results/zero_config_guard_20261023/README.md",
+      "destination": "software/docs/log/2026-10-23_MT6835零点配置监测候选记录.md",
+      "action": "move",
+      "kind": "诊断候选",
+      "source_sha256": "B5177054D989A42526AF2F7D84F5233E5617E5759A420183FBE2265BF5731B6E",
+      "original_characters": 1660,
+      "archived_characters": 1996,
+      "archived_sha256": "D814E686008F5402EB6D7A54548EF06F0F9125058B112A1D518E5130A7A54CC5"
+    },
+    {
+      "source": "software/control_analysis/results/mt6835_zero_trace_20261023/README.md",
+      "destination": "software/docs/log/2026-10-23_MT6835零位原始故障捕获候选记录.md",
+      "action": "move",
+      "kind": "诊断候选",
+      "source_sha256": "73F4B05868F377BC3340EDFD1F0942117B63702A29048ADA81673877469739FD",
+      "original_characters": 2005,
+      "archived_characters": 2341,
+      "archived_sha256": "6B3C5A2D4D274F35913B5B0B3DA027ABCB09E67FA307A7E6C813C82A944D988A"
+    },
+    {
+      "source": "software/control_analysis/results/mt6701_spi3_cs_20261023_152804/verification.md",
+      "destination": "software/docs/log/2026-10-23_MT6701_SPI3软件片选断点验证.md",
+      "action": "move",
+      "kind": "实机验证",
+      "source_sha256": "5CA809C801A0EDB6FB60DE25DCAB703180488C81A174CF4C20BFABA7DCA04174",
+      "original_characters": 1217,
+      "archived_characters": 1567,
+      "archived_sha256": "95A537A506C006228A3294724A38FE9972B36E8750BD037526E71C5799158035"
+    },
+    {
+      "source": "software/control_analysis/results/mt6701_spi3_verify_20261023_150246/verification.md",
+      "destination": "software/docs/log/2026-10-23_MT6701_SPI3首次烧录与通信失败记录.md",
+      "action": "move",
+      "kind": "实机验证",
+      "source_sha256": "26F1901A2FA7E12A6539DF771CF9CB0046940A82381E626A53FEC2B5D4710731",
+      "original_characters": 1283,
+      "archived_characters": 1641,
+      "archived_sha256": "945B0C860C41404CA666A410C1E6205F2CAE8D8F8CA0AF213F57C1C647C1CB02"
+    },
+    {
+      "source": "software/control_analysis/results/speed_measured_summary.md",
+      "destination": "software/docs/log/未注明日期_速度测试时域与频域实测汇总.md",
+      "action": "move",
+      "kind": "生成报告",
+      "source_sha256": "36DA7B8EEADD1DC917814FC8D47ACB9E7477C051FE315F6B2A112D5ABC88938C",
+      "original_characters": 2491,
+      "archived_characters": 2851,
+      "archived_sha256": "D7936606418487AEF5E37ED7D2AE3B1453600AA02170B6A6D1DE21F687E33D34"
+    },
+    {
+      "source": "software/servo_v1/README.md",
+      "destination": "software/docs/架构说明.md",
+      "action": "delete",
+      "kind": "重复或过时用户说明",
+      "source_sha256": "DDAB9FC249CB611840D2ADA684EBB4CCE1E1B01D1E12DF4FF82A9FDFE3EB19F2"
+    },
+    {
+      "source": "software/control_analysis/README.md",
+      "destination": "software/docs/架构说明.md",
+      "action": "delete",
+      "kind": "重复或过时用户说明",
+      "source_sha256": "9A51350BE3B0747BF4E85FF6B247B5413E453CA8F09F2C8F788A8FF55FA8C607"
+    },
+    {
+      "source": "software/control_analysis/速度闭环_用户说明.md",
+      "destination": "software/docs/架构说明.md",
+      "action": "delete",
+      "kind": "重复或过时用户说明",
+      "source_sha256": "C052AC820DCAD17E611A66D228C1B7E37C42DAF5B9ABCC70F88560FA30F36582"
+    },
+    {
+      "source": "software/servo_v1/MDK-ARM/docs/程序架构与执行逻辑.md",
+      "destination": "software/docs/架构说明.md",
+      "action": "delete",
+      "kind": "重复或过时用户说明",
+      "source_sha256": "BE3D94C18FD12F7ADF46E374238525C676258EDB9287F15FF1B4A9633F4C85C5"
+    },
+    {
+      "source": "software/servo_v1/MDK-ARM/docs/代码框架说明.md",
+      "destination": "software/docs/架构说明.md",
+      "action": "delete",
+      "kind": "重复或过时用户说明",
+      "source_sha256": "07CEB38A6610AF25E73A19EF22F60231B1982A4B3612ABE6C13B42046877DC24"
+    },
+    {
+      "source": "software/servo_v1/MDK-ARM/docs/电流采样.md",
+      "destination": "software/docs/架构说明.md",
+      "action": "delete",
+      "kind": "重复或过时用户说明",
+      "source_sha256": "E3CB44AC9CF6C2B2459AE08F5A0F1A36C6B449818A7DD7AFE6DEB378D097F411"
+    },
+    {
+      "source": "software/servo_v1/MDK-ARM/docs/control_loop_organization.md",
+      "destination": "software/docs/架构说明.md",
+      "action": "delete",
+      "kind": "重复或过时用户说明",
+      "source_sha256": "EB6BACE5CDBAC8C3D122EC5BAD85E3E07842562E6196DC4FF97EFFAC6A8DF87D"
+    },
+    {
+      "source": "software/servo_v1/MDK-ARM/docs/foc.md",
+      "destination": "software/docs/架构说明.md",
+      "action": "delete",
+      "kind": "重复或过时用户说明",
+      "source_sha256": "A43FA3A1DC6EFD0C61A3B8B0F2CBD34A05AC772675ECE6EFBD80B61F6BBE75E5"
+    },
+    {
+      "source": "software/servo_v1/MDK-ARM/docs/pc_waveform_protocol.md",
+      "destination": "software/docs/架构说明.md",
+      "action": "delete",
+      "kind": "重复或过时用户说明",
+      "source_sha256": "81F41A16F389E0D4FBD87F13E10F3FB9E3B0D102CA1396CAB4723B4DAAACF6DF"
+    },
+    {
+      "source": "software/servo_v1/MDK-ARM/docs/rs485_waveform_test.md",
+      "destination": "software/docs/架构说明.md",
+      "action": "delete",
+      "kind": "重复或过时用户说明",
+      "source_sha256": "7659243D66B0CC5D1B4CEC9729C99F3689E3B023A4258F0B4889222EDACF52BE"
+    },
+    {
+      "source": "software/servo_v1/MDK-ARM/docs/run.md",
+      "destination": "software/docs/架构说明.md",
+      "action": "delete",
+      "kind": "重复或过时用户说明",
+      "source_sha256": "3AF689BB1D9D7B8C5CB3E9FB35775AF089822F323B63AA5CCCA2E748542FECBD"
+    },
+    {
+      "source": "software/servo_v1/MDK-ARM/docs/running与MOE配合关系.md",
+      "destination": "software/docs/架构说明.md",
+      "action": "delete",
+      "kind": "重复或过时用户说明",
+      "source_sha256": "647450EA1957227703A9688899BEF1A7A9E774064D1C41D8A7839776BAD2C5E8"
+    },
+    {
+      "source": "software/servo_v1/MDK-ARM/docs/字段/速度闭环结构体字段说明.md",
+      "destination": "software/docs/架构说明.md",
+      "action": "delete",
+      "kind": "重复或过时用户说明",
+      "source_sha256": "D5B977BEA8E22F5AB756C1BB4DAD4AD0073A9E3097E0C9725F03F491FF1D86A8"
+    },
+    {
+      "source": "software/servo_v1/MDK-ARM/docs/encoder/README.md",
+      "destination": "software/docs/架构说明.md",
+      "action": "delete",
+      "kind": "重复或过时用户说明",
+      "source_sha256": "2D2C3AB3C2765412FC264ED65647664F600F7FDB88A9C6E8992995B9C69E335F"
+    },
+    {
+      "source": "software/servo_v1/MDK-ARM/docs/encoder/encoder_user_guide.md",
+      "destination": "software/docs/架构说明.md",
+      "action": "delete",
+      "kind": "重复或过时用户说明",
+      "source_sha256": "8425B4B96F8BA2A715CA581A7B9CB0903A0A58D6AE31E8C404A76CA4B0D76000"
+    },
+    {
+      "source": "software/servo_v1/2026-10-22_文档汇总/2026-10-22_文档汇总/README.md",
+      "destination": "software/docs/架构说明.md",
+      "action": "delete",
+      "kind": "重复或过时用户说明",
+      "source_sha256": "1047BD62E6669A1467E3C8C12E8ABBBD54F5904E9B0A02151F399F7A196B6F6C"
+    },
+    {
+      "source": "software/servo_v1/2026-10-22_文档汇总/2026-10-22_文档汇总/项目入口.md",
+      "destination": "software/docs/架构说明.md",
+      "action": "delete",
+      "kind": "重复或过时用户说明",
+      "source_sha256": "77D4A3251D9D077AF889AA8E8A8C14E79A8E6B30D90B424473CA040E912D8AF1"
+    },
+    {
+      "source": "software/servo_v1/2026-10-22_文档汇总/2026-10-22_文档汇总/项目简明说明.md",
+      "destination": "software/docs/架构说明.md",
+      "action": "delete",
+      "kind": "重复或过时用户说明",
+      "source_sha256": "09C33B4CE5D726A0C31463D0BBCB77FA3A089E97C1701B1383CD2F79F6EFA69D"
+    },
+    {
+      "source": "software/servo_v1/2026-10-22_文档汇总/2026-10-22_文档汇总/项目技术说明.md",
+      "destination": "software/docs/架构说明.md",
+      "action": "delete",
+      "kind": "重复或过时用户说明",
+      "source_sha256": "3031A32D1DB950FECE7FD676D904B4AFCE61763C6AD0A7CAD2E26FF4D7C987FA"
+    }
+  ],
+  "link_changes": [
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\README.md",
+      "old": "software/servo_v1/FOC/README.md#当前板级采样约束",
+      "new": "未注明日期_过调制与动态电流采样设计验证记录.md#当前板级采样约束"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\MDK-ARM\\docs\\daily_changes_2026-10-18.md",
+      "old": "../../../../README.md",
+      "new": "未注明日期_基础固件架构与审查历史记录.md"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\MDK-ARM\\docs\\daily_changes_2026-10-18.md",
+      "old": "../../README.md",
+      "new": "../架构说明.md"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\MDK-ARM\\docs\\daily_changes_2026-10-18.md",
+      "old": "../../FOC/README.md",
+      "new": "未注明日期_过调制与动态电流采样设计验证记录.md"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\MDK-ARM\\docs\\daily_changes_2026-10-18.md",
+      "old": "review_report_2026-10-18.md",
+      "new": "2026-10-18_FOC增量审查与问题跟踪.md"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\MDK-ARM\\docs\\daily_changes_2026-10-19_afternoon.md",
+      "old": "pc_waveform_protocol.md",
+      "new": "../架构说明.md"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\MDK-ARM\\docs\\daily_changes_2026-10-19_afternoon.md",
+      "old": "daily_changes_2026-10-19.md",
+      "new": "2026-10-19_FOC电压开环实机运行与时序验证日志.md"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\MDK-ARM\\docs\\issue.md",
+      "old": "rs485_waveform_test.md",
+      "new": "../架构说明.md"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\Tests\\mt6701_spi3_test.md",
+      "old": "../../control_analysis/results/mt6701_spi3_verify_20261023_150246/verification.md",
+      "new": "2026-10-23_MT6701_SPI3首次烧录与通信失败记录.md"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\2026-10-22_代码审查报告.md",
+      "old": "串口PC通讯模块实施路径.md",
+      "new": "2026-10-22_串口PC通讯实施方案_规划记录.md"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\2026-10-22_代码审查报告.md",
+      "old": "故障保护模块实施路径.md",
+      "new": "2026-10-22_故障保护模块实施方案_规划记录.md"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\2026-10-22_代码审查报告.md",
+      "old": "闭环整定模块实施路径.md",
+      "new": "2026-10-22_闭环整定模块实施方案_规划记录.md"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\2026-10-22_代码审查报告.md",
+      "old": "../Servo/Src/servo_manager.c",
+      "new": "../../servo_v1/Servo/Src/servo_manager.c"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\2026-10-22_代码审查报告.md",
+      "old": "../Modules/Encoder/Src/encoder.c",
+      "new": "../../servo_v1/Modules/Encoder/Src/encoder.c"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\2026-10-22_代码审查报告.md",
+      "old": "../Modules/Encoder/Inc/encoder_frame_guard.h",
+      "new": "../../servo_v1/Modules/Encoder/Inc/encoder_frame_guard.h"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\2026-10-22_代码审查报告.md",
+      "old": "../Modules/Encoder/Src/encoder.c",
+      "new": "../../servo_v1/Modules/Encoder/Src/encoder.c"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\2026-10-22_代码审查报告.md",
+      "old": "../Core/Src/main.c",
+      "new": "../../servo_v1/Core/Src/main.c"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\2026-10-22_代码审查报告.md",
+      "old": "../Core/Src/main.c",
+      "new": "../../servo_v1/Core/Src/main.c"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\2026-10-22_代码审查报告.md",
+      "old": "../Modules/Current_Sampling/Src/current_sampling.c",
+      "new": "../../servo_v1/Modules/Current_Sampling/Src/current_sampling.c"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\2026-10-22_代码审查报告.md",
+      "old": "2026-10-22_验证记录.md",
+      "new": "2026-10-22_文档汇总验证与证据记录.md"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\2026-10-22_代码审查报告.md",
+      "old": "../Servo/Src/speed_commission.c",
+      "new": "../../servo_v1/Servo/Src/speed_commission.c"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\2026-10-22_代码审查报告.md",
+      "old": "../Servo/Src/servo_manager.c",
+      "new": "../../servo_v1/Servo/Src/servo_manager.c"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\2026-10-22_代码审查报告.md",
+      "old": "../Modules/Three_Phase_Driver/Src/tim1_pwm.c",
+      "new": "../../servo_v1/Modules/Three_Phase_Driver/Src/tim1_pwm.c"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\2026-10-22_代码审查报告.md",
+      "old": "../Core/Src/main.c",
+      "new": "../../servo_v1/Core/Src/main.c"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\2026-10-22_代码审查报告.md",
+      "old": "../Core/Src/stm32g4xx_it.c",
+      "new": "../../servo_v1/Core/Src/stm32g4xx_it.c"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\2026-10-22_验证记录.md",
+      "old": "../Tests/Host/test_encoder_transport.c",
+      "new": "../../servo_v1/Tests/Host/test_encoder_transport.c"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\2026-10-22_验证记录.md",
+      "old": "../Tests/Host/test_speed_commission.c",
+      "new": "../../servo_v1/Tests/Host/test_speed_commission.c"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\2026-10-22_验证记录.md",
+      "old": "../Servo/Src/speed_commission.c",
+      "new": "../../servo_v1/Servo/Src/speed_commission.c"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\2026-10-22_验证记录.md",
+      "old": "../Tests/Host/run_tests.ps1",
+      "new": "../../servo_v1/Tests/Host/run_tests.ps1"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\闭环整定模块实施路径.md",
+      "old": "串口PC通讯模块实施路径.md",
+      "new": "2026-10-22_串口PC通讯实施方案_规划记录.md"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\闭环整定模块实施路径.md",
+      "old": "故障保护模块实施路径.md",
+      "new": "2026-10-22_故障保护模块实施方案_规划记录.md"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\闭环整定模块实施路径.md",
+      "old": "上位机读写参数表.md",
+      "new": "2026-10-22_上位机参数字典草案_规划记录.md"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\闭环整定模块实施路径.md",
+      "old": "系统性能评估模块实施路径.md",
+      "new": "2026-10-22_系统性能评估实施方案_规划记录.md"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\闭环整定模块实施路径.md",
+      "old": "../Core/Src/main.c",
+      "new": "../../servo_v1/Core/Src/main.c"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\闭环整定模块实施路径.md",
+      "old": "../Modules/Encoder/Src/encoder.c",
+      "new": "../../servo_v1/Modules/Encoder/Src/encoder.c"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\闭环整定模块实施路径.md",
+      "old": "../Servo/Src/speed_commission.c",
+      "new": "../../servo_v1/Servo/Src/speed_commission.c"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\闭环整定模块实施路径.md",
+      "old": "../Tests/Src/current_loop_test.c",
+      "new": "../../servo_v1/Tests/Src/current_loop_test.c"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\闭环整定模块实施路径.md",
+      "old": "../FOC/Src/foc_interface.c",
+      "new": "../../servo_v1/FOC/Src/foc_interface.c"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\闭环整定模块实施路径.md",
+      "old": "../FOC/Src/foc_current_tuning.c",
+      "new": "../../servo_v1/FOC/Src/foc_current_tuning.c"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\系统性能评估模块实施路径.md",
+      "old": "上位机读写参数表.md",
+      "new": "2026-10-22_上位机参数字典草案_规划记录.md"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\系统性能评估模块实施路径.md",
+      "old": "闭环整定模块实施路径.md#7-频响实验必须先把测量做对",
+      "new": "2026-10-22_闭环整定模块实施方案_规划记录.md#7-频响实验必须先把测量做对"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\系统性能评估模块实施路径.md",
+      "old": "../Tests/Inc/waveform_generator.h",
+      "new": "../../servo_v1/Tests/Inc/waveform_generator.h"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\系统性能评估模块实施路径.md",
+      "old": "../Core/Inc/timing_probes.h",
+      "new": "../../servo_v1/Core/Inc/timing_probes.h"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\系统性能评估模块实施路径.md",
+      "old": "../Modules/Three_Phase_Driver/Inc/tim1_pwm.h",
+      "new": "../../servo_v1/Modules/Three_Phase_Driver/Inc/tim1_pwm.h"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\系统性能评估模块实施路径.md",
+      "old": "../Modules/Encoder/Inc/encoder.h",
+      "new": "../../servo_v1/Modules/Encoder/Inc/encoder.h"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\系统性能评估模块实施路径.md",
+      "old": "../Tests/Inc/measurement_manager.h",
+      "new": "../../servo_v1/Tests/Inc/measurement_manager.h"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\系统性能评估模块实施路径.md",
+      "old": "../Servo/Inc/speed_commission.h",
+      "new": "../../servo_v1/Servo/Inc/speed_commission.h"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\系统性能评估模块实施路径.md",
+      "old": "../Tests/Inc/current_loop_test.h",
+      "new": "../../servo_v1/Tests/Inc/current_loop_test.h"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\故障保护模块实施路径.md",
+      "old": "串口PC通讯模块实施路径.md",
+      "new": "2026-10-22_串口PC通讯实施方案_规划记录.md"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\故障保护模块实施路径.md",
+      "old": "闭环整定模块实施路径.md",
+      "new": "2026-10-22_闭环整定模块实施方案_规划记录.md"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\故障保护模块实施路径.md",
+      "old": "../Servo/Inc/speed_overload_guard.h",
+      "new": "../../servo_v1/Servo/Inc/speed_overload_guard.h"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\故障保护模块实施路径.md",
+      "old": "2026-10-22_代码审查报告.md",
+      "new": "2026-10-22_文档汇总代码审查记录.md"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\串口PC通讯模块实施路径.md",
+      "old": "故障保护模块实施路径.md",
+      "new": "2026-10-22_故障保护模块实施方案_规划记录.md"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\串口PC通讯模块实施路径.md",
+      "old": "闭环整定模块实施路径.md",
+      "new": "2026-10-22_闭环整定模块实施方案_规划记录.md"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\串口PC通讯模块实施路径.md",
+      "old": "上位机读写参数表.md",
+      "new": "2026-10-22_上位机参数字典草案_规划记录.md"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\串口PC通讯模块实施路径.md",
+      "old": "../MDK-ARM/docs/pc_waveform_protocol.md",
+      "new": "../架构说明.md"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\串口PC通讯模块实施路径.md",
+      "old": "../Tests/Src/waveform_uart1_port.c",
+      "new": "../../servo_v1/Tests/Src/waveform_uart1_port.c"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\上位机读写参数表.md",
+      "old": "../Tests/Inc/waveform_uart1_port.h",
+      "new": "../../servo_v1/Tests/Inc/waveform_uart1_port.h"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\上位机读写参数表.md",
+      "old": "../Tests/Inc/waveform_generator.h",
+      "new": "../../servo_v1/Tests/Inc/waveform_generator.h"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\上位机读写参数表.md",
+      "old": "../Servo/Inc/speed_overload_guard.h",
+      "new": "../../servo_v1/Servo/Inc/speed_overload_guard.h"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\上位机读写参数表.md",
+      "old": "../FOC/Inc/foc_current_tuning.h",
+      "new": "../../servo_v1/FOC/Inc/foc_current_tuning.h"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\上位机读写参数表.md",
+      "old": "../Servo/Inc/speed_commission.h",
+      "new": "../../servo_v1/Servo/Inc/speed_commission.h"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\上位机读写参数表.md",
+      "old": "../FOC/Inc/foc_control_manager.h",
+      "new": "../../servo_v1/FOC/Inc/foc_control_manager.h"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\上位机读写参数表.md",
+      "old": "../FOC/Inc/foc_pi.h",
+      "new": "../../servo_v1/FOC/Inc/foc_pi.h"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\上位机读写参数表.md",
+      "old": "../FOC/Inc/foc_algorithm.h",
+      "new": "../../servo_v1/FOC/Inc/foc_algorithm.h"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\上位机读写参数表.md",
+      "old": "../Modules/Current_Sampling/Inc/current_sampling.h",
+      "new": "../../servo_v1/Modules/Current_Sampling/Inc/current_sampling.h"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\上位机读写参数表.md",
+      "old": "../Modules/Encoder/Src/encoder.c",
+      "new": "../../servo_v1/Modules/Encoder/Src/encoder.c"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\上位机读写参数表.md",
+      "old": "../Modules/Encoder/Inc/encoder.h",
+      "new": "../../servo_v1/Modules/Encoder/Inc/encoder.h"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\上位机读写参数表.md",
+      "old": "../FOC/Inc/foc_current_tuning.h",
+      "new": "../../servo_v1/FOC/Inc/foc_current_tuning.h"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\上位机读写参数表.md",
+      "old": "../Servo/Inc/speed_commission.h",
+      "new": "../../servo_v1/Servo/Inc/speed_commission.h"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\上位机读写参数表.md",
+      "old": "../Modules/Current_Sampling/Inc/adc1_current_sampling.h",
+      "new": "../../servo_v1/Modules/Current_Sampling/Inc/adc1_current_sampling.h"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\上位机读写参数表.md",
+      "old": "../Modules/Three_Phase_Driver/Inc/tim1_pwm.h",
+      "new": "../../servo_v1/Modules/Three_Phase_Driver/Inc/tim1_pwm.h"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\上位机读写参数表.md",
+      "old": "系统性能评估模块实施路径.md",
+      "new": "2026-10-22_系统性能评估实施方案_规划记录.md"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\上位机读写参数表.md",
+      "old": "故障保护模块实施路径.md",
+      "new": "2026-10-22_故障保护模块实施方案_规划记录.md"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\上位机读写参数表.md",
+      "old": "闭环整定模块实施路径.md",
+      "new": "2026-10-22_闭环整定模块实施方案_规划记录.md"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\2026-10-22_文档汇总\\2026-10-22_文档汇总\\上位机读写参数表.md",
+      "old": "串口PC通讯模块实施路径.md",
+      "new": "2026-10-22_串口PC通讯实施方案_规划记录.md"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\control_analysis\\2026-10-21_启动0x0A修复与高速编码器排查.md",
+      "old": "2026-10-22_取消连续速度相电流软件跳闸.md",
+      "new": "2026-10-22_取消连续速度相电流软件跳闸.md"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\control_analysis\\2026-10-21_启动0x0A修复与高速编码器排查.md",
+      "old": "results/speed_start_final_keil_diagnostics_nonhalt.log",
+      "new": "../../control_analysis/results/speed_start_final_keil_diagnostics_nonhalt.log"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\control_analysis\\2026-10-21_启动0x0A修复与高速编码器排查.md",
+      "old": "results/speed_start_final_keil_handoff.json",
+      "new": "../../control_analysis/results/speed_start_final_keil_handoff.json"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\control_analysis\\2026-10-21_启动0x0A修复与高速编码器排查.md",
+      "old": "results/speed_start_final_keil_verified_ready.log",
+      "new": "../../control_analysis/results/speed_start_final_keil_verified_ready.log"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\control_analysis\\2026-10-21_启动0x0A修复与高速编码器排查.md",
+      "old": "results/speed_start_final_keil_flashcompare.log",
+      "new": "../../control_analysis/results/speed_start_final_keil_flashcompare.log"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\control_analysis\\2026-10-21_启动0x0A修复与高速编码器排查.md",
+      "old": "results/speed_start_final_firmware_hashes.log",
+      "new": "../../control_analysis/results/speed_start_final_firmware_hashes.log"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\control_analysis\\2026-10-21_启动0x0A修复与高速编码器排查.md",
+      "old": "results/firmware_speed_start_final_keil.axf",
+      "new": "../../control_analysis/results/firmware_speed_start_final_keil.axf"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\control_analysis\\2026-10-21_启动0x0A修复与高速编码器排查.md",
+      "old": "results/speed_spi32_medium_fault_nonhalt.log",
+      "new": "../../control_analysis/results/speed_spi32_medium_fault_nonhalt.log"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\control_analysis\\2026-10-21_启动0x0A修复与高速编码器排查.md",
+      "old": "results/speed_spi32_medium_fault_decoded.log",
+      "new": "../../control_analysis/results/speed_spi32_medium_fault_decoded.log"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\control_analysis\\2026-10-21_启动0x0A修复与高速编码器排查.md",
+      "old": "results/speed_spi32_medium_ramp8500.json",
+      "new": "../../control_analysis/results/speed_spi32_medium_ramp8500.json"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\control_analysis\\2026-10-21_启动0x0A修复与高速编码器排查.md",
+      "old": "results/speed_spi32_medium_build.log",
+      "new": "../../control_analysis/results/speed_spi32_medium_build.log"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\control_analysis\\2026-10-21_启动0x0A修复与高速编码器排查.md",
+      "old": "results/speed_start_profile_ready.log",
+      "new": "../../control_analysis/results/speed_start_profile_ready.log"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\control_analysis\\2026-10-21_启动0x0A修复与高速编码器排查.md",
+      "old": "results/encoder_crc_exact_symbols.log",
+      "new": "../../control_analysis/results/encoder_crc_exact_symbols.log"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\control_analysis\\2026-10-21_启动0x0A修复与高速编码器排查.md",
+      "old": "results/speed_start_0a_board_diagnosis.log",
+      "new": "../../control_analysis/results/speed_start_0a_board_diagnosis.log"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\control_analysis\\2026-10-21_启动0x0A修复与高速编码器排查.md",
+      "old": "results/speed_start_board_flash_dump.log",
+      "new": "../../control_analysis/results/speed_start_board_flash_dump.log"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\control_analysis\\2026-10-21_启动0x0A修复与高速编码器排查.md",
+      "old": "results/encoder_crc_exact_symbols.log",
+      "new": "../../control_analysis/results/encoder_crc_exact_symbols.log"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\control_analysis\\2026-10-21_启动0x0A修复与高速编码器排查.md",
+      "old": "2026-10-21_持续速度闭环与15A保护调试日志.md",
+      "new": "2026-10-21_持续速度闭环与15A保护调试日志.md"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\control_analysis\\2026-10-21_启动0x0A修复与高速编码器排查.md",
+      "old": "results/speed_start_0a_board_diagnosis.log",
+      "new": "../../control_analysis/results/speed_start_0a_board_diagnosis.log"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\control_analysis\\2026-10-21_启动0x0A修复与高速编码器排查.md",
+      "old": "速度闭环_用户说明.md",
+      "new": "../架构说明.md"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\control_analysis\\2026-10-21_持续速度闭环与15A保护调试日志.md",
+      "old": "2026-10-21_启动0x0A修复与高速编码器排查.md",
+      "new": "2026-10-21_启动0x0A修复与高速编码器排查.md"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\control_analysis\\2026-10-21_速度闭环详细工作日志.md",
+      "old": "速度闭环_用户说明.md",
+      "new": "../架构说明.md"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\control_analysis\\2026-10-21_速度闭环详细工作日志.md",
+      "old": "2026-10-21_持续速度闭环与15A保护调试日志.md",
+      "new": "2026-10-21_持续速度闭环与15A保护调试日志.md"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\control_analysis\\2026-10-22_2500rpm停机与高速反馈时序排查.md",
+      "old": "速度闭环_用户说明.md",
+      "new": "../架构说明.md"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\control_analysis\\2026-10-22_取消连续速度相电流软件跳闸.md",
+      "old": "2026-10-22_2500rpm停机与高速反馈时序排查.md",
+      "new": "2026-10-22_2500rpm停机与高速反馈时序排查.md"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\control_analysis\\2026-10-22_取消连续速度相电流软件跳闸.md",
+      "old": "results/phase_trip_bypass_20261022_probe.log",
+      "new": "../../control_analysis/results/phase_trip_bypass_20261022_probe.log"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\control_analysis\\2026-10-22_取消连续速度相电流软件跳闸.md",
+      "old": "results/firmware_phase_trip_bypass_20261022_keil.axf",
+      "new": "../../control_analysis/results/firmware_phase_trip_bypass_20261022_keil.axf"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\control_analysis\\2026-10-22_取消连续速度相电流软件跳闸.md",
+      "old": "results/phase_trip_bypass_20261022_keil_build.log",
+      "new": "../../control_analysis/results/phase_trip_bypass_20261022_keil_build.log"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\control_analysis\\2026-10-22_取消连续速度相电流软件跳闸.md",
+      "old": "results/phase_trip_bypass_20261022_host_tests.log",
+      "new": "../../control_analysis/results/phase_trip_bypass_20261022_host_tests.log"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\control_analysis\\2026-10-22_取消连续速度相电流软件跳闸.md",
+      "old": "速度闭环_用户说明.md",
+      "new": "../架构说明.md"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\control_analysis\\MATLAB辨识与整定结果.md",
+      "old": "scripts/matlab_evaluate_speed.m",
+      "new": "../../control_analysis/scripts/matlab_evaluate_speed.m"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\control_analysis\\MATLAB辨识与整定结果.md",
+      "old": "scripts/matlab_identify_speed.m",
+      "new": "../../control_analysis/scripts/matlab_identify_speed.m"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\control_analysis\\MATLAB辨识与整定结果.md",
+      "old": "2026-10-21_速度闭环详细工作日志.md",
+      "new": "2026-10-21_速度闭环详细工作日志.md"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\control_analysis\\MATLAB辨识与整定结果.md",
+      "old": "results/matlab_measured_evaluation/measured_vs_predicted_frequency.png",
+      "new": "../../control_analysis/results/matlab_measured_evaluation/measured_vs_predicted_frequency.png"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\control_analysis\\MATLAB辨识与整定结果.md",
+      "old": "results/matlab_measured_evaluation/measured_steps.png",
+      "new": "../../control_analysis/results/matlab_measured_evaluation/measured_steps.png"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\control_analysis\\MATLAB辨识与整定结果.md",
+      "old": "2026-10-21_速度闭环详细工作日志.md#13-官网用法核查与本次复测范围",
+      "new": "2026-10-21_速度闭环详细工作日志.md#13-官网用法核查与本次复测范围"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\control_analysis\\MATLAB辨识与整定结果.md",
+      "old": "results/speed_prbs_sync_analysis/frequency_validation.png",
+      "new": "../../control_analysis/results/speed_prbs_sync_analysis/frequency_validation.png"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\control_analysis\\results\\speed_measured_summary.md",
+      "old": "speed_frequency_response.png",
+      "new": "../../control_analysis/results/speed_frequency_response.png"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\control_analysis\\results\\speed_measured_summary.md",
+      "old": "speed_step_comparison.png",
+      "new": "../../control_analysis/results/speed_step_comparison.png"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\MDK-ARM\\docs\\issue.md",
+      "old": "image/issue/1792032428666.png",
+      "new": "../../servo_v1/MDK-ARM/image/issue/1792032428666.png"
+    },
+    {
+      "source": "C:\\Users\\penghao\\Desktop\\Servo_9948\\G431_base_code\\software\\servo_v1\\MDK-ARM\\docs\\issue.md",
+      "old": "image/issue/1792026198952.png",
+      "new": "../../servo_v1/MDK-ARM/image/issue/1792026198952.png"
+    }
+  ],
+  "missing_original_links": [],
+  "preservation": "完整日志正文仅添加来源说明和调整Markdown链接；摘录例外记录原始行号；源文件SHA256在迁移前后核对，清除文件可从Git基线恢复。",
+  "link_resolution_notes": [
+    "旧文档汇总的 ../Core、../Modules 等链接按实际 servo_v1 源码位置修复。",
+    "issue.md 的两张图片位于 MDK-ARM/image/issue，不在原链接所指的 docs/image/issue；已恢复图片链接，图片文件保持原位置。"
+  ]
+}

@@ -1,0 +1,40 @@
+Functional overview STM32G431x6 STM32G431x8 STM32G431xB
+30/198 DS12589 Rev 6
+          
+3.18.2 Internal voltage reference (V REFINT)
+The internal voltage reference (VREFINT) provides a stable (bandgap) voltage output for 
+the ADC and the comparators. The VREFINT is internally connected to the ADC1_IN18 
+input channel. The precise voltage of VREFINT is individually measured for each part by ST 
+during production test and stored in the system memory area. It is accessible in read-only 
+mode.
+          
+3.18.3 V BAT battery voltage monitoring
+This embedded hardware enables the application to measure the VBAT battery voltage using 
+the internal ADC1_IN17 channel. As the VBAT voltage may be higher than the VDDA, and 
+thus outside the ADC input range, the VBAT pin is internally connected to a bridge divider by 
+3. As a consequence, the converted digital value is one third of the VBAT voltage.
+3.19 Digital to anal og converter (DAC)
+Four 12 bit DAC channels (2 external buffered and 2 internal unbuffered) can be used to 
+convert digital signals into analog voltage signal outputs. The chosen design structure is 
+composed of integrated resistor strings and an amplifier in inverting configuration.
+Table 5. Temperature sensor calibration values 
+Calibration value name Description Memory address
+TS_CAL1
+TS ADC raw data acquired at a 
+temperature of 30 °C (± 5 °C), 
+V
+DDA = VREF+ = 3.0 V (± 10 mV)
+0x1FFF 75A8 - 0x1FFF 75A9
+TS_CAL2
+TS ADC raw data acquired at a 
+temperature of 130 °C (± 5 °C), 
+V
+DDA = VREF+ = 3.0 V (± 10 mV)
+0x1FFF 75CA - 0x1FFF 75CB
+Table 6. Internal voltage reference calibration values 
+Calibration value name Description Memory address
+VREFINT
+Raw data acquired at a 
+temperature of 30 °C (± 5 °C), 
+VDDA = VREF+ = 3.0 V (± 10 mV)
+0x1FFF 75AA - 0x1FFF 75AB

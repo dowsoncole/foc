@@ -1,0 +1,29 @@
+15
+B1 Status Format:
+Bits b7 b6 b5 b4 b3 b2 b1 b0
+Data content 0
+Communication
+Error
+Encoder error 0 0 0 0 0
+B(2 ~ n), operation types and the corresponding return data（A for angle; M for
+Multi-turn; E for error）:
+Operation types
+Request n
+Return Data
+b7 b6 b5 b4 b3 B2 B3 B4 B5 B6 B7 B8 B9
+0 0 0 0 0 Get Position 4 A0 A1 A2
+1 0 0 0 1 Get multi-turn 4 M0 M1 M2
+0 0 0 1 1 Get all data 9 A0 A1 A2 17 M0 M1 M2 E
+1 1 0 0 0 Reset angle
+(3) 4 A0 A1 A2
+0 1 1 0 0 Reset multi-turn
+(4) 4 A0 A1 A2
+(1) An and Mn are left-aligned, i.e., if A is 17 bits of data, the higher 7 bits of A2 are 0
+(2) If the operation type does not exist in the B (2~n) table, a communication error will be triggered and the return data will be the same as that of the “Get Position” operation
+(3) Reset Position becomes effective only after the command is sent continuously 10 times
+(4) Reset Multi-turn Data becomes effective only after the command is sent continuously 10 times E, Error and Warning Bits:
+b7 b6 b5 b4 b3 b2 b1 b0
+Error Bit Warning Bit - - - - - - Battery Disconnect Battery Low Voltage - - - - - - For the T485 interface, the error and warning bits only indicate battery-related status in
+battery-backed encoder versions. Battery and LED indications are described in the
+Status Bits section.
+T485

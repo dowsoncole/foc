@@ -1,0 +1,122 @@
+Pinouts and pin description STM32G431x6 STM32G431x8 STM32G431xB
+44/198 DS12589 Rev 6
+4 Pinouts and pin description
+4.1 UFQFPN32 pinout description
+Figure 5. STM32G431x6/x8/xB UFQFPN32 pinout
+1. The above figure shows the package top view.
+4.2 LQFP32 pinout description
+Figure 6. STM32G431x6/x8/xB LQFP32 pinout
+1. The above figure shows the package top view.
+MSv47174V1
+UFQFPN32  
+1
+2
+3
+4
+5
+6
+7
+8
+VDD
+PF0-OSC_IN
+PF1-OSC_OUT
+PG10-NRST
+PA0
+PA1
+PA2
+PA3
+PA4
+PA5
+PA6
+PA7
+24
+23
+22
+21
+20
+19
+18
+17
+32 31
+PB0
+VSSA
+VDD
+PA10
+PA14
+VDDA
+VSS
+PA11
+PA8
+PA9
+PA12
+PA13
+VSSPB8-BOOT0PB7PB6PB5PB4PB3PA15
+30 29 28 27 26 25
+9 1 0 1 11 21 31 41 5 1 6
+Exposed pad
+MSv47175V1
+LQFP32
+1
+2
+3
+4
+5
+6
+7
+8
+VDD
+PF0-OSC_IN
+PF1-OSC_OUT
+PG10-NRST
+PA0  
+PA1
+PA2
+PA3
+24
+23
+22
+21
+20
+19
+18
+17
+29
+27
+25
+32
+31
+30
+28
+26
+12
+14
+16
+9
+10
+11
+13
+15
+PA4
+PA5
+PB0
+VSS
+PA6
+PA7
+VSSA
+VDDA
+PA14
+PA13
+PA12
+PA11
+PA10
+PA9
+PA8
+VDD
+VSS
+PB8-BOOT0
+PB5
+PA15
+PB7
+PB6
+PB4
+PB3

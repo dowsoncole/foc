@@ -1,0 +1,39 @@
+DS12589 Rev 6 35/198
+STM32G431x6 STM32G431x8 STM32G431xB Functional overview
+43
+3.24.4 Low-power timer (LPTIM1)
+The devices embed a low-power timer. This timer has an independent clock and are running 
+in Stop mode if it is clocked by LSE, LSI or an external clock. It is able to wakeup the system 
+from Stop mode.
+LPTIM1 is active in Stop mode.
+This low-power timer supports the following features:
+• 16-bit up counter with 16-bit autoreload register
+• 16-bit compare register
+• Configurable output: pulse, PWM
+• Continuous/ one shot mode
+• Selectable software/hardware input trigger
+• Selectable clock source
+– Internal clock sources: L SE, LSI, HSI16 or APB clock
+– External clock source over LPTIM input (working even with no internal clock 
+source running, used by pulse counter application).
+• Programmable digital glitch filter
+• Encoder mode
+3.24.5 Independent watchdog (IWDG)
+The independent watchdog is based on a 12-bit downcounter and an 8-bit prescaler. It is 
+clocked from an independent 32 kHz internal RC (LSI) and as it operates independently 
+from the main clock, it can operate in Stop and Standby modes. It can be used either as a 
+watchdog to reset the device when a problem occurs, or as a free running timer for 
+application timeout management. It is hardware or software configurable through the option 
+bytes. The counter can be frozen in debug mode.
+3.24.6 System window watchdog (WWDG)
+The window watchdog is based on a 7-bit downcounter that can be set as free running. It 
+can be used as a watchdog to reset the device when a problem occurs. It is clocked from 
+the main clock. It has an early warning interrupt capability and the counter can be frozen in 
+debug mode.
+3.24.7 SysTick timer
+This timer is dedicated to real-time operating systems, but could also be used as a standard 
+down counter. It features:
+• A 24-bit down counter
+• Autoreload capability
+• Maskable system interrupt generation when the counter reaches 0.
+• Programmable clock source

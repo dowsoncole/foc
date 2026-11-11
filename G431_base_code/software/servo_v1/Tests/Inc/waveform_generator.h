@@ -58,6 +58,8 @@ typedef struct
   float dc_bus_voltage_v;
 } waveform_source_snapshot_t;
 
+/* 1 = accepted (transport owns a copy), 2 = busy/retry, 0 = error.
+   sent_frames counts accepted frames, not physical wire completions. */
 typedef uint8_t (*waveform_transport_send_t)(void *context,
                                               const uint8_t *data,
                                               uint16_t length);

@@ -1,0 +1,31 @@
+DS12589 Rev 6 101/198
+STM32G431x6 STM32G431x8 STM32G431xB Electrical characteristics
+160
+Note: For information on selectin g the crystal, refer to the application note AN2867 “Oscillator 
+design guide for ST microcontrollers” available from the ST website www.st.com.
+Figure 21. Typical application with an 8 MHz crystal
+1. R EXT value depends on the crystal characteristics.
+Low-speed external clock generated from a crystal resonator
+The low-speed external (LSE) clock can be supplied with a 32.768 kHz crystal resonator 
+oscillator. All the information given in this paragraph are based on design simulation results 
+obtained with typical external components specified in Table 41. In the application, the 
+resonator and the load capacitors have to be placed as close as possible to the oscillator 
+pins in order to minimize output distortion and startup stabilization time. Refer to the crystal 
+resonator manufacturer for more details on the resonator characteristics (frequency, 
+package, accuracy).
+MS19876V1
+(1)
+OSC_IN
+OSC_OUT
+RF
+Bias 
+controlled 
+gain
+fHSE
+REXT
+8 MHz 
+resonator
+Resonator with integrated 
+capacitors
+CL1
+CL2

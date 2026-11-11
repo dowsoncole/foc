@@ -1,0 +1,38 @@
+Functional overview STM32G431x6 STM32G431x8 STM32G431xB
+40/198 DS12589 Rev 6
+3.30 Low-power universal asynchr onous receiver transmitter 
+(LPUART)
+The STM32G431x6/x8/xB devices embed one Low-Power UART. The LPUART supports 
+asynchronous serial communication with minimum power consumption. It supports half-
+duplex single-wire communication and modem operations (CTS/RTS). It allows 
+multiprocessor communication.
+The LPUART comes with a Transmit FIFO (TXFIFO) and a Receive FIFO (RXFIFO). FIFO 
+mode is enabled by software and is disabled by default. It has a clock domain independent 
+from the CPU clock, and can wakeup the system from Stop mode. The wake up from Stop 
+mode can be done on: 
+• Start bit detection
+• Any received data frame
+• A specific programmed data frame
+• Some specific TXFIFO/RXFIFO status interrupts when FIFO mode is enabled
+Only a 32.768 kHz clock (LSE) is needed to allow LPUART communication up to 9600 
+baud. Therefore, even in Stop mode, the LPUART can wait for an incoming frame while 
+having an extremely low energy consumption. Higher speed clock can be used to reach 
+higher baudrates.
+The LPUART interface can be served by the DMA controller.
+3.31 Serial peripheral interface (SPI)
+Three SPI interfaces allow communication up to 75 Mbits/s in master and up to 41 Mbits/s in 
+slave, half-duplex, full-duplex and simplex modes. The 3-bit prescaler gives 8 master mode 
+frequencies and the frame size is configurable from 4 bits to 16 bits. The SPI interfaces 
+support NSS pulse mode, TI mode and hardware CRC calculation.
+Two standard I2S interfaces (multiplexed with SPI2 and SPI3) supporting four different audio 
+standards can operate as master or slave at half-duplex communication modes. They can 
+be configured to transfer 16 and 24 or 32 bits with 16-bit or 32-bit data resolution and 
+synchronized by a specific signal. Audio sampling frequency from 8 kHz up to 192 kHz can 
+be set by 8-bit programmable linear prescaler. When operating in master mode it can output 
+a clock for an external audio component at 256 times the sampling frequency.
+All SPI interfaces can be served by the DMA controller.
+Tx/Rx FIFO X
+Tx/Rx FIFO size 8
+1. X = supported.
+Table 9. USART/UART/LPUART features (continued)
+USART modes/features(1) USART1 USART2 USART3 UART4 LPUART1

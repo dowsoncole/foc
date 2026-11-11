@@ -1,0 +1,21 @@
+24
+Instruction:
+This program can be applied to ARM series MCU, and can generate the fastest CRC-6 check through the compiler, just modify DATA_TOTAL_BIT_LENGTH to the value of the corresponding model. For example: 17M model to 47, 16 model to 30
+Caution:
+When called this function, a 32-bit read command is used for the buffer, requiring the buffer to be 4-byte aligned
+(some core versions don’t support unaligned data read; Even with support for unaligned reads, the kernel consumes
+more concatenation time). For the reception of BISS-C, the first byte received will be a placeholder byte with ACK, and the position data starts
+from the second byte, to read data and calculate CRC quickly, it is necessary to calculate CRC from the address
+where the position data starts, and require the address to be 4-byte alignment data. For example: struct{ uint8_t notUsedForAlignment[3]; //Only align data
+uint8_t placeholder; //The first placeholder byte of BISS-C is 0x82
+uint8_t buffer[8] __attribute__ ((aligned(4))); //Buffer of 4 bytes data align, for fast CRC
+} receiveBuffer;
+//Configure SPI and DMA
+//Use &receiveBuffer.placeholder as the receiving address //……
+//CRC calculate
+// Calculated using the receiveBuffer.buffer which is already 4-byte aligned
+uint8_t crc = calcBissCCRC(receiveBuffer.buffer);
+//The CRC result is equal to 0, indicating that the verification is passed
+if ( crc != 0 ){
+//crc validation failed
+}

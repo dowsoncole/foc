@@ -8,6 +8,7 @@
 /* USER CODE END Header */
 
 #include "mt6835.h"
+#include "mt6835_crc.h"
 #include "spi1_encoder.h"
 
 /* 24 bit 帧的前两个字节：命令字占 bit1~4，地址占 bit5~16。
@@ -24,22 +25,10 @@ void MT6835_PowerUpWait(void)
 
 uint8_t MT6835_CalcCrc24(uint32_t data24)
 {
-  uint8_t crc = MT6835_CRC_INIT;
-  uint8_t bit;
-
-  /* 24 bit 自最高位（ANGLE[20]）逐位移入，多项式 X8+X2+X+1 = 0x07。
-     反馈位 = CRC 寄存器最高位 XOR 当前数据位。 */
-  for (bit = 0U; bit < 24U; bit++)
-  {
-    uint8_t feedback = (uint8_t)(((crc >> 7) ^
-                                   (uint8_t)(data24 >> (23U - bit))) & 0x01U);
-    crc = (uint8_t)(crc << 1);
-    if (feedback != 0U)
-    {
-      crc = (uint8_t)(crc ^ MT6835_CRC_POLY);
-    }
-  }
-  return crc;
+#if MT6835_CRC_INIT != 0x00U || MT6835_CRC_POLY != 0x07U
+#error "Fast MT6835 CRC implementation requires init 0x00 and poly 0x07"
+#endif
+  return MT6835_Crc24Fast(data24);
 }
 
 void MT6835_BuildAngleReadCommand(uint8_t tx[6])
@@ -97,9 +86,7 @@ HAL_StatusTypeDef MT6835_ReadRegister(uint16_t reg, uint8_t *value,
   tx[1] = MT6835_FRAME_BYTE1(reg);
   tx[2] = 0x00U;
 
-  MT6835_CSN_SELECT();
   HAL_StatusTypeDef st = MT6835_SPI_TransmitReceive(tx, rx, 3U, timeout);
-  MT6835_CSN_RELEASE();
 
   if (st != HAL_OK)
   {
@@ -125,9 +112,7 @@ HAL_StatusTypeDef MT6835_WriteRegister(uint16_t reg, uint8_t value,
   tx[1] = MT6835_FRAME_BYTE1(reg);
   tx[2] = value;
 
-  MT6835_CSN_SELECT();
   HAL_StatusTypeDef st = MT6835_SPI_TransmitReceive(tx, rx, 3U, timeout);
-  MT6835_CSN_RELEASE();
 
   return st;
 }
@@ -164,9 +149,7 @@ HAL_StatusTypeDef MT6835_ReadAngle(mt6835_angle_t *frame, uint32_t timeout)
   }
 
   MT6835_BuildAngleReadCommand(tx);
-  MT6835_CSN_SELECT();
   HAL_StatusTypeDef st = MT6835_SPI_TransmitReceive(tx, rx, 6U, timeout);
-  MT6835_CSN_RELEASE();
 
   if (st != HAL_OK)
   {

@@ -1,0 +1,39 @@
+Package information STM32G431x6 STM32G431x8 STM32G431xB
+174/198 DS12589 Rev 6
+6.5 WLCSP49 package information
+This WLCSP49 is a 49-ball, 3.15 x 3.13 mm, 0.4 mm pitch, wafer level chip scale package.
+Figure 52. WLCSP49 - Outline
+1. Drawing is not to scale.
+2. Dimension is measured at the maximum bum p diameter parallel to primary datum Z.
+3. Primary datum Z and seating plane are defined by the spherical crowns of the bump.
+4. Bump position designation per JESD 95-1, SPP-010.
+B03Q_WLCSP49_DIE468_ME_V1
+F
+G e1
+e2
+e
+e
+A1 ORIENTATION REFERENCE
+E
+D A1
+A
+A2
+DETAIL A
+aaa
+bbb Z
+(4x)
+A3
+BOTTOM VIEW
+A2
+b
+FRONT VIEW
+TOP VIEW SIDE VIEW
+DETAIL A
+ROTATED 90
+eeeZ
+BUMP
+Zb(49x)
+ccc Z X Y
+ddd Z
+A1
+SEATING PLANE

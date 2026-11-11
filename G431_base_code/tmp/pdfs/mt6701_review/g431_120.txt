@@ -1,0 +1,7 @@
+Electrical characteristics STM32G431x6 STM32G431x8 STM32G431xB
+120/198 DS12589 Rev 6
+2. The I/O analog switch voltage booster is enabled when V DDA < 2.4 V (BOOSTEN = 1 in the SYSCFG_CFGR1 when 
+VDDA < 2.4V). It is disabled when VDDA ≥ 2.4 V.
+3. VREF+ can be internally connected to VDDA, depending on the package. Refer to Section 4: Pinouts and pin description for 
+further details.
+4. The maximum value of RAIN can be found in Table 61: Maximum ADC RAIN.

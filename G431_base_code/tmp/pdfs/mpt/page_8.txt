@@ -1,0 +1,24 @@
+7
+Specification
+Output Format
+Absolute Parameters
+Resolution 24 bit
+Maximum Speed 8,000 rpm
+Update Rate 50 kHz
+Repeatability 0 ~ ±1 bit (depending on resolution selection)
+Output interface SSI、BISS-C、RS485、RS422、T485、BUS、PERIOD
+Single-Turn
+Outputs angular position data
+Standard Multi-turn
+Outputs turn count and angular
+position data
+Turn count is not retained after power-off and resets from zero after power-on
+Battery Multi-turn
+Outputs turn count and angular
+position data
+After power-off, the encoder enters low-power mode powered by the battery, allowing continued rotation tracking and valid turn count retention after power￾on
+Flash multi-turn
+Output the data of angle and
+multi-turn
+After power-off, multi-turn data is stored in flash memory. Only ±90° mechanical rotation is allowed; multi-turn data becomes unreliable beyond this
+range

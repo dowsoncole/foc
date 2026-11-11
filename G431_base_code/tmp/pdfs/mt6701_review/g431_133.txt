@@ -1,0 +1,91 @@
+DS12589 Rev 6 133/198
+STM32G431x6 STM32G431x8 STM32G431xB Electrical characteristics
+160
+5.3.19 Digital-to-Analog converter characteristics
+          
+Table 68. DAC 1MSPS characteristics(1) 
+Symbol Parameter Conditions Min Typ Max Unit
+VDDA
+Analog supply voltage for 
+DAC ON
+DAC output buffer OFF, DAC_OUT 
+pin not connected (internal 
+connection only)
+1.71 -
+3.6 
+V
+Other modes 1.80 -
+V
+REF+ Positive reference voltage
+DAC output buffer OFF, DAC_OUT 
+pin not connected (internal 
+connection only)
+1.71 -
+VDDA
+Other modes 1.80 -
+VREF- Negative reference voltage - V SSA
+RL Resistive load DAC output 
+buffer ON
+connected to VSSA 5- -
+kΩ
+connected to VDDA 25 - -
+RO Output Impedance DAC output buffer OFF 9.6 11.7 13.8 k Ω
+RBON
+Output impedance sample 
+and hold mode, output 
+buffer ON
+VDD = 2.7 V - - 2
+kΩ
+VDD = 2.0 V - - 3.5
+RBOFF
+Output impedance sample 
+and hold mode, output 
+buffer OFF
+VDD = 2.7 V - - 16.5
+kΩ
+VDD = 2.0 V - - 18.0
+CL
+Capacitive load
+DAC output buffer ON - - 50 pF
+CSH Sample and hold mode - 0.1 1 µF
+VDAC_OUT
+Voltage on DAC_OUT 
+output
+DAC output buffer ON 0.2 - VREF+ 
+– 0.2 V
+DAC output buffer OFF 0 - V REF+
+tSETTLING
+Settling time (full scale: for 
+a 12-bit code transition 
+between the lowest and the 
+highest input codes when 
+DAC_OUT reaches final 
+value)
+Normal mode 
+DAC output 
+buffer ON 
+CL ≤ 50 pF, 
+RL ≥ 5 kΩ
+±0.5 LSB - 1.7 3
+µs
+±1 LSB - 1.6 2.9
+±2 LSB - 1.55 2.85
+±4 LSB - 1.48 2.8
+±8 LSB - 1.4 2.75
+Normal mode DAC output buffer 
+OFF, ±1LSB, CL = 10 pF -2 2 . 5
+t
+WAKEUP
+(2)
+Wakeup time from off state 
+(setting the ENx bit in the 
+DAC Control register) until 
+final value ±1 LSB
+Normal mode DAC output buffer ON 
+CL ≤ 50 pF, RL ≥ 5 kΩ -4 . 2 7 . 5
+µs
+Normal mode DAC output buffer 
+OFF, CL ≤ 10 pF -2 5
+PSRR V
+DDA supply rejection ratio Normal mode DAC output buffer ON 
+CL ≤ 50 pF, RL = 5 kΩ, DC -- 8 0 - 2 8 d B

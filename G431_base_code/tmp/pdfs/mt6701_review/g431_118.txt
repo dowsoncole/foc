@@ -1,0 +1,84 @@
+Electrical characteristics STM32G431x6 STM32G431x8 STM32G431xB
+118/198 DS12589 Rev 6
+5.3.18 Analog-to-digital converter characteristics
+Unless otherwise specified, the parameters given in Table 60 are preliminary values derived 
+from tests performed under ambient temperature, fPCLK frequency and VDDA supply voltage 
+conditions summarized in Table 17: General operating conditions.
+Note: It is recommended to perform a calibration after each power-up.
+          
+Table 60. ADC characteristics(1) (2) 
+Symbol Parameter Conditions Min Typ Max Unit
+VDDA
+Analog supply 
+voltage -1 . 6 2 - 3 . 6 V
+VREF+
+Positive 
+reference 
+voltage
+VDDA ≥ 2 V 2 - V DDA V
+VDDA < 2 V V DDA V
+VREF-
+Negative 
+reference 
+voltage
+-V SSA V
+VCMIN
+Input common 
+mode Differential (VREF++VREF-
+)/2 - 0.18
+(VREF+ + 
+VREF-)/2 
+(VREF+ + VREF-
+)/2 + 0.18 V
+fADC
+ADC clock 
+frequency
+Range 1, single 
+ADC operation 0.14 - 60
+MHz
+Range 2 - - 26
+Range 1, all ADCs 
+operation, single 
+ended mode 
+VDDA ≥ 2.7 V
+0.14 - 52
+Range 1, all ADCs 
+operation, single 
+ended mode 
+VDDA ≥ 1.62 V
+0.14 - 42
+Range 1, all ADCs 
+operation, 
+differential mode 
+V
+DDA ≥ 1.62 V
+0.14 - 56
+fs
+Sampling rate, 
+continuous mode
+For given 
+resolution and 
+sampling time 
+cycles (ts)
+0.001
+fADC / (sampling time 
+[cycles] + resolution [bits] + 
+0.5)
+Msps
+TTRIG
+External trigger 
+period
+Considering trigger 
+conversion latency 
+time (tLATR or 
+tLATRINJ)
+--
+1ms -
+Resolution = 
+12 bits, 
+f
+ADC=60 MHz
+tconv + [tLATR 
+or tLATRINJ] -
+VAIN (3) Conversion 
+voltage range -0 - V REF+ V

@@ -1,0 +1,40 @@
+Functional overview STM32G431x6 STM32G431x8 STM32G431xB
+38/198 DS12589 Rev 6
+3.28 Inter-integrated circuit interface (I2C)
+The device embeds three I2Cs. Refer to Table 8: I2C implementation for the features 
+implementation.
+The I2C bus interface handles communications between the microcontroller and the serial 
+I2C bus. It controls all I2C bus-specific sequencing, protocol, arbitration and timing. 
+The I2C peripheral supports:
+• I2C-bus specification and user manual rev. 5 compatibility: 
+– Slave and master modes , multimaster capability 
+– Standard-mode (Sm), with a bitrate up to 100 kbit/s
+– Fast-mode (Fm), with a bitrate up to 400 kbit/s 
+– Fast-mode Plus (Fm+), with a bitrate up to 1 Mbit/s and 20 mA output drive I/Os
+– 7-bit and 10-bit addressing mode, multiple 7-bit slave addresses
+– Programmable setup and hold times 
+– Optional clock stretching 
+• System management bus (SMBus) specification rev 2.0 compatibility: 
+– Hardware PEC (packet error checking) generation and verification with ACK 
+control 
+– Address resolution protocol (ARP) support 
+– SMBus alert 
+• Power system management protocol (PMBus
+TM) specification rev 1.1 compatibility 
+• Independent clock: a choice of independent clock sources allowing the I2C 
+communication speed to be independent from the PCLK reprogramming. 
+• Wakeup from Stop mode on address match 
+• Programmable analog and digital noise filters
+• 1-byte buffer with DMA capability
+          
+Table 8. I2C implementation 
+I2C features(1)
+1. X: supported
+I2C1 I2C2 I2C3
+Standard-mode (up to 100 kbit/s) X X X
+Fast-mode (up to 400 kbit/s) X X X
+Fast-mode Plus with 20mA output drive I/Os (up to 1 Mbit/s) X X X
+Programmable analog and digital noise filters X X X
+SMBus/PMBus hardware support X X X
+Independent clock X X X
+Wakeup from Stop mode on address match X X X

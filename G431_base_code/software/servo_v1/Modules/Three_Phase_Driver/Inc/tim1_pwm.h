@@ -28,21 +28,23 @@ extern "C" {
 #endif
 
 #include "stm32g4xx_hal.h"
+#include "control_timing.h"
+#include "pwm_commit_diagnostics.h"
 
 /* --------------------------------------------------------------------------*/
 /* 时序参数（配置线）                                                        */
 /* --------------------------------------------------------------------------*/
 /* SystemClock_Config() 把 SYSCLK 设为 HSE 8 MHz / 2 * 84 / 2 = 168 MHz，
    APB2 分频为 1，所以 TIM1 的内核时钟就是 168 MHz。 */
-#define TIM1_PWM_TIMER_CLOCK_HZ     168000000UL
+#define TIM1_PWM_TIMER_CLOCK_HZ     CONTROL_TIMER_CLOCK_HZ
 
 /* 中央对齐 PWM：计数器按 0 -> ARR -> 0 往复，因此一个载波周期占用
-   2 x (ARR + 1) 个计数时钟；重复计数器保证每个载波周期恰好产生一次更新事件。
+   2 x ARR 个计数时钟；重复计数器保证每个载波周期恰好产生一次更新事件。
    这里把「装入 ARR 的峰值」和「一个完整周期的计数总数」分别命名，
    因为比较寄存器是以后者为基准来表达的。 */
-#define TIM1_PWM_FREQUENCY_HZ       20000UL
+#define TIM1_PWM_FREQUENCY_HZ       CONTROL_FREQUENCY_HZ
 #define TIM1_PWM_COUNTS_PER_PERIOD  (TIM1_PWM_TIMER_CLOCK_HZ / TIM1_PWM_FREQUENCY_HZ)
-#define TIM1_PWM_COUNTER_PERIOD     ((TIM1_PWM_COUNTS_PER_PERIOD / 2UL) - 1UL)
+#define TIM1_PWM_COUNTER_PERIOD     CONTROL_PWM_PEAK_TICKS
 
 /* 主输出与其互补输出之间插入的死区时间。TIM_BDTR_DTG 取值 0x00..0x7F 时
    以 tDTS 为单位（时钟分频 DIV1 -> 1/168 MHz = 5.952 ns），故 84 计数 = 500 ns。
@@ -58,7 +60,7 @@ extern "C" {
 
 /* 应用层占空比标度：表示一个载波周期内半桥「高侧」开关导通的时间占比。
    0 = 高侧从不导通，1000 = 高侧常通，500 = 50 %。
-   它能整除 TIM1_PWM_COUNTS_PER_PERIOD，因此一个占空比步长对应 8.4 个比较计数。 */
+   比较值按 ARR 缩放；20 kHz 下一个标度步长对应 4.2 个比较计数。 */
 #define TIM1_PWM_DUTY_SCALE         1000U
 #define TIM1_PWM_DUTY_NEUTRAL       (TIM1_PWM_DUTY_SCALE / 2U)
 
@@ -69,13 +71,17 @@ extern "C" {
 /* 启动阶段 CCR4 初值相对载波峰值的提前量（不是谷值 UEV 的提前量）。
    ADC 启动之前，应用会将完整序列耗时交给 ConfigureCurrentSampling；之后
    CCR4 每周期动态规划，此初值不再用于运行中的采样位置计算。 */
-#define TIM1_PWM_ADC_TRIGGER_LEAD_NS 5714U
+#define TIM1_PWM_ADC_TRIGGER_LEAD_NS 358U
 
 /* FOC 的最小高侧脉宽与低侧采样建立时间。后者另加实际死区。
    500 ns 是板级调试起点，必须由电流放大器的实测建立时间复核。 */
 #define TIM1_PWM_FOC_MIN_PULSE_NS    1000U
 #define TIM1_PWM_CURRENT_SETTLE_NS    500U
 #define TIM1_PWM_COMMIT_GUARD_NS     2000U
+/* At 20 kHz the ADC-to-valley interval is only 25 us. Finish sampling before
+   the peak so the measured 22.5..23 us control path plus the 2 us commit
+   guard has bounded headroom. The planner still moves to a safe window. */
+#define TIM1_PWM_ADC_CONTROL_HEADROOM_NS 5000U
 
 typedef struct
 {
@@ -90,17 +96,20 @@ typedef struct
 } tim1_pwm_sampling_status_t;
 
 extern volatile tim1_pwm_sampling_status_t g_tim1_pwm_sampling;
+extern volatile pwm_commit_fault_t g_tim1_pwm_commit_fault;
+/* Written once at ADC IRQ entry; used only by the frozen failure diagnostic. */
+extern volatile uint32_t g_tim1_pwm_adc_entry_cycle;
 
 typedef void (*tim1_pwm_period_callback_t)(void *context);
 
 /* 提前量换算成计数，公式与 tim1_pwm.c 的 Tim1Pwm_NsToCounts() 一致。
-   5714 ns * 168 / 1000 = 959 计数。 */
+   单次 U/V 紧邻转换时，启动初值只需提前约半个序列。 */
 #define TIM1_PWM_ADC_LEAD_COUNTS \
   ((TIM1_PWM_ADC_TRIGGER_LEAD_NS * (TIM1_PWM_TIMER_CLOCK_HZ / 1000000UL)) / 1000UL)
 
 /* 防下溢：CH4 的比较值由 ARR - NsToCounts(LEAD) 得出，是无符号减法，
-   所以提前量的计数值必须不超过 ARR（= TIM1_PWM_COUNTER_PERIOD = 4199，
-   即提前量上限 24994 ns）。注意界限是半周期计数 ARR，不是整个载波周期：
+   所以提前量的计数值必须不超过 ARR（= TIM1_PWM_COUNTER_PERIOD = 4200，
+   即提前量上限 25000 ns）。注意界限是半周期计数 ARR，不是整个载波周期：
    中央对齐下计数器只走到 ARR 就折返。
    一旦越界，减法会回绕成一个远大于 ARR 的值，比较寄存器永远匹配不上，
    ADC 触发彻底失效且不会报错——静默失效，所以在编译期就挡住。 */
@@ -124,23 +133,17 @@ typedef void (*tim1_pwm_period_callback_t)(void *context);
      1. 比较值与占空比成正比，不是它的补。比较值越大，高侧导通时间越长。
      2. 超过 ARR 的比较值不再翻转：计数器到不了那个值，输出会一直停在有效
         电平，而不是把占空比范围扩大。因此可用比较带是 0..ARR，
-        只有标称计数周期 2 x (ARR + 1) 的一半。若按整周期而不是按比较带来
+        只有完整计数周期 2 x ARR 的一半。若按整周期而不是按比较带来
         缩放占空比，标度的上半段就会饱和：任何大于 50 % 的占空比都会被
         钉在接近 100 %。
 
    以计数器序列本身为基准（中央对齐，CNT < CCR 时有效，
-   一个载波周期 = 2 x ARR = 8398 个计数时钟）实测：
-     CCR    0 ->   0.0000 % 高侧      duty   0 ->   0.0000 %
-     CCR 2100 ->  50.0000 %           duty 500 ->  50.0000 %
-     CCR 2520 ->  60.0024 %           duty 600 ->  60.0024 %
-     CCR 4199 ->  99.9881 %           duty1000 ->  99.9881 %
-     CCR 4200 -> 100.0000 %（同样饱和）
-   整数除法的残余误差最大为周期的 0.0119 %，所以标度的 50 % 点
-   精确落在载波的 50 %。 */
+   一个载波周期 = 2 x ARR = 16800 个计数时钟）：
+     CCR 0 -> 0 %；CCR 4200 -> 50 %；CCR 5040 -> 60 %。
+   FOC 使用板级 ADC 采样上限，不请求静态高侧。 */
 
-/* 表示「高侧常通」的比较值，也就是可用比较带的顶端。
-   ARR + 1 会比顶端多一个计数，因此在使用处被钳位到 ARR。 */
-#define TIM1_PWM_COMPARE_FULL_SCALE (TIM1_PWM_COUNTER_PERIOD + 1UL)
+/* 中央对齐PWM1的占空比为CCR/ARR，不使用边沿对齐的ARR+1。 */
+#define TIM1_PWM_COMPARE_FULL_SCALE TIM1_PWM_COUNTER_PERIOD
 
 /* 50 % 点对应的比较值，也是空闲模式装载的值。 */
 #define TIM1_PWM_COMPARE_NEUTRAL    TIM1_PWM_DUTY_TO_COMPARE(TIM1_PWM_DUTY_NEUTRAL)
@@ -149,8 +152,7 @@ typedef void (*tim1_pwm_period_callback_t)(void *context);
   * @brief  把 0..TIM1_PWM_DUTY_SCALE 的高侧占空比换算成装入通道的比较值。
   *
   * 按比较带缩放：duty 0 装载 0（高侧从不导通），duty TIM1_PWM_DUTY_SCALE
-  * 装载 ARR + 1，使用处会把它钳位到 ARR（高侧常通）。比较带里的 +1
-  * 让 50 % 点恰好落在 (ARR + 1) 的一半，而不是比它少一个计数。
+  * 装载 ARR；50 % 点为 ARR/2，10 kHz 下精确为4200。
   *
   * 不要把这个映射取反，也不要按 TIM1_PWM_COUNTS_PER_PERIOD 缩放：
   * 比较值与占空比成正比，而任何超过 ARR 的值都会停止翻转而不是扩大范围。
@@ -170,7 +172,7 @@ extern TIM_HandleTypeDef htim1;
 /* --------------------------------------------------------------------------*/
 
 /**
-  * @brief  【配置线】配置并启动 TIM1：通道 1..3 输出 20 kHz 中央对齐互补 PWM，
+  * @brief  【配置线】配置并启动 TIM1：通道 1..3 输出 10 kHz 中央对齐互补 PWM，
   *         死区 500 ns；通道 4 作为 ADC 触发，位置比更新事件提前
   *         TIM1_PWM_ADC_TRIGGER_LEAD_NS。
   *

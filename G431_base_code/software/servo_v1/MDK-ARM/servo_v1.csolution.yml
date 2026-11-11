@@ -5,6 +5,6 @@ solution:
   target-types:
     - type: servo_v1
       device: STM32G431VBTx
-      optimize: debug
+      optimize: speed
   projects:
     - project: servo_v1.cproject.yml

@@ -1,0 +1,66 @@
+www.magntek.com.cn | 磁技术带来美妙变革 1.8版本  2022.12
+MT6701
+基于差分霍尔的磁性角度传感器芯片
+20
+7.7  I2C接口
+MT6701提供了标准的I2C通信接口，用于和MCU进行包括读取角度数据在内的一系列通信 。I2C
+通信参考电路如图-17和图-18所示，SCL是数字输入引脚，是否需要加上拉电阻取决于MCU。
+图-17: SOP-8封装I2C 参考电路
+图-18: QFN-16封装I2C 参考电路
+SDA
+MCU
+Master
+SCL
+11
+1 2 3 4
+5
+6
+7
+8
+910
+13
+12
+16
+14
+15
+V/-B W/-Z
+0.1uf
+TVS(6V)
+Recommended 
+for Better Reliability
+U/-A NC
+NC NC NC NC
+PUSH
+VDD
+Analog
+/PWM
+4.7K
+Slave
+MT6701
+200KΩ
+200KΩ
+4.7K
+200KΩ
+200KΩ
+7
+1
+2
+3
+4 5
+6
+8
+0.1uf
+VDD
+TVS(6V)
+Recommended 
+for Better Reliability
+Analog
+/PWM
+Push
+MCU
+Master
+Slave
+MT6701
+SDA
+SCL
+4.7k 4.7k

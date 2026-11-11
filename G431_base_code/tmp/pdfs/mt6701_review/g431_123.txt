@@ -1,0 +1,99 @@
+DS12589 Rev 6 123/198
+STM32G431x6 STM32G431x8 STM32G431xB Electrical characteristics
+160
+          
+Table 62. ADC accuracy - limited test conditions 1(1)(2)(3) 
+Symbol Parameter Conditions (4) Min Typ Max Unit
+ET
+Total 
+unadjusted 
+error
+Single ADC operation ADC clock 
+frequency ≤ 60 MHz,
+V
+DDA = VREF+ = 3 V, TA = 
+25 °C
+Continuous mode, sampling 
+rate:
+Fast channels@4Msps
+Slow channels@2Msps
+Single 
+ended
+Fast channel (max speed) - 5.9 6.9
+LSB
+Slow channel (max speed) - 5.5 6.9
+Differential
+Fast channel (max speed) - 4.6 5.6
+Slow channel (max speed) - 4 5.6
+EO Offset error
+Single 
+ended
+Fast channel (max speed) - 2.5 4
+Slow channel (max speed) - 1.9 4
+Differential
+Fast channel (max speed) - 1.8 2.8
+Slow channel (max speed) - 1.1 2.8
+EG Gain error
+Single 
+ended
+Fast channel (max speed) - 4.6 6.6
+Slow channel (max speed) - 4.5 6.6
+Differential
+Fast channel (max speed) - 3.6 4.6
+Slow channel (max speed) - 3.3 4.6
+ED
+Differential 
+linearity 
+error
+Single 
+ended
+Fast channel (max speed) - 1.1 1.9
+Slow channel (max speed) - 1.3 1.9
+Differential
+Fast channel (max speed) - 1.3 1.6
+Slow channel (max speed) - 1.4 1.6
+EL
+Integral 
+linearity 
+error
+Single 
+ended
+Fast channel (max speed) - 2.3 3.4
+Slow channel (max speed) - 2.4 3.4
+Differential
+Fast channel (max speed) - 2.1 3.2
+Slow channel (max speed) - 2.2 3.2
+ENOB
+Effective 
+number of 
+bits
+Single 
+ended
+Fast channel (max speed) 10.4 10.6 -
+bits
+Slow channel (max speed) 10.4 10.6 -
+Differential
+Fast channel (max speed) 10.8 10.9 -
+Slow channel (max speed) 10.8 10.9 -
+SINAD
+Signal-to-
+noise and 
+distortion 
+ratio
+Single 
+ended
+Fast channel (max speed) 64.4 65.6 -
+dB
+Slow channel (max speed) 64.4 65.6 -
+Differential
+Fast channel (max speed) 66.8 67.5 -
+Slow channel (max speed) 66.8 67.5 -
+SNR Signal-to-
+noise ratio
+Single 
+ended
+Fast channel (max speed) 65 66.9 -
+Slow channel (max speed) 65 66.9 -
+Differential
+Fast channel (max speed) 67 69 -
+Slow channel (max speed) 67 69 -

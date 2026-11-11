@@ -1,0 +1,27 @@
+DS12589 Rev 6 177/198
+STM32G431x6 STM32G431x8 STM32G431xB Package information
+193
+WLCSP49 device marking 
+The following figure gives an example of topside marking orientation versus ball A1 identifier 
+location.
+The printed markings may differ depending on the supply chain.
+Other optional marking or inset/upset marks, which identify the parts throughout supply 
+chain operations, are not indicated below.
+Figure 54. WLCSP49 top view example
+1. Parts marked as ES or E or accompanied by an engin eering sample notification letter are not yet qualified 
+and therefore not approved for use in production. ST is not responsible for any consequences resulting 
+from such use. In no event will ST be liable for the customer using any of these engineering samples in 
+production. ST’s Quality department must be contacted prior to any decision to use these engineering 
+samples to run a qualification activity.
+          
+(1)
+Product
+identification
+Revision code
+MSv62539V1
+G431CB6
+YW W
+Date code
+R
+Ball 1                
+identification

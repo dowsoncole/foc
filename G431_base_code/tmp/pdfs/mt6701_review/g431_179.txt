@@ -1,0 +1,30 @@
+DS12589 Rev 6 179/198
+STM32G431x6 STM32G431x8 STM32G431xB Package information
+193
+Figure 56. LQFP64 - Recommended footprint
+1. Dimensions are expr essed in millimeters.
+E3 - 7.500 - - 0.2953 -
+e - 0.500 - - 0.0197 -
+K 0 °3 . 5 °7 ° 0 °3 . 5 °7 °
+L 0.450 0.600 0.750 0.0177 0.0236 0.0295
+L1 - 1.000 - - 0.0394 -
+ccc - - 0.080 - - 0.0031
+1. Values in inches are converted from mm and rounded to 4 decimal digits.
+Table 95. LQFP64 - Mechanical data (continued)
+Symbol
+millimeters inches (1)
+Min Typ Max Min Typ Max
+48
+3249
+64 17
+1 16
+1.2
+0.3
+33
+10.3
+12.7
+10.3
+0.5
+7.8
+12.7
+ai14909c

@@ -1,0 +1,25 @@
+Package information STM32G431x6 STM32G431x8 STM32G431xB
+182/198 DS12589 Rev 6
+Figure 59. UFBGA64 - Recommended footprint
+          
+ddd - - 0.080 - - 0.0031
+eee - - 0.150 - - 0.0059
+fff - - 0.050 - - 0.0020
+1. Values in inches are converted from mm and rounded to 4 decimal digits.
+Table 96. UFBGA64 - Mechanical data (continued)
+Symbol
+millimeters inches (1)
+Min Typ Max Min Typ Max
+A 0.460 0.530 0.600 0.0181 0.0209 0.0236
+Table 97. UFBGA64 - Recommended PCB design rules (0.5 mm pitch BGA) 
+Dimension Recommended values
+Pitch 0.5
+Dpad 0.280 mm
+Dsm 0.370 mm typ. (depends on the solder mask 
+registration tolerance)
+Stencil opening 0.280 mm
+Stencil thickness Between 0.100 mm and 0.125 mm
+Pad trace width 0.100 mm
+A019_FP_V2
+Dpad
+Dsm

@@ -1,0 +1,46 @@
+Electrical characteristics STM32G431x6 STM32G431x8 STM32G431xB
+110/198 DS12589 Rev 6
+Static latch-up
+Two complementary static tests are required on three parts to assess the latch-up 
+performance: 
+• A supply overvoltage is applied to each power supply pin.
+• A current injection is applied to each input, output and configurable I/O pin.
+These tests are compliant with EIA/JESD 78E IC latch-up standard.
+          
+5.3.13 I/O current in jection characteristics
+As a general rule, current injection to the I/O pins, due to external voltage below VSS or 
+above VDD (for standard, 3.3 V-capable I/O pins) should be avoided during normal product 
+operation. However, in order to give an indication of the robustness of the microcontroller in 
+cases when abnormal injection accidentally happens, susceptibility tests are performed on a 
+sample basis during device characterization.
+Functional susceptibility to I/O current injection
+While a simple application is executed on the device, the device is stressed by injecting 
+current into the I/O pins programmed in floating input mode. While current is injected into 
+the I/O pin, one at a time, the device is checked for functional failures. 
+The failure is indicated by an out of range parameter: ADC error above a certain limit (higher 
+than 5 LSB TUE), out of conventional limits of induced leakage current on adjacent pins (out 
+of the -5 µA/+0 µA range) or other functional failure (for example reset occurrence or 
+oscillator frequency deviation).
+The characterization results are given in Table 52.
+Negative induced leakage current is caused by negative injection and positive induced 
+leakage current is caused by positive injection.
+          
+          
+Table 51. Electrical sensitivities 
+Symbol Parameter Conditions Class
+LU Static latch-up class TA = +125 °C conforming to JESD78E Class II level A
+Table 52. I/O current injection susceptibility 
+Symbol Description
+Functional 
+susceptibility
+Unit
+Negative 
+injection
+Positive 
+injection
+IINJ
+(1) Injected current on pin 
+All except TT_a, PF2 -5 NA
+mAPF2 -0 NA
+TT_a pins -5 0
+1. Guaranteed by characterization.

@@ -1,0 +1,38 @@
+DS12589 Rev 6 5/198
+STM32G431x6 STM32G431x8 STM32G431xB Contents
+6
+4.2 LQFP32 pinout description . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 44
+4.3 UFQFPN48 pinout description . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 45
+4.4 LQFP48 pinout description . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 45
+4.5 WLCSP49 ballout description . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 46
+4.6 LQFP64 pinout description . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 46
+4.7 UFBGA64 ballout description . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 47
+4.8 LQFP80 pinout description . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 48
+4.9 LQFP100 pinout description . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 49
+4.10 Pin definition . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 50
+4.11 Alternate functions  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 61
+5 Electrical characteristi cs  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 67
+5.1 Parameter conditions . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 67
+5.1.1 Minimum and maximum values . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 67
+5.1.2 Typical values  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 67
+5.1.3 Typical curves  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 67
+5.1.4 Loading capacitor  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 67
+5.1.5 Pin input voltage  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 67
+5.1.6 Power supply scheme  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 68
+5.1.7 Current consumption measurement  . . . . . . . . . . . . . . . . . . . . . . . . . . . 69
+5.2 Absolute maximum ratings . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 69
+5.3 Operating conditions  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 71
+5.3.1 General operating conditions . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 71
+5.3.2 Operating conditions at power-up / powe r-down . . . . . . . . . . . . . . . . . . 72
+5.3.3 Embedded reset and power control bloc k characteristics . . . . . . . . . . . 72
+5.3.4 Embedded voltage reference . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 74
+5.3.5 Supply current characteristics  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 75
+5.3.6 Wakeup time from low-power modes and voltage scaling  
+transition times . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 97
+5.3.7 External clock source characteristics . . . . . . . . . . . . . . . . . . . . . . . . . . . 98
+5.3.8 Internal clock source charac teristics  . . . . . . . . . . . . . . . . . . . . . . . . . . 103
+5.3.9 PLL characteristics . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 106
+5.3.10 Flash memory characteristics  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 107
+5.3.11 EMC characteristics . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 108
+5.3.12 Electrical sensitivity characteristics  . . . . . . . . . . . . . . . . . . . . . . . . . . . 109
+5.3.13 I/O current injection characteristics  . . . . . . . . . . . . . . . . . . . . . . . . . . . 110

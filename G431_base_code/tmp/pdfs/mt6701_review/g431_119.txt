@@ -1,0 +1,91 @@
+DS12589 Rev 6 119/198
+STM32G431x6 STM32G431x8 STM32G431xB Electrical characteristics
+160
+RAIN
+(4) External input 
+impedance -- - 5 0 k Ω
+CADC
+Internal sample 
+and hold 
+capacitor
+-- 5 - p F
+tSTAB Power-up time - 1 conversion 
+cycle
+tCAL Calibration time
+fADC = 60 MHz 1.93 µs
+-1 1 6 1 / f ADC
+tLATR
+Trigger 
+conversion 
+latency Regular 
+and injected 
+channels without 
+conversion abort
+CKMODE = 00 1.5 2 2.5
+1/f
+ADC
+CKMODE = 01 - - 2.0
+CKMODE = 10 - - 2.25
+CKMODE = 11 - - 2.125
+tLATRINJ
+Trigger 
+conversion 
+latency Injected 
+channels 
+aborting a 
+regular 
+conversion 
+CKMODE = 00 2.5 3 3.5
+1/f
+ADC
+CKMODE = 01 - - 3.0
+CKMODE = 10 - - 3.25
+CKMODE = 11 - - 3.125
+ts Sampling time
+fADC = 60 MHz 0.0416 - 10.675 µs
+- 2.5 - 640.5 1/f ADC
+tADCVREG_STUP ADC voltage 
+regulator start-up 
+time
+-- - 2 0 µ s
+t
+CONV
+Total conversion 
+time 
+(including 
+sampling time)
+fADC = 60 MHz 
+Resolution = 
+12 bits
+0.25 - 10.883 µs
+-t
+s[cycles] + resolution [bits] +0.5 = 15 to 653 1/f ADC
+IDDA(ADC)
+ADC 
+consumption 
+from the VDDA 
+supply
+fs = 4 Msps - 590 730
+µAfs = 1 Msps - 160 220
+fs = 10 ksps - 16 50
+IDDV_S(ADC)
+ADC 
+consumption 
+from the VREF+ 
+single ended 
+mode
+fs = 4 Msps - 110 140
+µAfs = 1 Msps - 30 40
+fs = 10 ksps - 0.6 2
+I
+DDV_D(ADC)
+ADC 
+consumption 
+from the VREF+ 
+differential mode
+fs = 4 Msps - 220 270
+µAfs = 1 Msps - 60 70
+fs = 10 ksps - 1.3 3
+1. Guaranteed by design.
+Table 60. ADC characteristics(1) (2) (continued)
+Symbol Parameter Conditions Min Typ Max Unit

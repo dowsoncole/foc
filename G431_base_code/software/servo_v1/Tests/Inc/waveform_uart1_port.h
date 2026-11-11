@@ -13,6 +13,8 @@ extern "C" {
 /* 当前板上 USART1 经过 PA8 控制的 485 收发器；该细节仅存在于端口适配层。 */
 HAL_StatusTypeDef WaveformUart1Port_Init(waveform_transport_t *transport,
                                         UART_HandleTypeDef *huart);
+/* Call in the main loop even if the waveform queue is empty. */
+void WaveformUart1Port_Service(void);
 
 #ifdef __cplusplus
 }

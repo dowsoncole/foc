@@ -1,0 +1,51 @@
+Electrical characteristics STM32G431x6 STM32G431x8 STM32G431xB
+108/198 DS12589 Rev 6
+5.3.11 EMC characteristics
+Susceptibility tests are performed on a sample basis during device characterization.
+Functional EMS (electromagnetic susceptibility)
+While a simple application is executed on the device (toggling 2 LEDs through I/O ports). 
+the device is stressed by two electromagnetic events until a failure occurs. The failure is 
+indicated by the LEDs:
+• Electrostatic discharge (ESD) (positive and negative) is applied to all device pins until 
+a functional disturbance occurs. This test is compliant with the IEC 61000-4-2 standard.
+• FTB: A Burst of Fast Transient voltage (positive and negative) is applied to V
+DD and 
+VSS through a 100 pF capacitor, until a functional disturbance occurs. This test is 
+compliant with the IEC 61000-4-4 standard.
+A device reset allows normal operations to be resumed. 
+The test results are given in Table 48. They are based on the EMS levels and classes 
+defined in application note AN1709.
+          
+Designing hardened software to avoid noise problems
+EMC characterization and optimization are performed at component level with a typical 
+application environment and simplified MCU software. It should be noted that good EMC 
+performance is highly dependent on the user application and the software in particular.
+Therefore it is recommended that the user applies EMC software optimization and 
+prequalification tests in relation with the EMC level requested for his application.
+Software recommendations
+The software flowchart must include the management of runaway conditions such as:
+• Corrupted program counter
+• Unexpected reset
+• Critical Data corruption (control registers...)
+Prequalification trials
+Most of the common failures (unexpected reset and program counter corruption) can be 
+reproduced by manually forcing a low state on the NRST pin or the Oscillator pins for 1 
+second.
+Table 48. EMS characteristics 
+Symbol Parameter Conditions Level/
+Class
+VFESD
+Voltage limits to be applied on any I/O pin 
+to induce a functional disturbance
+VDD = 3.3 V, TA = +25 °C,  
+fHCLK = 170 MHz, 
+conforming to IEC 61000-4-2
+2B
+VEFTB
+Fast transient voltage burst limits to be 
+applied through 100 pF on VDD and VSS 
+pins to induce a functional disturbance
+VDD = 3.3 V, TA = +25 °C,  
+fHCLK = 170 MHz, 
+conforming to IEC 61000-4-4
+5A

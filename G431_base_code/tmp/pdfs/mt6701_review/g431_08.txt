@@ -1,0 +1,54 @@
+List of tables STM32G431x6 STM32G431x8 STM32G431xB
+8/198 DS12589 Rev 6
+Table 43. HSI48 oscillator characteristics. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 104
+Table 44. LSI oscillator characteristics . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 105
+Table 45. PLL characteristics . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  . . . . 106
+Table 46. Flash memory characteristics . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 107
+Table 47. Flash memory endurance and data retention . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 107
+Table 48. EMS characteristics  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 108
+Table 49. EMI characteristics . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  . . . . 109
+Table 50. ESD absolute maximum ratings . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 109
+Table 51. Electrical sensitivities . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  . . . . . 110
+Table 52. I/O current injection susceptibility . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 110
+Table 53. I/O static characteristics . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  . . . . 111
+Table 54. Output voltage characteristics  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  . 113
+Table 55. I/O (except FT_c) AC characteristics . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 114
+Table 56. I/O FT_c AC characteristics . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 115
+Table 57. NRST pin characteristics  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  . . 116
+Table 58. EXTI input characteristics . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 117
+Table 59. Analog switches booster characteristics. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 117
+Table 60. ADC characteristics   . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 118
+Table 61. Maximum ADC RAIN  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  . 121
+Table 62. ADC accuracy - limited test  conditions 1  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 123
+Table 63. ADC accuracy - limited test  conditions 2  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 125
+Table 64. ADC accuracy - limited test  conditions 3  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 127
+Table 65. ADC accuracy (Multiple ADCs operation) - limited test conditions 1  . . . . . . . . . . . . . . . . 129
+Table 66. ADC accuracy (Multiple ADCs operation) - limited test conditions 2  . . . . . . . . . . . . . . . . 130
+Table 67. ADC accuracy (Multiple ADCs operation) - limited test conditions 3  . . . . . . . . . . . . . . . . 131
+Table 68. DAC 1MSPS characte ristics . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 133
+Table 69. DAC 1MSPS accuracy . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  . 136
+Table 70. DAC 15MSPS characteristics . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 137
+Table 71. DAC 15MSPS accuracy . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 139
+Table 72. VREFBUF characteristics . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  . 140
+Table 73. COMP characteristics . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 143
+Table 74. OPAMP characteristics  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 144
+Table 75. TS characteristics . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 148
+Table 76. V BAT monitoring characteristics  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 148
+Table 77. V BAT charging characteristics . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 148
+Table 78. TIMx characteristics . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  . . . . 149
+Table 79. IWDG min/max timeout period at 32 kHz (LSI). . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 150
+Table 80. WWDG min/max timeout value at 170 MHz (PCLK). . . . . . . . . . . . . . . . . . . . . . . . . . . . . 150
+Table 81. Minimum I2CCLK frequency in a ll I2C modes  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 151
+Table 82. I2C analog filter characteristics. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 151
+Table 83. SPI characteristics  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 152
+Table 84. I2S characteristics  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 155
+Table 85. SAI characteristics  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 157
+Table 86. USB electrical characteristics . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 159
+Table 87. USART electrical characteristics  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  159
+Table 88. UCPD characteristics . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  . . . 160
+Table 89. UFQFPN32 - Mechanical data . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 1 62
+Table 90. LQFP32 - Mechanical data . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 165
+Table 91. UFQFPN48 - Mechanical data . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 1 68
+Table 92. LQFP48 - Mechanical data . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 171
+Table 93. WLCSP49 - Mechanical data . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 175
+Table 94. WLCSP49 - Recommended PCB design rules. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 176

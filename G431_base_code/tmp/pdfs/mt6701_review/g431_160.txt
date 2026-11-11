@@ -1,0 +1,21 @@
+Electrical characteristics STM32G431x6 STM32G431x8 STM32G431xB
+160/198 DS12589 Rev 6
+5.3.27 UCPD characteristics
+UCPD1 controller complies with USB Type-C Rev.1.2 and USB Power Delivery Rev. 3.0 
+specifications. 
+          
+tv(TX) Data output valid time
+Master mode - 0.5 1.5
+ns
+Slave mode - 10 22
+th(RX) Data output hold time
+Master mode 0 - -
+Slave mode 7 - -
+1. Based on characterization, not tested in production.
+Table 87. USART electrical characteristics(1) (continued)
+Symbol Parameter Conditions Min Typ Max Unit
+Table 88. UCPD characteristics 
+Symbol Parameter Conditions Min Typ Max Unit
+VDD UCPD operating supply voltage
+Sink mode only 3.0 3.3 3.6 V
+Sink and source mode 3.135 3.3 3.465 V

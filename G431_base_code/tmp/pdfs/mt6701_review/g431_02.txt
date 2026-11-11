@@ -1,0 +1,44 @@
+STM32G431x6 STM32G431x8 STM32G431xB
+2/198 DS12589 Rev 6
+– 1 x 16-bit timer with 2 x IC/OCs, one 
+OCN/PWM, dead time generation and 
+emergency stop
+– 2 x 16-bit timers with IC/OC/OCN/PWM, 
+dead time generation and emergency stop
+– 2 x watchdog timers (independent, window)
+– 1 x SysTick timer: 24-bit downcounter
+– 2 x 16-bit basic timers
+– 1 x low-power timer
+• Calendar RTC with alarm, periodic wakeup 
+from stop/standby
+• Communication interfaces
+– 1 x FDCAN controller supporting flexible 
+data rate
+– 3 x I
+2C Fast mode plus (1 Mbit/s) with 
+20 mA current sink, SMBus/PMBus, 
+wakeup from stop
+– 4 x USART/UARTs (ISO 7816 interface, 
+LIN, IrDA, modem control)
+–1  x   L P U A R T
+– 3 x  SPIs, 4 to 16 programmable bit frames, 
+2 x with multiplexed half duplex I
+2S 
+interface
+– 1 x SAI (serial audio interface) 
+– USB 2.0 full-speed interface with LPM and 
+BCD support
+– IRTIM (infrared interface)
+– USB Type-C™ /USB power delivery 
+controller (UCPD)
+• True random number generator (RNG)
+• CRC calculation unit, 96-bit unique ID 
+• Development support: serial wire debug 
+(SWD), JTAG, Embedded Trace Macrocell™ 
+          
+          
+Table 1. Device summary 
+Reference Part number
+STM32G431x6 STM32G431C6, STM32G431K6, ST M32G431R6, STM32G431V6, STM32G431M6
+STM32G431x8 STM32G431C8, STM32G431K8, ST M32G431R8, STM32G431V8, STM32G431M8
+STM32G431xB STM32G431CB, STM32G431KB, STM32G431RB, STM32G431VB, STM32G431MB

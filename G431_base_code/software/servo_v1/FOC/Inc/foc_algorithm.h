@@ -2,6 +2,7 @@
 #define FOC_ALGORITHM_H
 
 #include <stdint.h>
+#include "current_policy.h"
 #include "foc_modulation.h"
 #include "foc_pi.h"
 
@@ -40,6 +41,12 @@ typedef struct
   /* Actual vector-limited references, used by performance measurements. */
   float applied_d_reference;
   float applied_q_reference;
+  /* 同一 ADC 周期内锁存的误差和限幅前 PI 命令，避免 Watch 跨周期读取
+     reference/current/output 后误判控制方向。PI 命令单位为 Vdc 标幺。 */
+  float d_current_error;
+  float q_current_error;
+  float d_pi_command;
+  float q_pi_command;
   uint8_t reference_limited;
   uint8_t integral_limited;
   float d_voltage;
@@ -90,13 +97,34 @@ typedef struct
   uint8_t voltage_ramp_complete;
 } foc_voltage_open_loop_t;
 
-/* 电流环台架测试参数与遥测。电流闭环使用真实 ADC 反馈，但电角度由本对象
-   自行推进，因此它是“开环角度 + 闭环电流”，不依赖编码器。PI 输出仍为
+/* 电流环按三阶段投运，禁止一上电就让 PI 掩盖相序/极性问题：
+   固定 Ud 检查方向 -> 仅 D 轴低增益 P 环 -> 低增益 D/Q PI。 */
+typedef enum
+{
+  FOC_CURRENT_STAGE_D_VOLTAGE_CHECK = 0,
+  FOC_CURRENT_STAGE_D_CURRENT_P_CHECK,
+  FOC_CURRENT_STAGE_DQ_PI_CLOSED_LOOP,
+  FOC_CURRENT_STAGE_COUNT
+} foc_current_stage_t;
+
+/* 电流环台架测试参数与遥测。电流闭环使用真实 ADC 反馈，main 强制电角度为
+   0，频率为 0，不依赖编码器；这不代表转子被机械锁止。PI 输出仍为
    相对母线电压的标幺值，下面的 output_*_voltage_v 仅用于物理量观察。 */
 typedef struct
 {
+  volatile foc_current_stage_t requested_stage;
+  volatile foc_current_stage_t active_stage;
+  volatile uint32_t stage_switch_count;
+  /* 第一阶段参数：电角度固定，Q 轴电压由算法强制为 0。Watch 只需修改
+     d_voltage_check_v；applied_* 是限幅、斜坡后的实际输出遥测。 */
+  float d_voltage_check_v;
+  float applied_d_voltage_check_v;
+  float voltage_check_ramp_v_per_s;
   float d_current_reference_a;
   float q_current_reference_a;
+  float applied_d_current_reference_a;
+  float applied_q_current_reference_a;
+  float current_reference_ramp_a_per_s;
   float dc_bus_voltage_v;
   float electrical_frequency_hz;
   float electrical_angle_rad;
@@ -106,6 +134,26 @@ typedef struct
   float output_d_voltage_v;
   float output_q_voltage_v;
 } foc_current_test_t;
+
+/* 只做坐标变换，不运行 PI，供固定电压方向测试观察 Id/Iq。 */
+uint8_t FOC_TransformCurrentDQ(float phase_a, float phase_b,
+                               float electrical_angle_rad,
+                               float *d_current, float *q_current);
+
+/* 固定角度的物理伏特命令入口；不推进角度、不运行电流 PI。 */
+uint8_t FOC_AlgorithmVoltageCommandStep(foc_algorithm_t *algorithm,
+                                        float d_voltage_v,
+                                        float q_voltage_v,
+                                        float dc_bus_voltage_v,
+                                        float electrical_angle_rad);
+
+/* Same voltage-only command, sharing one sin/cos pair with measured Id/Iq.
+   Feedback is telemetry, not a current PI or a voltage correction. */
+uint8_t FOC_AlgorithmVoltageFeedbackStep(foc_algorithm_t *algorithm,
+                                         float d_voltage_v,
+                                         float q_voltage_v,
+                                         float dc_bus_voltage_v,
+                                         const foc_input_t *feedback);
 
 void FOC_AlgorithmInit(foc_algorithm_t *algorithm,
                        const foc_parameters_t *parameters);

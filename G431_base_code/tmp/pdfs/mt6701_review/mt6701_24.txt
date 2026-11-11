@@ -1,0 +1,66 @@
+www.magntek.com.cn | 磁技术带来美妙变革 1.8版本  2022.12
+MT6701
+基于差分霍尔的磁性角度传感器芯片
+24
+MT6701提供了SSI接口，上位机或MCU可以通过SSI接口接收14位的角度数据、状态位以及对
+应的校验位数据。SSI参考电路如图-22和图-23。
+图-22: SOP-8 封装SSI参考电路
+7.8  SSI 接口
+ 
+图-23: QFN-16 封装SSI参考电路
+7
+1
+2
+3
+4 5
+6
+8
+0.1uf
+VDD
+TVS(6V)
+Recommended 
+for Better Reliability
+Analog
+/PWM
+Push
+MCU
+Master
+Slave
+MT6701
+DO
+CLK
+CSN
+200KΩ
+200KΩ
+DO
+MCU
+Master
+CLK
+11
+1 2 3 4
+5
+6
+7
+8
+910
+13
+12
+16
+14
+15
+V/-B W/-Z
+0.1uf
+TVS(6V)
+Recommended 
+for Better Reliability
+U/-A NC
+NC NC NC NC
+PUSH
+VDD
+Analog
+/PWM
+CSN
+MT6701
+Slave
+200KΩ
+200KΩ

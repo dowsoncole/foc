@@ -1,0 +1,44 @@
+STM32G431x6 STM32G431x8 STM32G431xB Electrical characteristics
+DS12589 Rev 6 87/198
+          
+          
+Table 30. Current consumption in Stop 0 mode 
+Symbol Parameter
+Conditions TYP MAX (1)
+Unit
+- VDD 25°C 55°C 85°C 105°C 125°C 25°C 55°C 85°C 105°C 125°C
+IDD(Stop 0)
+Supply current 
+in Stop 0 mode, 
+RTC disabled
+-
+1.8 V 150 280 680 1200 2100 560 1600 4000 7100 12000
+µA
+2.4 V 150 280 680 1200 2100 560 1600 4000 7100 12000
+3 V 155 280 685 1200 2150 560 1600 4000 7100 12000
+3.6 V 155 285 685 1200 2150 560 1600 4000 7200 12000
+1. Guaranteed by characterization re sults, unless otherwise specified.
+Table 31. Current consumption in Standby mode 
+Symbol Parameter
+Conditions TYP MAX (1)
+Unit
+- VDD 25°C 55°C 85°C 105°C 125°C 25°C 55°C 85°C 105°C 125°C
+IDD
+(Standby)
+Supply current in Standby 
+mode (backup registers 
+retained),
+ RTC disabled
+No independent 
+watchdog
+1.8 V 92.0 205 870 2250 5600 220 1000 3200 8000 20000
+nA
+2.4 V 100 240 1000 2600 6450 250 1100 3600 9000 23000
+3 V 120 280 1200 3050 7400 280 1300 4200 11000 26000
+3.6 V 175 385 1550 3800 9200 370 1500 4900 12000 30000
+With independent 
+watchdog
+1.8 V 275 - - - - - - - - -
+2.4 V 335 - - - - - - - - -
+3  V 4 0 0 - - - - --- - -
+3.6 V 510 - - - - - - - - -

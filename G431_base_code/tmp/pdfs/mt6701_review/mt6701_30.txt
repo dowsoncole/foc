@@ -1,0 +1,35 @@
+www.magntek.com.cn | 磁技术带来美妙变革 1.8版本  2022.12
+MT6701
+基于差分霍尔的磁性角度传感器芯片
+30
+*Z_PULSE_WIDTH[2:0] （地址0x32[6:4])
+Z_PULSE_WIDTH 寄存器定义了Z脉冲宽度(图-9和图-10)。
+HYST Z脉冲宽度
+0x0 1 LSB
+0x1 2 LSB
+0x2 4 LSB
+0x3 8 LSB
+0x4 12 LSB
+0x5 16 LSB
+0x6 180°
+0x7 1 LSB
+*ZERO[11:0] (地址0x32[3:0] & 0x33[7:0])
+ZERO 寄存器定义了零点位置。
+ZERO 0°位置
+0x000 0°
+0x001 0.088°
+0x002 0.176°
+… …
+0xFFD 359.736°
+0xFFE 359.824°
+0xFFF 359.912°
+*PWM_FREQ (Address 0x38[7])
+PWM_FREQ 寄存器定义了PWM的频率。
+PWM_FREQ PWM频率
+0x0 994.4 Hz
+0x1 497.2 Hz
+*PWM_POL (地址0x38[6])
+PWM_POL寄存器定义了PWM的极性。
+PWM_POL PWM极性
+0x0 高电平有效
+0x1 低电平有效

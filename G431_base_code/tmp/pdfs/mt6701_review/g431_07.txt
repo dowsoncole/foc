@@ -1,0 +1,53 @@
+DS12589 Rev 6 7/198
+STM32G431x6 STM32G431x8 STM32G431xB List of tables
+9
+List of tables
+Table 1. Device summary . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  . . . . . 2
+Table 2. STM32G431x6/x8/xB feat ures and peripheral counts  . . . . . . . . . . . . . . . . . . . . . . . . . . . . 14
+Table 3. STM32G431x6/x8/xB peripherals interconnect matrix . . . . . . . . . . . . . . . . . . . . . . . . . . . . 25
+Table 4. DMA implementation  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 27
+Table 5. Temperature sensor calibration values. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 30
+Table 6. Internal voltage reference calibrati on values  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 30
+Table 7. Timer feature comparison. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 32
+Table 8. I2C implementation. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  . . . . 38
+Table 9. USART/UART/LPUART features . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 39
+Table 10. SAI features implementation. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 41
+Table 11. Legend/abbreviations used in the pinout table . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 50
+Table 12. STM32G431x6/x8/xB pin definition  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 5 1
+Table 13. Alternate function . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  . . . . . . 61
+Table 14. Voltage characteristics . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 69
+Table 15. Current characteristics . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 70
+Table 16. Thermal characteristics.  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 70
+Table 17. General operating conditions . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  . . 71
+Table 18. Operating conditions at power-up / power-down  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 72
+Table 19. Embedded reset and power control block characterist ics. . . . . . . . . . . . . . . . . . . . . . . . . . 72
+Table 20. Embedded internal voltage reference. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 74
+Table 21. Current consumption in Run and Low-power run modes, code with data  
+processing running from Flash in single Bank, ART enable (Cache ON Prefetch OFF)  . . 76
+Table 22. Current consumption in Run and Low-power run modes,  
+code with data processing running from SRAM1 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 78
+Table 23. Typical current consumption in Run a nd Low-power run modes, with different codes  
+running from Flash, ART enable (Cache ON Prefetch OFF)  . . . . . . . . . . . . . . . . . . . . . . . 80
+Table 24. Typical current consumption in Run a nd Low-power run modes, with different codes  
+running from SRAM1  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 81
+Table 25. Typical current consumption in Run a nd Low-power run modes, with different codes  
+running from SRAM2  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 82
+Table 26. Typical current consumption in Run a nd Low-power run modes, with different codes  
+running from CCM  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 83
+Table 27. Current consumption in Sleep and Low-power sleep mode Flash ON . . . . . . . . . . . . . . . . 84
+Table 28. Current consumption in low-power sleep modes,  Flash in power-down. . . . . . . . . . . . . . . 85
+Table 29. Current consumption in Stop 1 mode . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 86
+Table 30. Current consumption in Stop 0 mode . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 87
+Table 31. Current consumption in Standby mode  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 87
+Table 32. Current consumption in Shutdown mode . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 89
+Table 33. Current consumption in VBAT mode  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 91
+Table 34. Peripheral current consumption . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 93
+Table 35. Low-power mode wakeup timings  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 97
+Table 36. Regulator modes transition times . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 98
+Table 37. Wakeup time using USART/LPUART. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 98
+Table 38. High-speed external user clock characteristics. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 98
+Table 39. Low-speed external user clock characteristics . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 99
+Table 40. HSE oscillator characteristics . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 100
+Table 41. LSE oscillator characteristics (f
+LSE = 32.768 kHz) . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 102
+Table 42. HSI16 oscillator characteristics. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 103

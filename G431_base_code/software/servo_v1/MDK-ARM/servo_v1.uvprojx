@@ -19,7 +19,7 @@
           <Vendor>STMicroelectronics</Vendor>
           <PackID>Keil.STM32G4xx_DFP.2.2.0</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
-          <Cpu>IRAM(0x20000000-0x20007FFF) IROM(0x8000000-0x801FFFF) CLOCK(8000000) FPU2 CPUTYPE("Cortex-M4") TZ</Cpu>
+          <Cpu>IRAM(0x20000000-0x20007FFF) IROM(0x8000000-0x801EFFF) CLOCK(8000000) FPU2 CPUTYPE("Cortex-M4") TZ</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
           <FlashDriverDll></FlashDriverDll>
@@ -82,7 +82,7 @@
           </BeforeMake>
           <AfterMake>
             <RunUserProg1>0</RunUserProg1>
-            <RunUserProg2>1</RunUserProg2>
+            <RunUserProg2>0</RunUserProg2>
             <UserProg1Name></UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
@@ -253,7 +253,7 @@
               <IROM>
                 <Type>1</Type>
                 <StartAddress>0x8000000</StartAddress>
-                <Size>0x20000</Size>
+                <Size>0x1f000</Size>
               </IROM>
               <XRAM>
                 <Type>0</Type>
@@ -278,7 +278,7 @@
               <OCR_RVCT4>
                 <Type>1</Type>
                 <StartAddress>0x8000000</StartAddress>
-                <Size>0x20000</Size>
+                <Size>0x1f000</Size>
               </OCR_RVCT4>
               <OCR_RVCT5>
                 <Type>1</Type>
@@ -315,7 +315,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>1</Optim>
+            <Optim>4</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -334,12 +334,12 @@
             <v6LangP>3</v6LangP>
             <vShortEn>1</vShortEn>
             <vShortWch>1</vShortWch>
-            <v6Lto>0</v6Lto>
+            <v6Lto>1</v6Lto>
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>-ffp-mode=full</MiscControls>
-              <Define>USE_HAL_DRIVER,STM32G431xx</Define>
+              <MiscControls>-ffp-mode=std -fno-finite-math-only</MiscControls>
+              <Define>USE_HAL_DRIVER,STM32G431xx,ENCODER_FAULT_TRIGGER_DIAGNOSTIC=2</Define>
               <Undefine></Undefine>
               <IncludePath>../Core/Inc;../FOC/Inc;../Servo/Inc;../Modules/Driver_Communication/Inc;../Modules/Three_Phase_Driver/Inc;../Modules/Current_Sampling/Inc;../Modules/Encoder/Inc;../Tests/Inc;../Drivers/STM32G4xx_HAL_Driver/Inc;../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32G4xx/Include;../Drivers/CMSIS/Include</IncludePath>
             </VariousControls>
@@ -363,16 +363,16 @@
             </VariousControls>
           </Aads>
           <LDads>
-            <umfTarg>1</umfTarg>
+            <umfTarg>0</umfTarg>
             <Ropi>0</Ropi>
             <Rwpi>0</Rwpi>
             <noStLib>0</noStLib>
             <RepFail>1</RepFail>
-            <useFile>0</useFile>
+            <useFile>1</useFile>
             <TextAddressRange></TextAddressRange>
             <DataAddressRange></DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile></ScatterFile>
+            <ScatterFile>servo_v1_servo_v1.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc></Misc>
@@ -536,6 +536,66 @@
           <GroupName>Modules/Encoder</GroupName>
           <Files>
             <File>
+              <FileName>mpt_t485.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Modules/Encoder/Src/mpt_t485.c</FilePath>
+            </File>
+            <File>
+              <FileName>mpt_t485_protocol.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Modules/Encoder/Src/mpt_t485_protocol.c</FilePath>
+            </File>
+            <File>
+              <FileName>output_position.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Servo/Src/output_position.c</FilePath>
+            </File>
+            <File>
+              <FileName>encoder_calibration.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Servo/Src/encoder_calibration.c</FilePath>
+            </File>
+            <File>
+              <FileName>user_control.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Servo/Src/user_control.c</FilePath>
+            </File>
+            <File>
+              <FileName>encoder_calibration_record.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Modules/Encoder/Src/encoder_calibration_record.c</FilePath>
+            </File>
+            <File>
+              <FileName>encoder_calibration_store.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Modules/Encoder/Src/encoder_calibration_store.c</FilePath>
+            </File>
+            <File>
+              <FileName>output_position_math.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Servo/Src/output_position_math.c</FilePath>
+            </File>
+            <File>
+              <FileName>mt6701_ssi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Modules/Encoder/Src/mt6701_ssi.c</FilePath>
+            </File>
+            <File>
+              <FileName>mt6701_ssi.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>../Modules/Encoder/Inc/mt6701_ssi.h</FilePath>
+            </File>
+            <File>
+              <FileName>spi3_encoder.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Modules/Encoder/Src/spi3_encoder.c</FilePath>
+            </File>
+            <File>
+              <FileName>spi3_encoder.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>../Modules/Encoder/Inc/spi3_encoder.h</FilePath>
+            </File>
+            <File>
               <FileName>spi1_encoder.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Modules/Encoder/Src/spi1_encoder.c</FilePath>
@@ -641,6 +701,11 @@
               <FilePath>../Servo/Src/servo_manager.c</FilePath>
             </File>
             <File>
+              <FileName>speed_commission.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Servo/Src/speed_commission.c</FilePath>
+            </File>
+            <File>
               <FileName>servo_manager.h</FileName>
               <FileType>5</FileType>
               <FilePath>../Servo/Inc/servo_manager.h</FilePath>
@@ -650,6 +715,16 @@
         <Group>
           <GroupName>Tests</GroupName>
           <Files>
+            <File>
+              <FileName>mt6701_spi3_test.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Tests/Src/mt6701_spi3_test.c</FilePath>
+            </File>
+            <File>
+              <FileName>mt6701_spi3_test.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>../Tests/Inc/mt6701_spi3_test.h</FilePath>
+            </File>
             <File>
               <FileName>current_loop_test.c</FileName>
               <FileType>1</FileType>

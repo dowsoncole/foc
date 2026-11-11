@@ -1,0 +1,38 @@
+STM32G431x6 STM32G431x8 STM32G431xB Electrical characteristics
+DS12589 Rev 6 89/198
+          
+IDD (wakeup 
+from Standby)
+Supply current during wakeup 
+from Standby mode
+Wakeup clock is 
+HSI16 = 16 MHz(4) 3  V 2 . 0 - - - - --- - - m A
+1. Guaranteed by characterization re sults, unless otherwise specified.
+2. Based on characterization done with a 32.768 kHz crystal (MC306-G-06Q-32.768, manufacturer JFVNY) with two 6.8 pF loading capacitors. 
+3. The supply current in Standby with SRAM2 mode is: IDD_ALL(Standby) + IDD_ALL(SRAM2). The supply current in Standby with RTC with SRAM2 mode is: IIDD_ALL(Standby 
++ RTC) + IDD_ALL(SRAM2). 
+4. Wakeup with code execution from Fl ash. Average value given for a typical wakeup time as specified in Table 35: Low-power mode wakeup timings.
+Table 31. Current consumption in Standby mode (continued)
+Symbol Parameter
+Conditions TYP MAX (1)
+Unit
+- VDD 25°C 55°C 85°C 105°C 125°C 25°C 55°C 85°C 105°C 125°C
+Table 32. Current consumption in Shutdown mode 
+Symbol Parameter
+Conditions TYP MAX (1)
+Unit
+- VDD 25°C 55°C 85°C 105°C 125°C 25°C 55°C 85°C 105°C 125°C
+IDD
+(Shutdown)
+Supply current 
+in Shutdown 
+mode (backup 
+registers 
+retained) RTC 
+disabled
+-
+1.8 V 14.0 94.0 570 1600 4350 130 420 2100 6100 17000
+nA
+2.4 V 22.0 120 670 1900 4950 150 490 2400 6900 19000
+3 V 35.0 150 805 2200 5750 180 560 2800 7800 21000
+3.6 V 74.0 245 1100 2900 7350 220 710 3300 9100 24000

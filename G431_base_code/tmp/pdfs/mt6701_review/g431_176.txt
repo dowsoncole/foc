@@ -1,0 +1,15 @@
+Package information STM32G431x6 STM32G431x8 STM32G431xB
+176/198 DS12589 Rev 6
+Figure 53. WLCSP49 - Recommended footprint
+1. Dimensions are expr essed in millimeters.
+          
+Table 94. WLCSP49 - Recommended PCB design rules 
+Dimension Recommended values
+Pitch 0.4 mm
+Dpad 0,225 mm
+Dsm 0.290 mm typ. (depends on soldermask registration tolerance)
+Stencil opening 0.250 mm
+Stencil thickness 0.100 mm
+BGA_WLCSP_FT_V1
+Dsm
+Dpad

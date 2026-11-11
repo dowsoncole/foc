@@ -76,9 +76,9 @@ extern "C" {
 
 /* --------------------------------------------------------------------------*/
 /* CRC 参数（手册：多项式 X8+X2+X+1 = 0x07，覆盖 ANGLE[20:0]+STATUS[2:0] 共
-   24 bit，ANGLE[20] 为最高位最先移入）。
-   ⚠ 手册未给出 CRC 寄存器初值，此处按 CRC-8 常规取 0x00。若实测校验恒不
-   通过，优先尝试把初值改为 0xFF 再验证，并在 README 中固化结论。 */
+   24 bit，ANGLE[20] 为最高位最先移入）。CRC 寄存器初值经实机/逻辑分析仪
+   验证确认为 0x00（2026-10-22 固化），例如 B5 25 58 -> 4A、61 E4 08 -> 81，
+   不可因偶发坏帧改为 0xFF。 */
 #define MT6835_CRC_POLY              0x07U
 #define MT6835_CRC_INIT              0x00U
 
@@ -156,15 +156,15 @@ HAL_StatusTypeDef MT6835_ReadStatus(mt6835_status_t *status, uint32_t timeout);
 /**
   * @brief  读取一整帧角度数据：单帧内连读 0x003~0x006 四个寄存器。
   *
-  * CSN 在整个 4×24 bit 事务期间保持拉低，因此四个寄存器来自同一次锁存
+  * CSN 在整个 48 bit 事务期间保持拉低，因此四个寄存器来自同一次锁存
   * （手册 §7.6.9：CSN 下降沿锁存 0x003~0x006，直到被读走），STATUS 与
   * ANGLE 不会错位。函数内部完成位域拼装与 CRC 重算比对。
   *
   * @param  frame   角度帧存放处，不可为 NULL
   * @retval HAL_OK 表示四个字节都读到了（CRC 是否通过看 frame->crc_ok）；
   *         HAL_ERROR / HAL_TIMEOUT 表示传输本身失败。
-  * @note   单次事务约 9 µs（10.5 MHz），允许在主循环与测试层调用；
-  *         是否放进 20 kHz 电流环由上层按耗时预算决定。
+  * @note   48 个时钟在 10.5 MHz 下需 4.57 µs，另有软件开销。此阻塞接口
+  *         仅供线程上下文调用；20 kHz 正式采集使用异步 DMA 接口。
   */
 HAL_StatusTypeDef MT6835_ReadAngle(mt6835_angle_t *frame, uint32_t timeout);
 

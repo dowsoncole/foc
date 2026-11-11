@@ -95,14 +95,16 @@ HAL_StatusTypeDef MX_OPAMP3_Init(void)
 
 /**
   * @brief  配置 ADC1 注入组两个通道（rank 1 = 通道 3 / PA2 / U 相，rank 2 = 通道 12 / PB1 / V 相），
-  *         16 倍过采样，随后执行一次上电自校准。
+  *         单次紧邻 U/V 转换，随后执行一次上电自校准。
   *
   * 时钟换算：RCC 把 ADC12 内核源选为 SYSCLK=168 MHz，因此必须走异步分频，
   *   ClockPrescaler = ADC_CLOCK_ASYNC_DIV4 -> ADC 时钟 42 MHz（合规）。
-  *   单次转换 = 采样 2.5 cycles + 12 位逐次逼近 12.5 cycles = 15 cycles
-  *   -> 357 ns；过采样 16 倍 -> 5.71 µs / 通道，两通道序列 11.43 µs。
+  *   Sample duration and oversampling are selected by ADC1_CS_PROFILE.
+  *   Profile 1: (12.5 + 12.5) * 1 * 2 / 42 MHz = 1.190 us.
+  *   Profile 6: 2x, two-rank sequence = 2.381 us.
+  *   Profile 2 (previous baseline): 4x, two-rank sequence = 4.762 us.
   *
-  * 触发时序：TIM1_CH4 的提前量取本序列耗时的一半（5.714 µs），使序列正好以
+  * 触发时序：TIM1_CH4 的提前量取本序列耗时的一半，使序列靠近
   *   载波峰值附近。运行时由 PWM 规划器根据下一组三相 duty 动态设置 CCR4。
   */
 HAL_StatusTypeDef MX_ADC1_Init(uint8_t software_trigger_flag)
@@ -113,9 +115,16 @@ HAL_StatusTypeDef MX_ADC1_Init(uint8_t software_trigger_flag)
 
   /* USER CODE BEGIN ADC1_Init 0 */
 
-  /* 过采样倍率 16，且不做右移：硬件把 16 次转换结果直接累加后写入 JDR，
-     满量程 4095 x 16 = 65520 占满 16 位。读数换算成 12 位等效码需除以 16。 */
+  /* Rank-wise oversampling trades noise against U/V sampling skew.
+     Keep sum bits (no shift); current_sampling divides by the selected ratio. */
+  oversampleConfig.Ratio = ADC_OVERSAMPLING_RATIO_2;
+#if ADC1_CS_OVERSAMPLING_RATIO == 4
+  oversampleConfig.Ratio = ADC_OVERSAMPLING_RATIO_4;
+#elif ADC1_CS_OVERSAMPLING_RATIO == 8
+  oversampleConfig.Ratio = ADC_OVERSAMPLING_RATIO_8;
+#elif ADC1_CS_OVERSAMPLING_RATIO == 16
   oversampleConfig.Ratio = ADC_OVERSAMPLING_RATIO_16;
+#endif
   oversampleConfig.RightBitShift = ADC_RIGHTBITSHIFT_NONE;
 
   /* USER CODE END ADC1_Init 0 */
@@ -128,10 +137,8 @@ HAL_StatusTypeDef MX_ADC1_Init(uint8_t software_trigger_flag)
      ADEN/JADSTART 置位但注入转换不结束。SYSCLK/4 仍为 42 MHz。 */
   hadc1.Init.ClockPrescaler = ADC_CLOCK_ASYNC_DIV4;
   hadc1.Init.Resolution = ADC_RESOLUTION_12B;
-  /* ⚠ 左对齐在这里被硬件忽略：注入组过采样已使能，RM0440 §21.4.26 明确
-     「过采样模式下不支持左对齐」，ALIGN 位不起作用，JDR 里是右对齐的
-     16 位累加值。保留该赋值只为与参考配置逐字一致。 */
-  hadc1.Init.DataAlign = ADC_DATAALIGN_LEFT;
+  /* Right-aligned 12-bit conversions; oversampling produces unshifted sums. */
+  hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
   hadc1.Init.GainCompensation = 0;
   hadc1.Init.ScanConvMode = ADC_SCAN_ENABLE;
   /* 序列级 EOC：整个注入序列跑完才置标志，因此读到 JDR 时两个通道的数据
@@ -144,8 +151,7 @@ HAL_StatusTypeDef MX_ADC1_Init(uint8_t software_trigger_flag)
   /* 溢出时保留旧数据而非覆盖：电流环宁可拿到略旧的一次采样，
      也不要拿到撕裂的数据。 */
   hadc1.Init.Overrun = ADC_OVR_DATA_PRESERVED;
-  /* 这里关闭的是「规则组」过采样；注入组过采样由下面的
-     InjecOversamplingMode 单独使能，两者互不影响。 */
+  /* Regular group oversampling remains disabled; injected group is below. */
   hadc1.Init.OversamplingMode = DISABLE;
 
   if (HAL_ADC_Init(&hadc1) != HAL_OK)
@@ -189,10 +195,8 @@ HAL_StatusTypeDef MX_ADC1_Init(uint8_t software_trigger_flag)
   /* 关闭注入上下文队列：每个 TIM1_CH4 触发点都重新开跑固定的两通道序列，
      适合 20 kHz 的等间隔触发。 */
   sConfigInjected.QueueInjectedContext = DISABLE;
-  /* 2.5 cycles 是采样时间最短档。驱动源是片内运放输出，源阻抗低，短采样
-     时间足够；过采样 16 倍本身也提供了额外的噪声平均。
-     完整 16 倍序列耗时交给 PWM 规划器，不能只检查第一个采样瞬间。 */
-  sConfigInjected.InjectedSamplingTime = ADC_SAMPLETIME_2CYCLES_5;
+  /* Same profile drives the sampling time, sum divisor and PWM reservation. */
+  sConfigInjected.InjectedSamplingTime = ADC1_CS_SAMPLE_TIME;
 
   /* 软件触发用于上电偏置标定：此时 TIM1_CH4 的触发被摘除，标定不受 PWM
      时序干扰。运行时使用 T1_TRGO2=OC4REF 上升沿，让采样点跟随载波。 */
@@ -212,7 +216,10 @@ HAL_StatusTypeDef MX_ADC1_Init(uint8_t software_trigger_flag)
      因此软件触发模式下这个赋值不会生效，无需按分支区分。 */
   sConfigInjected.ExternalTrigInjecConvEdge = ADC_EXTERNALTRIGINJECCONV_EDGE_RISING;
 
+  sConfigInjected.InjecOversamplingMode = DISABLE;
+#if ADC1_CS_OVERSAMPLING_RATIO > 1
   sConfigInjected.InjecOversamplingMode = ENABLE;
+#endif
   sConfigInjected.InjecOversampling = oversampleConfig;
 
   /* rank 1：ADC_CHANNEL_3 = PA2 = OPAMP1 输出 = U 相 = foc_input_t.phase_a。 */

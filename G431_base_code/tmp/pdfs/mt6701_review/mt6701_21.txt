@@ -1,0 +1,23 @@
+www.magntek.com.cn | 磁技术带来美妙变革 1.8版本  2022.12
+MT6701
+基于差分霍尔的磁性角度传感器芯片
+21
+参数 描述 最小值 最大值 单位
+TSCL SCL 时钟周期 1 - μs
+THD.STA “开始通信”保持时间 250 - ns
+TLOW SCL低电平时间 250 - ns
+THIGH SCL高电平时间 250 - ns
+TSU.DA SDA准备时间 100 - ns
+THD.DA SDA保持时间 50 - ns
+TR SDA/SCL上升时间 - 150 ns
+TF SDA/SCL下降时间 - 150 ns
+TSU.STP “停止通信”准备时间 250 - ns
+I2C 时序参数
+7.7.1  I2C 时序图
+图-19: I2C  时序图
+SCL
+SDA
+TH D.STA TH D.D A TSU . D A
+TSC L
+TSU . STPTR TF
+START STO P2nd STARTTH I G H TLO W

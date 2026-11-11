@@ -1,0 +1,58 @@
+Electrical characteristics STM32G431x6 STM32G431x8 STM32G431xB
+88/198 DS12589 Rev 6
+IDD
+(Standby with 
+RTC)
+Supply current in Standby 
+mode (backup registers 
+retained), 
+RTC enabled
+RTC clocked by 
+LSI, no 
+independent 
+watchdog
+1.8 V 490 605 1300 2650 5950 670 1400 3600 8200 20000
+nA
+2.4 V 630 765 1550 3100 6950 850 1700 4200 9400 23000
+3 V 785 955 1850 3700 8050 1100 1900 4900 11000 26000
+3.6 V 1000 1200 2350 4600 9950 1400 2400 5800 13000 30000
+RTC clocked by 
+LSI, with 
+independent 
+watchdog
+1.8 V 530 - - - - - - - - -
+2.4 V 685 - - - - - - - - -
+3  V 8 6 0 - - - - --- - -
+3.6 V 1100 - - - - - - - - -
+RTC clocked by 
+LSE bypassed at 
+32768 Hz
+1.8 V 360 470 1100 2450 5750 - - - - -
+nA
+2.4 V 480 625 1400 3000 6800 - - - - -
+3 V 825 1100 2200 4200 8700 - - - - -
+3.6 V 2550 3400 5250 8000 13500 - - - - -
+RTC clocked by 
+LSE quartz
+(2) in low 
+drive mode
+1.8 V 355 490 990 2150 4800 - - - - -
+2.4 V 455 605 1200 2550 5550 - - - - -
+3 V 595 775 1450 3100 6400 - - - - -
+3.6 V 810 1200 2050 3900 7750 - - - - -
+IDD
+(SRAM2)(3)
+Supply current to be added in 
+Standby mode when SRAM2 
+is retained
+-
+1.8 V 218 530 1680 3500 6900 - - - - -
+nA
+2.4 V 220 525 1700 3500 7050 - - - - -
+3 V 215 530 1650 3500 7100 - - - - -
+3.6 V 220 545 1700 3600 6800 - - - - -
+Table 31. Current consumption in Standby mode (continued)
+Symbol Parameter
+Conditions TYP MAX (1)
+Unit
+- VDD 25°C 55°C 85°C 105°C 125°C 25°C 55°C 85°C 105°C 125°C

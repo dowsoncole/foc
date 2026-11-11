@@ -1,0 +1,171 @@
+#ifndef FOC_ALGORITHM_H
+#define FOC_ALGORITHM_H
+
+#include <stdint.h>
+#include "foc_modulation.h"
+#include "foc_pi.h"
+
+typedef struct
+{
+  /* 实际两次电流快照间隔；动态移动采样点时由 ADC 回调逐周期更新。 */
+  float sample_period_s;
+  /* 名义 PWM 周期；未提供实际 sample_period_s 时用作后备。 */
+  float pwm_period_s;
+  /* 基波相电压峰值 / Vdc。最大 2/pi，并受 modulation 的 duty 跨度降额。 */
+  float voltage_limit;
+  foc_modulation_parameters_t modulation;
+  float current_limit;
+  foc_pi_t d_controller;
+  foc_pi_t q_controller;
+} foc_parameters_t;
+
+typedef struct
+{
+  /* 两相反馈使用物理安培，必须与 d/q 电流给定和 current_limit 同量纲。 */
+  float phase_a;
+  float phase_b;
+  float electrical_angle_rad;
+  float d_reference;
+  float q_reference;
+  /* 三类输入独立表示有效性：只有全部为 1 才允许本周期运行 FOC。 */
+  uint8_t current_valid;
+  uint8_t angle_valid;
+  uint8_t reference_valid;
+} foc_input_t;
+
+typedef struct
+{
+  float d_current;
+  float q_current;
+  /* Actual vector-limited references, used by performance measurements. */
+  float applied_d_reference;
+  float applied_q_reference;
+  /* 同一 ADC 周期内锁存的误差和限幅前 PI 命令，避免 Watch 跨周期读取
+     reference/current/output 后误判控制方向。PI 命令单位为 Vdc 标幺。 */
+  float d_current_error;
+  float q_current_error;
+  float d_pi_command;
+  float q_pi_command;
+  uint8_t reference_limited;
+  uint8_t integral_limited;
+  float d_voltage;
+  float q_voltage;
+  float alpha_voltage;
+  float beta_voltage;
+  /* 过调制中实际电压含谐波；基波目标单独提供给调参与抗饱和。 */
+  float fundamental_d_voltage;
+  float fundamental_q_voltage;
+  float fundamental_voltage_limit;
+  /* SVPWM 计算时的三相投影，仅供遥测；PWM 硬件消费下方 duty。 */
+  float phase_a_voltage;
+  float phase_b_voltage;
+  float phase_c_voltage;
+  float phase_a_duty;
+  float phase_b_duty;
+  float phase_c_duty;
+  foc_modulation_region_t modulation_region;
+  uint8_t sector;
+  uint8_t valid;
+  uint8_t saturated;
+} foc_output_t;
+
+typedef struct
+{
+  foc_parameters_t parameters;
+  foc_output_t output;
+} foc_algorithm_t;
+
+/* 开环电压算法的给定与运行状态。给定和斜坡状态使用物理伏特；算法内部
+   除以 dc_bus_voltage_v 后才进入标幺调制。频率为电角频率；
+   electrical_angle_rad 和 cycle_count 由 VoltageStep 自动更新。 */
+typedef struct
+{
+  /* Command values.  The algorithm slews applied_* toward these targets so
+     the first enabled PWM frame never contains a full voltage step. */
+  float d_voltage_v;
+  float q_voltage_v;
+  float dc_bus_voltage_v;
+  float electrical_frequency_hz;
+  float electrical_angle_rad;
+  uint32_t cycle_count;
+  float applied_d_voltage_v;
+  float applied_q_voltage_v;
+  /* Per-axis voltage slew in V/s.  Zero keeps the legacy immediate-step
+     behaviour, which is useful for deterministic host tests. */
+  float voltage_ramp_rate_v_per_s;
+  uint8_t voltage_ramp_complete;
+} foc_voltage_open_loop_t;
+
+/* 电流环按三阶段投运，禁止一上电就让 PI 掩盖相序/极性问题：
+   固定 Ud 检查方向 -> 仅 D 轴低增益 P 环 -> 低增益 D/Q PI。 */
+typedef enum
+{
+  FOC_CURRENT_STAGE_D_VOLTAGE_CHECK = 0,
+  FOC_CURRENT_STAGE_D_CURRENT_P_CHECK,
+  FOC_CURRENT_STAGE_DQ_PI_CLOSED_LOOP,
+  FOC_CURRENT_STAGE_COUNT
+} foc_current_stage_t;
+
+/* 电流环台架测试参数与遥测。电流闭环使用真实 ADC 反馈，main 强制电角度为
+   0，频率为 0，不依赖编码器；这不代表转子被机械锁止。PI 输出仍为
+   相对母线电压的标幺值，下面的 output_*_voltage_v 仅用于物理量观察。 */
+typedef struct
+{
+  volatile foc_current_stage_t requested_stage;
+  volatile foc_current_stage_t active_stage;
+  volatile uint32_t stage_switch_count;
+  /* 第一阶段参数：电角度固定，Q 轴电压由算法强制为 0。Watch 只需修改
+     d_voltage_check_v；applied_* 是限幅、斜坡后的实际输出遥测。 */
+  float d_voltage_check_v;
+  float applied_d_voltage_check_v;
+  float voltage_check_ramp_v_per_s;
+  float d_current_reference_a;
+  float q_current_reference_a;
+  float applied_d_current_reference_a;
+  float applied_q_current_reference_a;
+  float current_reference_ramp_a_per_s;
+  float dc_bus_voltage_v;
+  float electrical_frequency_hz;
+  float electrical_angle_rad;
+  uint32_t cycle_count;
+  float measured_d_current_a;
+  float measured_q_current_a;
+  float output_d_voltage_v;
+  float output_q_voltage_v;
+} foc_current_test_t;
+
+/* 只做坐标变换，不运行 PI，供固定电压方向测试观察 Id/Iq。 */
+uint8_t FOC_TransformCurrentDQ(float phase_a, float phase_b,
+                               float electrical_angle_rad,
+                               float *d_current, float *q_current);
+
+/* 固定角度的物理伏特命令入口；不推进角度、不运行电流 PI。 */
+uint8_t FOC_AlgorithmVoltageCommandStep(foc_algorithm_t *algorithm,
+                                        float d_voltage_v,
+                                        float q_voltage_v,
+                                        float dc_bus_voltage_v,
+                                        float electrical_angle_rad);
+
+/* Same voltage-only command, sharing one sin/cos pair with measured Id/Iq.
+   Feedback is telemetry, not a current PI or a voltage correction. */
+uint8_t FOC_AlgorithmVoltageFeedbackStep(foc_algorithm_t *algorithm,
+                                         float d_voltage_v,
+                                         float q_voltage_v,
+                                         float dc_bus_voltage_v,
+                                         const foc_input_t *feedback);
+
+void FOC_AlgorithmInit(foc_algorithm_t *algorithm,
+                       const foc_parameters_t *parameters);
+void FOC_AlgorithmReset(foc_algorithm_t *algorithm);
+uint8_t FOC_InputIsValid(const foc_input_t *input);
+void FOC_AlgorithmStep(foc_algorithm_t *algorithm,
+                       const foc_input_t *input);
+
+/* 开环电压测试入口：跳过电流采样、Park 反馈和 PI，把伏特给定除以母线电压
+   得到标幺D/Q电压，再按电角度变换到 alpha/beta 并生成三相 duty。
+   voltage_limit 仍是相对母线电压 Vdc 的标幺限制。 */
+uint8_t FOC_AlgorithmVoltageStep(foc_algorithm_t *algorithm,
+                                 foc_voltage_open_loop_t *open_loop,
+                                 float sample_period_s);
+
+#endif

@@ -1,0 +1,49 @@
+Electrical characteristics STM32G431x6 STM32G431x8 STM32G431xB
+148/198 DS12589 Rev 6
+5.3.23 Temperature sensor characteristics
+          
+5.3.24 V BAT monitoring characteristics
+          
+          
+Table 75. TS characteristics 
+Symbol Parameter Min Typ Max Unit
+TL
+(1)
+1. Guaranteed by design.
+VTS linearity with temperature - ±1 ±2 °C
+Avg_Slope(1) Average slope 2.3 2.5 2.7 mV/°C
+V30 Voltage at 30°C (±5 °C)(2)
+2. Measured at V DDA = 3.0 V ±10 mV. The V30 ADC conversion result is stored in the TS_CAL1 byte. Refer 
+to Table 5: Temperature sensor calibration values.
+0.742 0.76 0.785 V
+tSTART-RUN
+(1) Start-up time in Run mode (start-up of buffer) - 8 15 µs
+tSTART_CONT
+(3)
+3.  Continuous mode means RUN mode or Temperature Sensor ON.
+Start-up time when entering in continuous 
+mode - 70 120 µs
+tS_temp
+(1) ADC sampling time when reading the 
+temperature 5-- µ s
+IDD(TS)(1) Temperature sensor consumption from VDD, 
+when selected by ADC -4 . 77 µ A
+Table 76. VBAT monitoring characteristics(1) 
+1. 1.55 V < V BAT < 3.6 V.
+Symbol Parameter Min Typ Max Unit
+R Resistor bridge for V BAT - 3x39 - k Ω
+QR a t i o  o n  V BAT measurement - 3 - -
+Er(2)
+2. Guaranteed by design.
+Error on Q -10 - 10 %
+tS_vbat
+(2) ADC sampling time when reading the VBAT 12 - - µs
+Table 77. VBAT charging characteristics 
+Symbol Parameter Conditions Min Typ Max Unit
+RBC
+Battery 
+charging 
+resistor 
+VBRS = 0 - 5 -
+kΩ
+VBRS = 1 - 1.5 -

@@ -1,0 +1,7 @@
+Electrical characteristics STM32G431x6 STM32G431x8 STM32G431xB
+122/198 DS12589 Rev 6
+1. Guaranteed by design.
+2. The I/O analog switch voltage booster is enabled when V DDA < 2.4 V (BOOSTEN = 1 in the 
+SYSCFG_CFGR1 when VDDA < 2.4V). It is disabled when VDDA ≥ 2.4 V.
+3. Fast channels are: ADCx_IN1 to ADCx_IN5.
+4. Slow channels are: all ADC inputs except the fast channels.

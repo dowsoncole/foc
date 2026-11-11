@@ -1,0 +1,38 @@
+Package information STM32G431x6 STM32G431x8 STM32G431xB
+192/198 DS12589 Rev 6
+6.10.2 Selecting the product temperature range
+When ordering the microcontroller, the temperature range is specified in the ordering 
+information scheme shown in Section 7: Ordering information.
+Each temperature range suffix corresponds to a specific guaranteed ambient temperature at 
+maximum dissipation and, to a specific maximum junction temperature.
+As applications do not commonly use the STM32G431xB at maximum dissipation, it is 
+useful to calculate the exact power consumption and junction temperature to determine 
+which temperature range is best suited to the application.
+The following examples show how to calculate the temperature range needed for a given 
+application.
+Example 1: High-performance application
+Assuming the following application conditions:
+Maximum ambient temperature TAmax = 82 °C (measured according to JESD51-2), 
+IDDmax = 50 mA, VDD = 3.5 V, maximum 20 I/Os used at the same time in output at low 
+level with IOL = 8 mA, VOL= 0.4 V and maximum 8 I/Os used at the same time in output 
+at low level with IOL = 20 mA, VOL= 1.3 V
+PINTmax = 50 mA × 3.5 V= 175 mW
+PIOmax = 20 × 8 mA × 0.4 V + 8 × 20 mA × 1.3 V = 272 mW
+This gives: PINTmax = 175 mW and PIOmax = 272 mW:
+PDmax = 175 + 272 = 447 mW
+Using the values obtained in  TJmax is calculated as follows:
+– For LQFP100, 42 °C/W 
+T
+Jmax = 82 °C + (42 °C/W × 447 mW) = 82 °C + 18.774 °C = 100.774 °C
+This is within the range of the suffix 6 version parts (–40 < TJ < 105 °C) see Section 7: 
+Ordering information.
+In this case, parts must be ordered at least with the temperature range suffix 6 (see 
+Section 7: Ordering information).
+Note: With this given P Dmax we can find the TAmax allowed for a given device temperature range 
+(order code suffix 6 or 7).
+Suffix 6: TAmax = TJmax - (42°C/W × 447 mW) = 105-18.774 = 86.226 °C
+Suffix 3: TAmax = TJmax - (42°C/W × 447 mW) = 130-18.774 = 111.226 °C
+Example 2: High-temperature application
+Using the same rules, it is possible to address applications that run at high ambient 
+temperatures with a low dissipation, as long as junction temperature TJ remains within the 
+specified range.

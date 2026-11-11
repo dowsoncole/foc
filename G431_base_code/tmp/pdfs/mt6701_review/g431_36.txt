@@ -1,0 +1,43 @@
+Functional overview STM32G431x6 STM32G431x8 STM32G431xB
+36/198 DS12589 Rev 6
+3.25 Real-time clock (RTC ) and backup registers
+The RTC supports the following features: 
+• Calendar with subsecond, seconds, minutes, hours (12 or 24 format), week day, date, 
+month, year, in BCD (binary-coded decimal) format. 
+• Automatic correction for 28, 29 (leap year), 30, and 31 days of the month. 
+• Two programmable alarms. 
+• On-the-fly correction from 1 to 32767 RTC clock pulses. This can be used to 
+synchronize it with a master clock. 
+• Reference clock detection: a more precise second source clock (50 or 60 Hz) can be 
+used to enhance the calendar precision. 
+• Digital calibration circuit with 0.95 ppm resolution, to compensate for quartz crystal 
+inaccuracy. 
+• Timestamp feature which can be used to save the calendar content. This function can 
+be triggered by an event on the timestamp pin, or by a tamper event, or by a switch to 
+VBAT mode.
+• 17-bit auto-reload wakeup timer (WUT) for periodic events with programmable 
+resolution and period. 
+The RTC is supplied through a switch that takes power either from the VDD supply when 
+present or from the VBAT pin. 
+The RTC clock sources can be: 
+• A 32.768 kHz external crystal (LSE)
+• An external resonator or oscillator (LSE)
+• The internal low power RC oscillator (LSI, with typical frequency of 32 kHz) 
+• The high-speed external clock (HSE) divided by 32. 
+The RTC is functional in VBAT mode and in all low-power modes when it is clocked by the 
+LSE. When clocked by the LSI, the RTC is not functional in VBAT mode, but is functional in 
+all low-power modes except Shutdown mode.
+All RTC events (Alarm, WakeUp Timer, Timestamp) can generate an interrupt and wakeup 
+the device from the low-power modes.
+3.26 Tamper and backu p registers (TAMP) 
+• 16 32-bit backup registers, retained in all low-power modes and also in VBAT mode. 
+They can be used to store sensitive data as their content is protected by an tamper 
+detection circuit. They are not reset by a system or power reset, or when the device 
+wakes up from Standby or Shutdown mode.
+• Up to three tamper pins for external tamper detection events. The external tamper pins 
+can be configured for edge detection, edge and level, level detection with filtering. 
+• Five internal tampers events. 
+• Any tamper detection can generate a RTC timestamp event. 
+• Any tamper detection erases the backup registers. 
+• Any tamper detection can generate an interrupt and wake-up the device from all low-
+power modes. 

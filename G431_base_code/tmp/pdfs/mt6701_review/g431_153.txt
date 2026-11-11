@@ -1,0 +1,55 @@
+DS12589 Rev 6 153/198
+STM32G431x6 STM32G431x8 STM32G431xB Electrical characteristics
+160
+Figure 35. SPI timing diagram - slave mode and CPHA = 0
+tv(SO)
+Data output valid time
+Slave mode  
+2.7 V < VDD < 3.6 V 
+Voltage Range V1
+-9 1 2
+ns
+Slave mode  
+1.71 V < VDD < 3.6 V 
+Voltage Range V1
+-9 1 8
+Slave mode  
+1.71 V < VDD < 3.6 V 
+Voltage Range V2
+-1 3 2 2
+tv(MO) Master mode - 3.5 4.5
+th(SO)
+Data output hold time
+Slave mode 1.71 V < VDD < 3.6 V 6 - -
+Slave mode Range V2 9 - -
+th(MO) Master mode 2 - -
+1. Guaranteed by characterization results.
+2. The maximum frequency in Slave transmitter mode is determined by the sum of tv(SO) and tsu(MI) which has to fit into 
+SCK low or high-phase preceding the SCK sampling edge. This value can be achieved when the SPI communicates with a 
+master having tsu(MI) = 0 while Duty(SCK) = 50%. 
+Table 83. SPI characteristics(1) (continued)
+Symbol Parameter Conditions Min Typ Max (2) Unit
+MSv41658V1
+NSS input
+CPHA=0
+CPOL=0
+SCK inputCPHA=0
+CPOL=1
+MISO output
+MOSI input
+tsu(SI)
+th(SI)
+tw(SCKL)
+tw(SCKH)
+tc(SCK)
+tr(SCK)
+th(NSS)
+tdis(SO)
+tsu(NSS)
+ta(SO) tv(SO)
+Next bits IN
+Last bit OUT
+First bit IN
+First bit OUT Next bits OUT
+th(SO) tf(SCK)
+Last bit IN

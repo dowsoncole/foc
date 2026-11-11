@@ -1,0 +1,75 @@
+DS12589 Rev 6 55/198
+STM32G431x6 STM32G431x8 STM32G431xB Pinouts and pin description
+66
+- - 25 26 F1 34 G8 43 51 PB12 I/O FT_a -
+I2C2_SMBA, 
+SPI2_NSS/
+I2S2_WS, TIM1_BKIN, 
+USART3_CK, 
+LPUART1_RTS_DE, 
+EVENTOUT
+ADC1_IN11
+- - 26 27 E2 35 G6 44 52 PB13 I/O TT_a -
+SPI2_SCK/I2S2_CK, 
+TIM1_CH1N, 
+USART3_CTS, 
+LPUART1_CTS, 
+EVENTOUT
+OPAMP3_VINP
+- - 27 28 D3 36 F8 45 53 PB14 I/O TT_a -
+TIM15_CH1, 
+SPI2_MISO, 
+TIM1_CH2N, 
+USART3_RTS_DE, 
+COMP4_OUT, 
+EVENTOUT
+ADC1_IN5,
+OPAMP2_VINP
+- - 28 29 E1 37 F7 46 54 PB15 I/O FT_a -
+RTC_REFIN,
+TIM15_CH2,
+TIM15_CH1N,
+COMP3_OUT,
+TIM1_CH3N,
+SPI2_MOSI/
+I2S2_SD,
+EVENTOUT
+ADC2_IN15
+--- - - -- 47 55 PD8 I/O FT_a - USART3_TX,
+EVENTOUT -
+--- - - -- 48 56 PD9 I/O FT - USART3_RX, 
+EVENTOUT -
+--- - - -- 49 57 PD10 I/O FT - USART3_CK,
+EVENTOUT -
+- -- - ---- 5 8 P D 1 1 I / O F T _ a - USART3_CTS, 
+EVENTOUT -
+- -- - ---- 5 9 P D 1 2 I / O F T-
+TIM4_CH1,
+USART3_RTS_DE,
+EVENTOUT
+-
+- - - - - - - - 60 PD13 I/O FT - TIM4_CH2, EVENTOUT -
+- - - - - - - - 61 PD14 I/O TT_a - TIM4_CH3, EVENTOUT OPAMP2_VINP
+- -- - ---- 6 2 P D 1 5 I / O F T- TIM4_CH4, SPI2_NSS, 
+EVENTOUT -
+--- - - -- 50 63 VSS S - - - -
+--- - - -- 51 64 VDD S - - - -
+Table 12. STM32G431x6/x8/xB pin definition(1) (continued)
+Pin Number
+Pin name 
+(function 
+after reset)
+Pin type
+I/O structure
+Notes
+Alternate function Additional 
+functions
+UFQFPN32
+LQFP32
+UFQFPN48
+LQFP48
+WLCSP49
+LQFP64
+UFBGA64
+LQFP80
+LQFP100

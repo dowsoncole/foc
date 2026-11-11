@@ -1,0 +1,59 @@
+Electrical characteristics STM32G431x6 STM32G431x8 STM32G431xB
+100/198 DS12589 Rev 6
+High-speed external clock generated from a crystal/ceramic resonator
+The high-speed external (HSE) clock can be supplied with a 4 to 48 MHz crystal/ceramic 
+resonator oscillator. All the information given in this paragraph are based on design 
+simulation results obtained with typical external components specified in Table 40. In the 
+application, the resonator and the load capacitors have to be placed as close as possible to 
+the oscillator pins in order to minimize output distortion and startup stabilization time. Refer 
+to the crystal resonator manufacturer for more details on the resonator characteristics 
+(frequency, package, accuracy).
+          
+For CL1 and CL2, it is recommended to use high-quality external ceramic capacitors in the 
+5 pF to 20 pF range (typ.), designed for high-frequency applications, and selected to match 
+the requirements of the crystal or resonator (see Figure 21). CL1 and CL2 are usually the 
+same size. The crystal manufacturer typically specifies a load capacitance which is the 
+series combination of CL1 and CL2. PCB and MCU pin capacitance must be included (10 pF 
+can be used as a rough estimate of the combined pin and board capacitance) when sizing 
+CL1 and CL2.
+Table 40. HSE oscillator characteristics(1) 
+1. Guaranteed by design.
+Symbol Parameter Conditions (2)
+2. Resonator characteristics given by the crystal/ceramic resonator manufacturer.
+Min Typ Max Unit
+fOSC_IN Oscillator frequency - 4 8 48 MHz
+RF Feedback resistor - - 200 - k Ω 
+IDD(HSE) HSE current consumption
+During startup(3)
+3. This consumption level occurs  during the first 2/3 of the tSU(HSE) startup time 
+-- 5 . 5
+mA
+VDD = 3 V, 
+Rm = 30 Ω, 
+CL = 10 pF@8 MHz
+-0 . 4 4-
+VDD = 3 V, 
+Rm = 45 Ω, 
+CL = 10 pF@8 MHz
+-0 . 4 5-
+VDD = 3 V, 
+Rm = 30 Ω, 
+CL = 5 pF@48 MHz
+-0 . 6 8-
+VDD = 3 V, 
+Rm = 30 Ω,
+CL = 10 pF@48 MHz
+-0 . 9 4-
+VDD = 3 V, 
+Rm = 30 Ω, 
+CL = 20 pF@48 MHz
+-1 . 7 7-
+Gm 
+Maximum critical crystal 
+transconductance Startup - - 1.5 mA/V
+tSU(HSE)
+(4)
+4. t SU(HSE) is the startup time measured from the moment it is enabled (by software) to a stabilized 8 MHz 
+oscillation is reached. This value is measured for a standard crystal resonator and it can vary significantly 
+with the crystal manufacturer
+Startup time  V DD is stabilized - 2 - ms

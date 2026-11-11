@@ -1,0 +1,29 @@
+Functional overview STM32G431x6 STM32G431x8 STM32G431xB
+34/198 DS12589 Rev 6
+3.24.2 General-purpose timers (TIM 2, TIM3, TIM4, TIM15, TIM16, 
+TIM17)
+There are up to six synchronizable general-purpose timers embedded in the 
+STM32G431x6/x8/xB devices (see Table 7 for differences). Each general-purpose timer can 
+be used to generate PWM outputs, or act as a simple time base.
+• TIM2, TIM3, and TIM4
+They are full-featured general-purpose timers:
+– TIM2 has a 32-bit auto-reload up/downcounter and 32-bit prescaler
+– TIM3 and TIM4 have 16-bit auto-reload up/downcounter and 16-bit prescaler.
+These timers feature 4 independent channels for input capture/output compare, PWM 
+or one-pulse mode output. They can work together, or with the other general-purpose 
+timers via the Timer Link feature for synchronization or event chaining.
+The counters can be frozen in debug mode.
+All have independent DMA request generation and support quadrature encoders.
+• TIM15, 16 and 17
+They are general-purpose timers with mid-range features:
+They have 16-bit auto-reload upcounters and 16-bit prescalers.
+– TIM15 has 2 channels and 1 complementary channel
+– TIM16 and TIM17 have 1 channel and 1 complementary channel
+All channels can be used for input capture/output compare, PWM or one-pulse mode 
+output.
+The timers can work together via the Timer Link feature for synchronization or event 
+chaining. The timers have independent DMA request generation.
+The counters can be frozen in debug mode.
+3.24.3 Basic timers (TIM6 and TIM7)
+The basic timers are mainly used for DAC trigger generation. They can also be used as 
+generic 16-bit timebases.

@@ -1,0 +1,57 @@
+DS12589 Rev 6 115/198
+STM32G431x6 STM32G431x8 STM32G431xB Electrical characteristics
+160
+          
+FM+
+Fmax(5) Maximum 
+frequency
+C=50 pF, 1.6 V≤VDD≤3.6 V
+-1 M H z
+Tr/TF(4)
+Output high to 
+low level fall 
+time
+-5 n s
+1. The I/O speed is configured using the OSPEEDRy[1 :0] bits. The Fm+ mode is configured in the 
+SYSCFG_CFGR1 register. Refer to the reference manual RM0440 "STM32G4 Series advanced Arm®-
+based 32-bit MCUs" for a description of GPIO Port configuration register.
+2. Guaranteed by design.
+3. This value represented the I/O capability  but maximum system frequency is 170 MHz.
+4. The fall time is defined between 70% and 30% of the output waveform accordingly to I2C specification.
+5. The maximum frequency is defined with the following conditions: 
+- (Tr+ Tf) ≤ 2/3 T. 
+- 45%<Duty cycle<55%
+Table 56. I/O FT_c AC characteristics(1) (2) 
+1. The I/O speed is configured using the OSPEEDRy[1 :0] bits. The Fm+ mode is configured in the 
+SYSCFG_CFGR1 register. Refer to the reference manual RM0440 "STM32G4 Series advanced Arm®-
+based 32-bit MCUs" for a description of GPIO Port configuration register.
+2. Guaranteed by design.
+Speed Symbol Parameter Conditions Min Max Unit
+0
+Fmax Maximum 
+frequency
+C=50 pF, 2.7 V≤VDD≤3.6 V - 2
+MHz
+C=50 pF, 1.6 V≤VDD≤2.7 V - 1
+Tr/Tf
+Output H/L to 
+L/H level fall 
+time
+C=50 pF, 2.7 V≤VDD≤3.6 V - 170
+ns
+C=50 pF, 1.6 V≤VDD≤2.7 V - 330
+1
+Fmax Maximum 
+frequency
+C=50 pF, 2.7 V≤VDD≤3.6 V - 10
+MHz
+C=50 pF, 1.6 V≤VDD≤2.7 V - 5
+Tr/Tf
+Output H/L to 
+L/H level fall 
+time
+C=50 pF, 2.7 V≤VDD≤3.6 V - 35
+ns
+C=50 pF, 1.6 V≤VDD≤2.7 V - 65
+Table 55. I/O (except FT_c) AC characteristics(1) (2) (continued)
+Speed Symbol Parameter Conditions Min Max Unit

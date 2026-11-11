@@ -1,0 +1,47 @@
+DS12589 Rev 6 141/198
+STM32G431x6 STM32G431x8 STM32G431xB Electrical characteristics
+160
+Figure 31. VREFOUT_TEMP in case VRS = 00
+IINRUSH
+Control of 
+maximum DC 
+current drive on 
+VREFBUF_ 
+OUT during start-
+up phase 
+(6)
+-- 8 - m A
+IDDA(VREF
+BUF)
+VREFBUF 
+consumption from 
+VDDA 
+Iload = 0 µA - 16 25
+µA
+Iload = 500 µA - 18 30
+Iload = 4 mA - 35 50
+Iload = 6.5 mA - 45 80
+1. Guaranteed by design, unl ess otherwise specified.
+2. In degraded mode, the voltage reference buffer can not maintain accurately the output voltage which follows (V DDA - drop 
+voltage).
+3. Line regulation is given for overal l supply variation, in normal mode.
+4. Tcoeff_vrefint refer to Tcoeff parameter in the embedded voltage reference section.
+5. The capacitive load must include a 100 nF low ESR c apacitor in order to cut-off the high frequency noise.
+6. To correctly control the VREFBUF inrush current during start-up phase and scaling change, the V
+DDA voltage should be in 
+the range [2.4 V to 3.6 V], [2.8 V to 3.6 V] and [3.135 V to 3.6 V] respectively for VRS=0,1 and 2.
+Table 72. VREFBUF characteristics(1) (continued)
+Symbol Parameter Conditions Min Typ Max Unit
+MSv62522V1
+2.025
+2.03
+2.035
+2.04
+2.045
+2.05
+2.055
+2.06
+-40 -20 0 20 40 60 80 100 120
+V
+°C
+Mean Min Max

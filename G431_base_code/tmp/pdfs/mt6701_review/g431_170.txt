@@ -1,0 +1,36 @@
+Package information STM32G431x6 STM32G431x8 STM32G431xB
+170/198 DS12589 Rev 6
+6.4 LQFP48 package information
+This LQFP is a 48-pin, 7 x 7 mm low-profile quad flat package.
+Figure 49. LQFP48 - Outline
+1. Drawing is not to scale.
+5B_ME_V2
+PIN 1
+IDENTIFICATION
+ccc C
+C
+D3
+0.25 mm
+GAUGE PLANE
+b
+A1
+A
+A2
+c
+A1
+L1
+LD
+D1
+E3
+E1
+E
+e
+121
+13
+24
+2536
+37
+48
+SEATING
+PLANE
+K

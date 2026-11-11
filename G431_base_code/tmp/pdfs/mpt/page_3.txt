@@ -1,0 +1,41 @@
+2
+Models
+MPT-20-30-A-24-S-N-A-M
+After power-off, battery backup maintains the multi-turn data 24BM – 24 bits + Battery multi-turn Multi-turn count resets after power-off and is only retained
+during power-on. 24M – 24 bits + Normal multi-turn
+Rotor inner diameter
+Refer to Size xx – Thread type
+xxB – Bonding type
+Output type
+A – absolute
+Input voltage
+N – 5V
+Operating temperature
+A – -40 ~ 85 °C
+B – -40 ~ 105 °C
+C – -40 ~ 125 °C
+(1) The SSI protocol does not support CRC verification. For improved reliability, the BiSS-C protocol using the same hardware platform is recommended
+(2) For the Tamagawa protocol, 17-bit corresponds to 17M-T / 17BM-T / 17FM-T, while 23-bit corresponds to 23M-T /
+23BM-T / 23FM-T
+(3) Includes RS485, RS422, BUS, and PERIOD. See following pages for other protocols
+(4) Fixed periodic transmission interval of 1 ms
+Stator outer diameter
+Refer to Size xx – Thread type
+xxB – Bonding type
+Output parameter
+24 – 24 bits single-turn
+Multi-turn data is stored in flash memory, allowing up to ±90° rotation after power-off. 24FM – 24 bits + Flash multi-turn
+Baud rate
+M – Default: 2.5 M
+V – 5M
+A –115200
+Output interface
+S – SSI
+(1)
+B – BISS-C
+R – R485
+A – R422
+T – T485 ( 17-bit / 23-bit Tamagawae)
+(2)
+D – BUS (high speed bus)
+P – PERIOD (periodic send)

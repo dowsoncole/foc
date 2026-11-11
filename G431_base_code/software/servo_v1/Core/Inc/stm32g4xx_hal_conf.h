@@ -115,8 +115,8 @@
   *        (when HSE is used as system clock source, directly or through the PLL).
   */
 #if !defined  (HSE_VALUE)
-  /* The board fitted crystal X1 is 8 MHz. */
-  #define HSE_VALUE    (8000000UL) /*!< Value of the External oscillator in Hz */
+  /* HSE configuration requires a 12 MHz crystal. */
+  #define HSE_VALUE    (12000000UL) /*!< Value of the External oscillator in Hz */
 #endif /* HSE_VALUE */
 
 #if !defined  (HSE_STARTUP_TIMEOUT)
@@ -184,7 +184,7 @@ The real value may vary depending on the variations in voltage and temperature.*
 #define  VDD_VALUE                   (3300UL) /*!< Value of VDD in mv */
 #define  TICK_INT_PRIORITY           (15UL)    /*!< tick interrupt priority (lowest by default)  */
 #define  USE_RTOS                     0U
-#define  PREFETCH_ENABLE              0U
+#define  PREFETCH_ENABLE              1U /* ART prefetch; retain boost mode and 4 Flash wait states. */
 #define  INSTRUCTION_CACHE_ENABLE     1U
 #define  DATA_CACHE_ENABLE            1U
 

@@ -3,7 +3,7 @@
   ******************************************************************************
   * @file    adc1_current_sampling.h
   * @brief   相电流采样的 L1 外设配置：片内 OPAMP1 / OPAMP3 跟随放大 +
-  *          ADC1 注入组两通道采样，由 TIM1_CH4 触发。
+ *          ADC1 注入组两通道紧邻采样，由 TIM1_CH4 触发。
   *
   *          引脚映射（STM32G431VB 片内运放的固定复用关系，依据数据手册与
   *          stm32g4xx_hal_opamp.h 中 OPAMP_NONINVERTINGINPUT_IO0 /
@@ -48,24 +48,55 @@ extern "C" {
 /* 硬件常量                                                                  */
 /* --------------------------------------------------------------------------*/
 
-/* ADC1 走同步时钟：ADC12 内核时钟 168 MHz（RCC.ADC12Freq_Value），
+/* ADC1 使用异步时钟：ADC12 内核时钟 168 MHz（RCC.ADC12Freq_Value），
    RCC ADC12 源为 SYSCLK 时使用 ADC_CLOCK_ASYNC_DIV4 -> ADC 时钟 42 MHz。
    G431 同步模式下 ADC 时钟上限 60 MHz，42 MHz 合规。 */
 #define ADC1_CS_ADC_CLOCK_HZ        42000000UL
 
-/* 单次转换耗时：采样时间 2.5 cycles + 12 位逐次逼近 12.5 cycles = 15 cycles。
-   15 / 42 MHz = 357 ns。 */
-#define ADC1_CS_CYCLES_PER_CONV     15UL
+/* High-speed candidate: profile 1 uses one conversion, retaining 12.5-cycle
+   sample-and-hold at 42 MHz. The complete sequence is reserved by the PWM
+   planner; no deadtime/settling margin is removed to increase duty range.
+   Profile 2 is the previously verified 7500 rpm / 4x baseline. */
+#define ADC1_CS_PROFILE 1
+#if ADC1_CS_PROFILE == 0
+#define ADC1_CS_SAMPLE_TIME ADC_SAMPLETIME_2CYCLES_5
+#define ADC1_CS_CYCLES_PER_CONV 15UL
+#define ADC1_CS_OVERSAMPLING_RATIO 1UL
+#elif ADC1_CS_PROFILE == 1
+#define ADC1_CS_SAMPLE_TIME ADC_SAMPLETIME_12CYCLES_5
+#define ADC1_CS_CYCLES_PER_CONV 25UL
+#define ADC1_CS_OVERSAMPLING_RATIO 1UL
+#elif ADC1_CS_PROFILE == 2
+#define ADC1_CS_SAMPLE_TIME ADC_SAMPLETIME_12CYCLES_5
+#define ADC1_CS_CYCLES_PER_CONV 25UL
+#define ADC1_CS_OVERSAMPLING_RATIO 4UL
+#elif ADC1_CS_PROFILE == 3
+#define ADC1_CS_SAMPLE_TIME ADC_SAMPLETIME_12CYCLES_5
+#define ADC1_CS_CYCLES_PER_CONV 25UL
+#define ADC1_CS_OVERSAMPLING_RATIO 8UL
+#elif ADC1_CS_PROFILE == 4
+#define ADC1_CS_SAMPLE_TIME ADC_SAMPLETIME_24CYCLES_5
+#define ADC1_CS_CYCLES_PER_CONV 37UL
+#define ADC1_CS_OVERSAMPLING_RATIO 8UL
+#elif ADC1_CS_PROFILE == 5
+#define ADC1_CS_SAMPLE_TIME ADC_SAMPLETIME_12CYCLES_5
+#define ADC1_CS_CYCLES_PER_CONV 25UL
+#define ADC1_CS_OVERSAMPLING_RATIO 16UL
+#elif ADC1_CS_PROFILE == 6
+#define ADC1_CS_SAMPLE_TIME ADC_SAMPLETIME_12CYCLES_5
+#define ADC1_CS_CYCLES_PER_CONV 25UL
+#define ADC1_CS_OVERSAMPLING_RATIO 2UL
+#else
+#error Unsupported ADC commissioning profile
+#endif
 
-/* 注入组过采样率 16，且 RightBitShift = NONE，所以硬件把 16 次转换结果
-   直接累加后交给 JDR：满量程 4095 x 16 = 65520，占满 16 位。
-   ⚠ 读出的原始码是累加值，换算成 12 位等效码必须先除以 16。 */
-#define ADC1_CS_OVERSAMPLING_RATIO  16UL
+/* Unshifted sums retain fractional-LSB information. Current conversion divides
+   by the SAME ratio, including offset calibration. 16*4095 fits uint16_t.
+   Timing is rounded upward and passed to the PWM sampling-window planner. */
+#define ADC1_CS_OVERSAMPLED_CONV_NS \
+  ((ADC1_CS_CYCLES_PER_CONV * ADC1_CS_OVERSAMPLING_RATIO * 1000UL + 41UL) / 42UL)
 
-/* 单通道完成一轮过采样所需时间：16 x 357 ns = 5.71 µs。 */
-#define ADC1_CS_OVERSAMPLED_CONV_NS 5714UL
-
-/* 注入序列共两个通道，顺序转换，全部就绪需要约 11.43 µs。 */
+/* Two sequential ranks; reserve the complete oversampled sequence. */
 #define ADC1_CS_SEQUENCE_CONV_NS    (ADC1_CS_OVERSAMPLED_CONV_NS * 2UL)
 
 /* 序列居中时相对载波峰值的提前量，仅供诊断参考。
@@ -126,18 +157,15 @@ HAL_StatusTypeDef MX_OPAMP1_Init(void);
 HAL_StatusTypeDef MX_OPAMP3_Init(void);
 
 /**
-  * @brief  【配置线】配置 ADC1 注入组：两个通道、16 倍过采样、由 TIM1_CH4
+  * @brief  【配置线】配置 ADC1 注入组：两个通道紧邻转换、由 TIM1_CH4
   *         或软件触发；随后执行一次上电自校准。
   *
   * 注入序列 rank 1 = ADC_CHANNEL_3（PA2，OPAMP1 输出）= U 相，
   *            rank 2 = ADC_CHANNEL_12（PB1，OPAMP3 输出）= V 相。
   *
   * 关键配置及其理由：
-  *   - DataAlign 设为左对齐，但注入组过采样已使能，硬件会忽略 ALIGN 位
-  *     并强制右对齐（RM0440 §21.4.26「过采样模式下不支持左对齐」）。
-  *     保留该赋值只为与参考配置逐字一致，实际读出的是右对齐的 16 位累加值。
-  *   - OversamplingMode = DISABLE 针对的是「规则组」过采样；注入组过采样由
-  *     InjecOversamplingMode 单独使能，两者互不影响。
+  *   - DataAlign 右对齐；JDR 是未右移的累加码，量纲除以过采样倍率。
+  *   - 规则组关闭过采样；注入组使用 ADC1_CS_PROFILE，时序同步交给 PWM 规划器。
   *   - EOCSelection = ADC_EOC_SEQ_CONV：整个注入序列结束才置 EOC，
   *     因此读到 JDR 时两个通道的数据一定同时有效，不会读到半更新序列。
   *   - Overrun = ADC_OVR_DATA_PRESERVED：溢出时保留旧数据而不是覆盖，

@@ -1,0 +1,141 @@
+STM32G431x6 STM32G431x8 STM32G431xB Pinouts and pin description
+DS12589 Rev 6 65/198
+Port E
+PE0 - - TIM4_ETR - TIM16_
+CH1
+-- USART1_
+TX
+------- EVENT
+OUT
+PE1 - - - - TIM17_
+CH1
+-- USART1_
+RX
+------- EVENT
+OUT
+PE2 TRACECK - TIM3_
+CH1
+S A I 1 _ C K 1 --------- SAI1_
+MCLK_A
+- EVENT
+OUT
+PE3 TRACED0 - TIM3_
+CH2
+---------- SAI1_
+SD_B
+- EVENT
+OUT
+PE4 TRACED1 - TIM3_
+CH3
+S A I 1 _ D 2 --------- SAI1_
+FS_A
+- EVENT
+OUT
+PE5 TRACED2 - TIM3_
+CH4
+S A I 1 _ C K 2 --------- SAI1_
+SCK_A
+- EVENT
+OUT
+P E 6 T R A C E D 3 - - S A I 1 _ D 1 --------- SAI1_
+SD_A
+- EVENT
+OUT
+PE7 - - TIM1_
+ETR
+---------- SAI1_
+SD_B
+- EVENT
+OUT
+PE8 - - TIM1_
+CH1N
+---------- SAI1_
+SCK_B
+- EVENT
+OUT
+PE9 - - TIM1_
+CH1
+---------- SAI1_
+FS_B
+- EVENT
+OUT
+PE10 - - TIM1_
+CH2N
+---------- SAI1_
+MCLK_B
+- EVENT
+OUT
+PE11 - - TIM1_
+CH2
+------------ EVENT
+OUT
+PE12 - - TIM1_
+CH3N
+------------ EVENT
+OUT
+PE13 - - TIM1_
+CH3
+------------ EVENT
+OUT
+PE14 - - TIM1_
+CH4
+--- TIM1_
+BKIN2
+-------- EVENT
+OUT
+PE15 - - TIM1_
+BKIN
+--- TIM1_
+CH4N
+USART3_
+RX
+------- EVENT
+OUT
+Table 13. Alternate function (continued)
+Port
+AF0 AF1 AF2 AF3 AF4 AF5 AF6 AF7 AF8 AF9 AF10 AF11 AF12 AF13 AF14 AF15
+SYS_AF
+LPTIM1/TI
+M2/5/15/1
+6/17
+I2C3/TIM1/
+2/3/4/8/15/
+GPCOMP1
+I2C3/SAI1/
+USB/TIM8/
+15/
+GPCOMP3
+I2C1/2/3/
+TIM1/8/16/
+17
+SPI1/2/3/
+I2S2/3/
+UART4
+/TIM8/Infra
+red
+SPI2/3/
+I2S2/3/
+TIM1/8/
+Infrared
+USART1/2/
+3
+I2C3/4
+/UART4/
+LPUART1/
+GPCOMP1/
+2/3
+TIM1/8/15/
+FDCAN1
+TIM2/3/4/8/
+17
+LPTIM1/TI
+M1/8/FDCA
+N1
+LPUART1/
+SAI1/TIM1
+SAI1/
+OPAMP2
+UART4/SAI
+1/TIM2/15/
+UCPD1
+EVENT

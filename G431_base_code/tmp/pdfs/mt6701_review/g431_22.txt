@@ -1,0 +1,42 @@
+Functional overview STM32G431x6 STM32G431x8 STM32G431xB
+22/198 DS12589 Rev 6
+• VREF-, VREF+
+VREF+ is the input reference voltage for ADCs and DACs. It is also the output of the 
+internal voltage reference buffer when enabled.
+When VDDA < 2 V VREF+ must be equal to VDDA.
+When VDDA ≥ 2 V VREF+ must be between 2 V and VDDA.
+The internal voltage reference buffer supports three output voltages, which are 
+configured with VRS bits in the VREFBUF_CSR register:
+–V REF+ = 2.048 V
+–V REF+ = 2.5 V 
+–V REF+ = 2.9 V
+VREF- is double bonded with VSSA.
+3.11.2 Power supply supervisor
+The device has an integrated ultra-low-power brown-out reset (BOR) active in all modes 
+(except for Shutdown mode). The BOR ensures proper operation of the device after power-
+on and during power down. The device remains in reset mode when the monitored supply 
+voltage V
+DD is below a specified threshold, without the need for an external reset circuit.
+The lowest BOR level is 1.71 V at power on, and other higher thresholds can be selected 
+through option bytes.The device features an embedded programmable voltage detector 
+(PVD) that monitors the VDD power supply and compares it to the VPVD threshold. An 
+interrupt can be generated when VDD drops below the VPVD threshold and/or when VDD is 
+higher than the VPVD threshold. The interrupt service routine can then generate a warning 
+message and/or put the MCU into a safe state. The PVD is enabled by software.
+In addition, the device embeds a peripheral voltage monitor which compares the 
+independent supply voltages V
+DDA, with a fixed threshold in order to ensure that the 
+peripheral is in its functional supply range.
+3.11.3 Voltage regulator
+Two embedded linear voltage regulators, main regulator (MR) and low-power regulator 
+(LPR), supply most of digital circuitry in the device. The MR is used in Run and Sleep 
+modes. The LPR is used in Low-power run, Low-power sleep and Stop modes. In Standby 
+and Shutdown modes, both regulators are powered down and their outputs set in high-
+impedance state, such as to bring their current consumption close to zero. 
+The device supports dynamic voltage scaling to optimize its power consumption in Run 
+mode. the voltage from the main regulator that supplies the logic (VCORE) can be adjusted 
+according to the system’s maximum operating frequency.
+The main regulator (MR) operates in the following ranges:
+• Range 1 boost mode with the CPU running at up to 170 MHz.
+• Range 1 normal mode with CPU running at up to 150 MHz.
+• Range 2 with a maximum CPU frequency of 26 MHz.

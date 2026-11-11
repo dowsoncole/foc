@@ -1,0 +1,26 @@
+18
+completely received. Zero setting is completed only after all 10 cycles are executed successfully. The remaining number of
+required cycles can be determined from the C value returned by operation type 01. Note: (1) If the command preceding 01 is not 00, the sequence start condition is not satisfied, and the C value is 0. (2) If the command two cycles before 01 is not 01, the sequence condition is not satisfied, and the C value is 1. Counting
+starts from this point. Set ID Operation:
+To prevent accidental ID configuration, a specific sequence of address values must be used to enter the
+Set ID mode before configuring the ID. During the Set ID process, the transmitted address value shall be
+twice the previously returned C value, as shown below: Address X 2 4 6 8 10 12 14 16 Y
+C — — — 4 5 6 7 8 9 10
+Note: (1) X represents an arbitrary value, while Y represents the actual address value to be configured. (2) No response is returned for the first three sequence groups. This mechanism is intended to prevent accidental triggering
+during bus operation. Since this command bypasses the ID limitation, unintended transmission could otherwise cause all devices on the bus to respond simultaneously
+(3) If any other command is inserted into the sequence, the C value returned by the next Set ID command will be 1, and
+counting restarts from this point. (4) If the transmitted address value does not match the required sequence, the returned C value will be 1, and counting restarts
+from this point. Bus devices:
+All devices on the bus shall enter a temporary “sleep” state when the received ID does not match their own device ID. During this period, the device shall not respond to any commands on the bus, preventing response ripple effects on the bus. For scalability, the sleep duration is defined as TSUSPEND, The calculation method is shown in the table below: Single-turn
+Resolution
+Multi-turn
+Resolution
+Bus Sleep Bytes BSUSPEND BSUSPEND Bus Sleep Time TSUSPEND（us）
+XX YY ceil(XX/8) + YY/8 + 4 BSUSPEND * (1 + 8 + 1) / 2.5
+Example: For the 16M1-D model, 𝑆𝑆 = 𝑐𝑒 16
+8 +
+8
+8 + 4 ∗
+1+8+1
+2.5 = 28𝑢
+BUS

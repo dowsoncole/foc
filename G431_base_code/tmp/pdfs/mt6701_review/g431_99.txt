@@ -1,0 +1,46 @@
+DS12589 Rev 6 99/198
+STM32G431x6 STM32G431x8 STM32G431xB Electrical characteristics
+160
+Figure 19. High-speed external clock source AC timing diagram
+Low-speed external user clock generated from an external source
+In bypass mode the LSE oscillator is switched off and the input pin is a standard GPIO.
+The external clock signal has to respect the I/O characteristics in Section 5.3.14. However, 
+the recommended clock input waveform is shown in Figure 20.
+          
+Figure 20. Low-speed external clock source AC timing diagram
+Table 39. Low-speed external user clock characteristics(1) 
+1. Guaranteed by design.
+Symbol Parameter Conditions Min Typ Max Unit
+fLSE_ext
+User external clock source 
+frequency - - 32.768 1000 kHz
+VLSEH
+OSC32_IN input pin high 
+level voltage - 0.7 V DD -V DD
+V
+VLSEL
+OSC32_IN input pin low level 
+voltage -V SS -0 . 3  V DD
+tw(LSEH)
+tw(LSEL)
+OSC32_IN high or low time - 250 - - ns
+MS19214V2
+VHSEH
+tf(HSE)
+90%
+10%
+THSE
+ttr(HSE)
+VHSEL
+tw(HSEH)
+tw(HSEL)
+MS19215V2
+VLSEH
+tf(LSE)
+90%
+10%
+TLSE
+ttr(LSE)
+VLSEL
+tw(LSEH)
+tw(LSEL)

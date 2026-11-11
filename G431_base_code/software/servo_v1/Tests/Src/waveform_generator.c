@@ -265,6 +265,7 @@ void WaveformGenerator_Task(void)
   uint8_t channel;
   uint8_t value_offset;
   uint16_t frame_length;
+  uint8_t send_status;
   if ((g_waveform_generator.enabled == 0U) || (s_tail == s_head)) return;
 
   tail = s_tail;
@@ -293,7 +294,8 @@ void WaveformGenerator_Task(void)
   frame_length = (uint16_t)(12U + 5U * sample.channel_count);
   frame[frame_length - 1U] = WaveformGenerator_Crc8(frame, frame_length - 1U);
 
-  if (s_transport.send(s_transport.context, frame, frame_length) != 0U)
+  send_status = s_transport.send(s_transport.context, frame, frame_length);
+  if (send_status == 1U)
   {
     s_frame_sequence++;
     s_tail = (uint8_t)((tail + 1U) % WAVEFORM_QUEUE_LENGTH);
@@ -301,7 +303,7 @@ void WaveformGenerator_Task(void)
       g_waveform_generator.queued_samples--;
     g_waveform_generator.sent_frames++;
   }
-  else
+  else if (send_status != 2U)
   {
     g_waveform_generator.transport_errors++;
   }

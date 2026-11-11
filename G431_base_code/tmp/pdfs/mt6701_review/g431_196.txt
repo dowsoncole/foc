@@ -1,0 +1,49 @@
+Revision history STM32G431x6 STM32G431x8 STM32G431xB
+196/198 DS12589 Rev 6
+20-Nov-2020 3
+Updated:
+– Table 2: STM32G431x6/x8/xB features and peripheral counts 
+timer PWM channel number.
+– Section 3.5: Embedded SRAM.
+– Table 12: STM32G431x6/x8/xB pin definition.
+– Figure 11: STM32G431x6/x8/xB UFBGA64 ballout.
+– Table 21, Table 22, Table 27, Table 28, Table 29, Table 30, 
+Table 31 Table 32 max current consumptions.
+– Table 35: Low-power mode wakeup timings adding note.
+– Table 70: DAC 15MSPS characteristics TSAMP, .dV/dt (hold phase) 
+and IDDA(DAC) characteristics.
+– Table 73: COMP characteristics IDDA(COMP).
+– Table 74: OPAMP characteristics PSRR.
+– Table 76: VBAT monitoring characteristics.
+– Table 100: Package thermal characteristics.
+– Internal voltage reference buffer (VREFBUF) at 2.9 V.
+Removed:
+– Current consumption in Run and Low-power run modes, code with 
+data processing running from Flash in single Bank, ART disable 
+table.
+– Typical current consumption in Run and Low-power run modes, 
+with different codes running from Flash, ART disable table.
+22-Feb-2021 4
+Updated:
+– Section 3.11.4: Low-power modes.
+– Table 29: Current consumption in Stop 1 mode.
+– Table 30: Current consumption in Stop 0 mode.
+– Table 31: Current consumption in Standby mode.
+– Table 32: Current consumption in Shutdown mode.
+01-Oct-2021 5
+Updated:
+– Section 2: Description
+– Table 2: STM32G431x6/x8/xB features and peripheral counts
+– Table 5: Temperature sensor calibration values
+– Table 12: STM32G431x6/x8/xB pin definition
+– Figure 5: STM32G431x6/x8/xB UFQFPN32 pinout
+– Table 62: ADC accuracy - limited test conditions 1
+– Table 63: ADC accuracy - limited test conditions 2
+– Table 64: ADC accuracy - limited test conditions 3
+– Figure 28: ADC accuracy characteristics
+– Figure 29: Typical connection diagram when using the ADC with 
+FT/TT pins featuring analog switch function
+Deleted:
+– Note 2 of Figure 40: UFQFPN32 - Outline
+Table 102. Document revision history (continued)
+Date Revision Changes

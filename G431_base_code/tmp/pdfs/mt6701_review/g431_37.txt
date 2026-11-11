@@ -1,0 +1,16 @@
+DS12589 Rev 6 37/198
+STM32G431x6 STM32G431x8 STM32G431xB Functional overview
+43
+3.27 Infrared transmitter 
+The STM32G431x6/x8/xB devices provide an infrared transmitter solution. The solution is 
+based on internal connections between TIM16 and TIM17 as shown in the figure below. 
+TIM17 is used to provide the carrier frequency and TIM16 provides the main signal to be 
+sent. The infrared output signal is available on PB9 or PA13.
+To generate the infrared remote control signals, TIM16 channel 1 and TIM17 channel 1 must 
+be properly configured to generate correct waveforms. All standard IR pulse modulation 
+modes can be obtained by programming the two timers output compare channels. 
+Figure 4. Infrared transmitter
+MS30474V2
+TIM17_CH1
+TIM16_CH1
+IRTIM IR_OUT

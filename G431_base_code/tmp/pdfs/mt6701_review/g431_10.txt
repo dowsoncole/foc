@@ -1,0 +1,52 @@
+List of figures STM32G431x6 STM32G431x8 STM32G431xB
+10/198 DS12589 Rev 6
+List of figures
+Figure 1. STM32G431x6/x8/xB block diagram  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 16
+Figure 2. Multi-AHB bus matrix  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 19
+Figure 3. Voltage reference buffer . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 31
+Figure 4. Infrared transmitter . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 37
+Figure 5. STM32G431x6/x8/xB UFQFPN32 pinout . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 44
+Figure 6. STM32G431x6/x8/xB LQFP32 pinout  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 44
+Figure 7. STM32G431x6/x8/xB UFQFPN48 pinout . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 45
+Figure 8. STM32G431x6/x8/xB LQFP48 pinout  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 45
+Figure 9. STM32G431x6/x8/xB WLCSP49 ballout  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 46
+Figure 10. STM32G431x6/x8/xB LQFP64 pinout  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 46
+Figure 11. STM32G431x6/x8/xB UFBGA64 ballout. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 47
+Figure 12. STM32G431x6/x8/xB LQFP80 pinout  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 48
+Figure 13. STM32G431x6/x8/xB LQFP100 pinout  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 49
+Figure 14. Pin loading conditions. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  . . . . . 67
+Figure 15. Pin input voltage . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 67
+Figure 16. Power supply scheme. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 68
+Figure 17. Current consumption measurement .  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 69
+Figure 18. VREFINT versus temperature . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 75
+Figure 19. High-speed external clock source AC timing diagra m  . . . . . . . . . . . . . . . . . . . . . . . . . . . . 99
+Figure 20. Low-speed external clock source AC timing diagram.  . . . . . . . . . . . . . . . . . . . . . . . . . . . . 99
+Figure 21. Typical application with an 8 MHz crystal . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 101
+Figure 22. Typical application with a 32.768 kHz crystal . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 102
+Figure 23. HSI16 frequency versus temperature . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 104
+Figure 24. HSI48 frequency versus temperature . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 105
+Figure 25. I/O input characteristics  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 112
+Figure 26. I/O AC characteristics definition
+(1)  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 116
+Figure 27. Recommended NRST pin protection  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 117
+Figure 28. ADC accuracy characteristics. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 132
+Figure 29. Typical connection diagram when using the ADC with FT/TT pins  
+featuring analog switch function . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 132
+Figure 30. 12-bit buffered / non-buffered DAC. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 135
+Figure 31. VREFOUT_TEMP in case  VRS = 00 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 141
+Figure 32. VREFOUT_TEMP in case  VRS = 01 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 142
+Figure 33. VREFOUT_TEMP in case  VRS = 10 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 142
+Figure 34. OPAMP noise density @ 25°C . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 1 47
+Figure 35. SPI timing diagram - slave mode and CPHA = 0 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 153
+Figure 36. SPI timing diagram - slave mode and CPHA = 1 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 154
+Figure 37. SPI timing diagram - master mode . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 154
+Figure 38. SAI master timing waveforms . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 158
+Figure 39. SAI slave timing waveforms . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 158
+Figure 40. UFQFPN32 - Outline  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 161
+Figure 41. UFQFPN32 - Recommended footprin t . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 162
+Figure 42. UFQFPN32 top view example  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 1 63
+Figure 43. LQFP32 - Outline . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 164
+Figure 44. LQFP32 - Recommended footprint. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 165
+Figure 45. LQFP32 top view example . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  . 166
+Figure 46. UFQFPN48 - Outline  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 167
+Figure 47. UFQFPN48 - Recommended footprin t . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 168

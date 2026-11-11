@@ -1,0 +1,52 @@
+DS12589 Rev 6 151/198
+STM32G431x6 STM32G431x8 STM32G431xB Electrical characteristics
+160
+          
+The SDA and SCL I/O requirements are met with the following restrictions: 
+• The SDA and SCL I/O pins are not “true” open-drain. When configured as open-drain, 
+the PMOS connected between the I/O pin and VDDIOx is disabled, but is still present. 
+• The 20mA output drive requirement in Fast-mode Plus is supported partially. This limits 
+the maximum load Cload supported in Fm+, which is given by these formulas:
+–t r(SDA/SCL)=0.8473 x Rp x Cload
+–R p(min)= (VDD - VOL(max)) / IOL(max)
+Where Rp is the I2C lines pull-up. Refer to Section 5.3.14: I/O port characteristics for the 
+I2C I/Os characteristics.
+All I2C SDA and SCL I/Os embed an analog filter. Refer to Table 82 below for the analog 
+filter characteristics: 
+          
+SPI characteristics
+Unless otherwise specified, the parameters given in Table 83 for SPI are derived from tests 
+performed under the ambient temperature, fPCLKx frequency and supply voltage conditions 
+summarized in Table 17: General operating conditions.
+• Output speed is set to OSPEEDRy[1:0] = 11
+• Capacitive load C = 30 pF
+• Measurement points are done at CMOS levels: 0.5 x VDD
+Refer to Section 5.3.14: I/O port characteristics for more details on the input/output alternate 
+function characteristics (NSS, SCK, MOSI, MISO for SPI).
+Table 81. Minimum I2CCLK frequency in all I2C modes 
+Symbol Parameter Condition Min Unit
+f(I2CCLK) I2CCLK 
+frequency
+Standard mode 2
+MHz
+Fast-mode
+Analog Filtre ON
+DNF=0 8
+Analog Filtre OFF
+DNF=1 9
+Fast-mode 
+Plus
+Analog Filtre ON
+DNF=0 17
+Analog Filtre OFF
+DNF=1 16
+Table 82. I2C analog filter characteristics(1) 
+1. Guaranteed by design.
+Symbol Parameter Min Max Unit
+tAF
+Maximum pulse width of spikes that 
+are suppressed by the analog filter 50(2)
+2. Spikes with widths below t AF(min) are filtered.
+90(3)
+3. Spikes with widths above t AF(max) are not filtered
+ns

@@ -1,0 +1,65 @@
+DS12589 Rev 6 137/198
+STM32G431x6 STM32G431x8 STM32G431xB Electrical characteristics
+160
+          
+SINAD
+Signal-to-noise 
+and distortion 
+ratio
+DAC output buffer ON 
+CL ≤ 50 pF, RL ≥ 5 kΩ, 1 kHz -7 0 . 4-
+dB
+DAC output buffer OFF 
+CL ≤ 50 pF, no RL, 1 kHz -7 1-
+ENOB Effective 
+number of bits
+DAC output buffer ON 
+CL ≤ 50 pF, RL ≥ 5 kΩ, 1 kHz -1 1 . 4-
+bits
+DAC output buffer OFF 
+CL ≤ 50 pF, no RL, 1 kHz -1 1 . 5-
+1. Guaranteed by design.
+2. Difference between two consecutive codes - 1 LSB.
+3. Difference between measured value at Code i and the value at Code i on a line drawn between Code 0 and last Code 4095.
+4. Difference between the value measured at Code (0x001) and the ideal value.
+5. Difference between ideal slope of the transfer functi on and measured slope computed from code 0x000 and 0xFFF when 
+buffer is OFF, and from code giving 0.2 V and (V
+REF+ – 0.2) V when buffer is ON.
+Table 69. DAC 1MSPS accuracy(1) (continued)
+Symbol Parameter Conditions Min Typ Max Unit
+Table 70. DAC 15MSPS characteristics(1) 
+Symbol Parameter Conditions Min Typ Max Unit
+VDDA
+Analog supply voltage for 
+DAC ON - 1.71 - 3.6 
+VVREF+ Positive reference voltage - 1.71 - V DDA
+VREF- Negative reference voltage - V SSA
+VDAC_OUT
+Voltage on DAC_OUT 
+output -0 - V REF+ V
+tSETTLING
+Settling time (full scale: for 
+a 12-bit code transition 
+between the lowest and the 
+highest input codes when 
+DAC_OUT reaches final 
+value)
+V
+DDA>2,7V
+With One comparator 
+on DAC output
+10%-90% - 16 22
+ns
+5%-95% - 21 29
+1%-99% - 33 46
+32lsb - 40 53
+1lsb - 64 87
+VDDA>2,7V 
+With One comparator 
+and OPAMP on DAC 
+output
+10%-90% - 24 32
+5%-95% - 32 43
+1%-99% - 49 67
+32lsb - 57 75
+1lsb - 93 125

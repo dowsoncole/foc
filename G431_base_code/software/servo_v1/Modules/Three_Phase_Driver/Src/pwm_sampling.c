@@ -6,7 +6,8 @@ static uint8_t sampling_parameters_valid(const pwm_sampling_parameters_t *p)
 {
   return ((p != 0) && (p->peak > 1U) && (p->peak <= 65535U) &&
           (p->sequence_ticks > 0U) && (p->sequence_ticks < 2U * p->peak) &&
-          (p->guard_ticks < p->peak)) ? 1U : 0U;
+          (p->guard_ticks < p->peak) &&
+          (p->preferred_lead_ticks < 2U * p->peak)) ? 1U : 0U;
 }
 
 uint8_t PwmSampling_UniformLimit(const pwm_sampling_parameters_t *p,
@@ -45,12 +46,38 @@ uint8_t PwmSampling_Plan(const pwm_sampling_parameters_t *p,
 
   plan->low_window_start = largest + p->guard_ticks;
   plan->low_window_end = 2U * p->peak - largest - p->guard_ticks;
-  preferred = (int32_t)p->peak - (int32_t)p->sequence_ticks;
+  preferred = (int32_t)p->peak - (int32_t)p->sequence_ticks -
+              (int32_t)p->preferred_lead_ticks;
   /* CCR=0 或 CCR>ARR 为静态电平；CCR=ARR 只在峰值产生极窄切换，仍避开。 */
   if ((compare_w > 0U) && (compare_w <= p->peak))
   {
     edges[edge_count++] = (int32_t)compare_w;
     edges[edge_count++] = (int32_t)(2U * p->peak - compare_w);
+  }
+
+  /* If the globally nearest start is already safe, no segmented search can
+     improve it. This preserves the exact original trigger and tie policy. */
+  {
+    int32_t candidate = preferred;
+    uint8_t safe = 1U;
+    if (candidate < low) candidate = low;
+    if (candidate > high) candidate = high;
+    for (i = 0U; i < edge_count; ++i)
+    {
+      if (candidate > edges[i] - (int32_t)p->guard_ticks - (int32_t)p->sequence_ticks &&
+          candidate < edges[i] + (int32_t)p->guard_ticks)
+      {
+        safe = 0U;
+        break;
+      }
+    }
+    if (safe)
+    {
+      plan->trigger = (uint32_t)candidate;
+      plan->sequence_end = plan->trigger + p->sequence_ticks;
+      plan->valid = 1U;
+      return 1U;
+    }
   }
 
   /* 最多两个 W 边沿，将可用起点区间分为最多三段，无无界循环。 */

@@ -1,0 +1,30 @@
+DS12589 Rev 6 93/198
+STM32G431x6 STM32G431x8 STM32G431xB Electrical characteristics
+160
+On-chip peripheral current consumption
+The current consumption of the on-chip peripherals is given in Table 34. The MCU is placed 
+under the following conditions:
+• All I/O pins are in Analog mode
+• The given value is calculated by measuring the difference of the current consumptions:
+– when the peripheral is clocked on
+– when the peripheral is clocked off
+• Ambient operating temperature and supply voltage conditions summarized in Table 14: 
+Voltage characteristics
+• The power consumption of the digital part of the on-chip peripherals is given in 
+Table 34. The power consumption of the analog part of the peripherals (where 
+applicable) is indicated in each related section of the datasheet.
+          
+Table 34. Peripheral current consumption 
+BUS Peripheral Range 1 
+Boost Mode Range 1 Range 2 Low-power 
+run and sleep Unit
+AHB Bus Matrix 5.31 5.00 4.07 4.97 µA/MHz
+AHB1
+DMA1 3.21 2.95 2.45 2.68 
+µA/MHz
+DMA2 3.10 2.86 2.37 2.59 
+DMAMUX 7.48 6.97 5.74 6.43 
+CORDIC 1.61 1.50 1.24 1.34 
+FMAC 3.70 3.47 2.86 3.27 
+FLASH 6.10 5.66 4.64 5.33 
+SRAM1 0.31 0.32 0.26 0.38 

@@ -1,0 +1,26 @@
+10
+BISS-C protocol interface
+Electrical connection diagram：
+MA+ MA
+MA￾SLO+
+SLO- SLO
+Encoder Controller
+The interface uses four differential signal lines: MA+/MA− and SLO+/SLO−. The MA termination resistor
+is integrated inside the encoder. A termination resistor or other impedance matching scheme should be
+added on the controller-side SLO line. Timing diagram：
+<
+SLO
+MA
+tMA
+Ack Start
+tACK
+“0” b(n) b(n-1) b1 b0 Timeout Ack
+Idle
+tM tP
+(1) The encoder latches the current angular position data at the red point. The protocol uses MA for clock synchronization. The MA line remains high when idle. On the first falling
+edge of MA, the current data is latched and communication starts. The encoder drives SLO low on the
+second rising edge of MA. Following the start bit “0”, data is transmitted MSB first on each rising edge of
+MA, while the controller samples SLO on each falling edge of MA until the LSB is received.
+BIS
+-
+C

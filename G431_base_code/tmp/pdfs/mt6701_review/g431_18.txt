@@ -1,0 +1,48 @@
+Functional overview STM32G431x6 STM32G431x8 STM32G431xB
+18/198 DS12589 Rev 6
+• Readout protection (RDP) to protect the whole memory. Three levels of protection are 
+available:
+– Level 0: no readout protection
+– Level 1: memory readout prot ection; the Flash memory cannot be read from or written 
+to if either the debug features are connected or the boot in RAM or bootloader are 
+selected
+– Level 2: chip readout protection; the d ebug features (Cortex-M4 JTAG and serial 
+wire), the boot in RAM and the bootloader selection are disabled (JTAG fuse). This 
+selection is irreversible.
+• Write protection (WRP): the protected area is protected against erasing and 
+programming.
+• Proprietary code readout protection (PCROP): a part of the Flash memory can be 
+protected against read and write from third parties. The protected area is execute-only 
+and it can only be reached by the STM32 CPU as an instruction code, while all other 
+accesses (DMA, debug and CPU data read, write and erase) are strictly prohibited. An 
+additional option bit (PCROP_RDP) allows to select if the PCROP area is erased or not 
+when the RDP protection is changed from Level 1 to Level 0.
+• Securable memory area: a part of Flash memory can be configured by option bytes to 
+be securable. After reset this securable memory area is not secured and it behaves like 
+the remainder of main Flash memory (execute, read, write access). When secured, any 
+access to this securable memory area generates corresponding read/write error. 
+Purpose of the Securable memory area is to protect sensitive code and data (secure 
+keys storage) which can be executed only once at boot, and never again unless a new 
+reset occurs.
+The Flash memory embeds the error correction code (ECC) feature supporting:
+• Single error detection and correction
+• Double error detection
+• The address of the ECC fail can be read in the ECC register
+• 1 Kbyte (128 double word) OTP (one-time programmable) for user data. The OTP area 
+is available in Bank 1 only. The OTP data cannot be erased and can be written only 
+once.
+3.5 Embedded SRAM
+STM32G431x6/x8/xB devices feature 32 Kbytes of embedded SRAM. This SRAM is split 
+into three blocks:
+• 16 Kbytes mapped at address 0x2000 0000 (SRAM1). The CM4 can access the 
+SRAM1 through the System Bus (or through the I-Code/D-Code buses when boot from 
+SRAM1 is selected or when physical remap is selected by SYSCFG_MEMRMP 
+register). Whole SRAM1 supports hardware parity check.
+• 6 Kbytes mapped at address 0x2000 4000 (SRAM2). The CM4 can access the SRAM2 
+through the System bus. SRAM2 can be kept in stop and standby modes.
+• 10 Kbytes mapped at address 0x1000 0000 (CCM SRAM). It is accessed by the CPU 
+through I-Code/D-Code bus for maximum performance.  
+It is also aliased at 0x2000 5800 address to be accessed by all masters (CPU, DMA1, 
+DMA2) through SBUS contiguously to SRAM1 and SRAM2. The CCM SRAM supports 
+hardware parity check and can be write-protected with 1-Kbyte granularity.
+• The memory can be accessed in read/write at max CPU clock speed with 0 wait states.

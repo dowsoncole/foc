@@ -10,6 +10,7 @@ typedef struct
   uint32_t peak;
   uint32_t sequence_ticks;
   uint32_t guard_ticks;
+  uint32_t preferred_lead_ticks; /* sequence end before the carrier peak */
 } pwm_sampling_parameters_t;
 
 typedef struct
@@ -22,7 +23,8 @@ typedef struct
 } pwm_sampling_plan_t;
 
 /* 完整两路过采样序列必须位于 U/V 都已稳定的低侧窗口中；还要避开 W
-   的两次开关边沿。优先让序列在峰值完成，窗口变窄时向后移动到最早可行点。
+   的两次开关边沿。优先让序列在峰值前保留计算时间，窗口变窄时移动到
+   距离目标最近的可行点。
    只规划时间，不改变三相 duty，不改 ADC 过采样倍率。 */
 uint8_t PwmSampling_Plan(const pwm_sampling_parameters_t *parameters,
                           uint32_t compare_u, uint32_t compare_v,

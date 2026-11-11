@@ -1,0 +1,21 @@
+8
+SSI protocol interface
+Electrical connection diagram：
+The interface uses four differential signal lines: Clock+/Clock− and Data+/Data−. The Clock termination
+resistor is integrated inside the encoder. A termination resistor or other impedance matching method is
+recommended on the controller-side Data line. Timing Diagram：
+Data
+Clock
+t CL
+Start b(n) b(n-1) b(n-2) b1 b0 Idle b(n)
+t M t P
+This protocol uses the Clock signal to synchronize data transmission. When the first falling edge of Clock
+arrives, the current data is latched. Starting from the MSB, data is output to the Data line on each rising
+edge of Clock, while the controller reads the Data line on each falling edge of Clock until the LSB has been
+received. After transmission is completed and the timeout periodtM expires, the Data line returns to high level. The
+Clock signal must remain high until the next read operation is allowed, i.e., after the pause time tP. tCL
+must be shorter than tM. During any read operation, if the interval exceeds tM, the transmission will be
+terminated.
+S
+I
+Encoder Controller

@@ -1,0 +1,73 @@
+Electrical characteristics STM32G431x6 STM32G431x8 STM32G431xB
+138/198 DS12589 Rev 6
+tSETTLING
+Settling time (full scale: for 
+a 12-bit code transition 
+between the lowest and the 
+highest input codes when 
+DAC_OUT reaches final 
+value)
+V
+DDA<2,7V
+With One comparator 
+on DAC output
+10%-90% - 16 88
+ns
+5%-95% - 21 116
+1%-99% - 33 181
+32lsb - 40 196
+1lsb - 64 332
+V
+DDA<2,7V 
+With One comparator 
+and OPAMP on DAC 
+output
+10%-90% - 24 128
+5%-95% - 32 170
+1%-99% - 49 265
+32lsb - 57 284
+1lsb - 93 483
+t
+WAKEUP
+(2)
+Wakeup time from off state 
+(setting the ENx bit in the 
+DAC Control register) until 
+final value ±1 LSB
+Normal mode CL ≤ 10 pF - 1.4 3.5 µs
+PSRR V DDA supply rejection ratio
+VDD > 2.7 V 65 85 -
+dB
+VDD <2.7 V 40 85 -
+tSAMP
+Sampling time in sample 
+and hold mode (code 
+transition between the 
+lowest input code and the 
+highest input code when 
+DACOUT reaches final 
+value ±1LSB)
+- - 0.7 - µs
+CI
+int
+Internal sample and hold 
+capacitor -- 4 5 p F
+dV/dt (hold 
+phase)
+Voltage decay rate in 
+Sample and hold mode, 
+during hold phase
+CSH = 4 pF
+T = 55°C -5 0 - m V / m s
+IDDA(DAC) DAC consumption from 
+VDDA
+No load, middle code (0x800) - - 0.2
+µA
+IDDV(DAC) DAC consumption from 
+VREF+
+No load, middle code (0x800)(3) -7 2 0 9 5 5
+1. Guaranteed by design.
+2. In buffered mode, the output can overshoot above the fi nal value for low input code (starting from min value).
+3. Worst case consumpt ion is at code 0x800.
+Table 70. DAC 15MSPS characteristics(1) (continued)
+Symbol Parameter Conditions Min Typ Max Unit

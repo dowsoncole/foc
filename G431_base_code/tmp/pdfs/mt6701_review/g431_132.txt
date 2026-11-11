@@ -1,0 +1,93 @@
+Electrical characteristics STM32G431x6 STM32G431x8 STM32G431xB
+132/198 DS12589 Rev 6
+Figure 28. ADC accuracy characteristics
+Figure 29. Typical connection diagram when using the ADC with FT/TT pins
+featuring analog switch function
+1. Refer to Table 60: ADC characteristics for the values of RAIN and CADC.
+2. C parasitic represents the capacitance of the PCB (dependent on soldering and PCB layout quality) plus the 
+pad capacitance (refer to Table 53: I/O static characteristics for the value of the pad capacitance). A high 
+Cparasitic value downgrades conversion accuracy. To remedy this, fADC should be reduced.
+3. Refer to Table 53: I/O static characteristics for the values of Ilkg.
+4. Refer to Figure 16: Power supply scheme.
+General PCB design guidelines
+Power supply decoupling must be performed as shown in Figure 16: Power supply scheme. 
+The decoupling capacitor on VDDA must be ceramic (good quality) and it must be placed as 
+close as possible to the chip.
+MSv19880V6
+(1) Example of an actual transfer curve
+(2) Ideal transfer curve
+(3) End-point correlation line
+n = ADC resolution
+E
+T = total unadjusted error: maximum deviation    
+between the actual and ideal transfer curves
+EO = offset error: maximum deviation between the first 
+actual transition and the first ideal one
+EG = gain error: deviation between the last ideal 
+transition and the last actual one
+ED = differential linearity error: maximum deviation 
+between actual steps and the ideal one
+EL = integral linearity error: maximum deviation between 
+any actual transition and the end point correlation line
+2n-1 
+7
+6
+5
+4
+3
+2
+1
+0
+(1/2n)*VREF+
+Output code
+EO
+VSSA
+2n-2 
+2n-3 
+VREF+ (VDDA)
+ET
+EL
+ED
+1 LSB ideal
+EG
+(1)
+(2)
+(3)
+(or                 )][1LSB =    
+VDDA
+2n 
+VREF+
+2n 
+(2/2n)*VREF+
+(3/2n)*VREF+
+(4/2n)*VREF+
+(5/2n)*VREF+
+(6/2n)*VREF+
+(7/2n)*VREF+
+(2n-3/2n)*VREF+
+(2n-2/2n)*VREF+
+(2n-1/2n)*VREF+
+(2n/2n)*VREF+
+MSv67871V3
+Sample-and-hold ADC converter
+Converter
+Cparasitic
+(2)
+Ilkg
+(3) CADC
+VDDA
+(4)
+RAIN
+(1)
+VAIN
+RADC
+VREF+
+(4)
+VSSA
+I/O 
+analog 
+switch
+Sampling 
+switch with 
+multiplexing
+VSSVSS

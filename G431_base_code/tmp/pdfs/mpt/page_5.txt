@@ -1,0 +1,7 @@
+4
+Drawings
+A
+A
+Arrow as Pin1
+Connector
+The “red arrow” in the figure indicates Pin 1. For details, please refer to Page 5. For stator mounting, either M1.6 screws can be passed through the M2 threaded holes, or M2 screws can be used with the M2 threads for fastening. For rotor mounting, a dedicated tool should be used for tightening. For details, please refer to the DPT Design and Mounting Guidelines. Calibration must be performed after mounting. For calibration software, procedures, and drawings, please contact KingKong Technology.

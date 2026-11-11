@@ -1,0 +1,31 @@
+STM32G431x6 STM32G431x8 STM32G431xB Electrical characteristics
+DS12589 Rev 6 77/198
+          
+          
+IDD (LPRun)
+Supply current 
+in Low-power 
+run mode
+f
+HCLK = fHSE 
+all peripherals disable
+2 MHz 350 525 990 1600 2650 970 2200 3900 6700 11000
+μA
+1 MHz 255 410 860 1500 2550 830 2100 3800 6600 11000
+250 KHz 145 300 750 1400 2450 690 1900 3700 6500 11000
+62.5 KHz 99.5 270 725 1350 2400 670 1800 3700 6500 11000
+fHCLK = fHSI / HPRE
+all peripherals disable
+2 MHz 865 1050 1500 2150 3200 1600 2800 4500 7600 12000
+1 MHz 820 965 1400 2050 3100 1500 2700 4400 7400 12000
+250 KHz 725 875 1300 1950 3000 1400 2600 4400 7400 12000
+62.5 KHz 685 860 1300 1900 2950 1300 2600 4400 7400 12000
+Table 21. Current consumption in Run and Low-power run modes, code with data 
+processing running from Flash in single Bank, ART enable (Cache ON Prefetch OFF) (continued)
+Symbol Parameter
+Condition
+fHCLK
+Typ Max
+Unit
+- Voltage 
+scaling 25°C 55°C 85°C 105°C 125°C 25°C 55°C 85°C 105°C 125°C

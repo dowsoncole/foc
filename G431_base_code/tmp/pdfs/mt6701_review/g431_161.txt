@@ -1,0 +1,34 @@
+DS12589 Rev 6 161/198
+STM32G431x6 STM32G431x8 STM32G431xB Package information
+193
+6 Package information
+In order to meet environmental requirements, ST offers these devices in different grades of 
+ECOPACK packages, depending on their level of environmental compliance. ECOPACK 
+specifications, grade definitions and product status are available at: www.st.com. 
+ECOPACK is an ST trademark.
+6.1 UFQFPN32 package information
+This UFQFPN is a 32-pin, 5 x 5 mm, 0.5 mm pitch ultra thin fine pitch quad flat package.
+Figure 40. UFQFPN32 - Outline
+1. Drawing is not to scale.
+2. All leads/pads should also be soldered to the PCB to improve the lead/pad solder joint life.
+3. There is an exposed die pad on the underside of t he UFQFPN package. It is recommended to connect and 
+solder this backside pad to PCB ground.
+A0B8_ME_V3
+1
+32
+PIN 1 Identifier
+SEATINGPLANE
+C
+Cddd
+A
+A1
+A3
+e
+b
+D1
+bE2
+L
+e
+E1 E
+D2 L
+D

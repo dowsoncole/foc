@@ -1,0 +1,55 @@
+Electrical characteristics STM32G431x6 STM32G431x8 STM32G431xB
+106/198 DS12589 Rev 6
+5.3.9 PLL characteristics
+The parameters given in Table 45 are derived from tests performed under temperature and 
+VDD supply voltage conditions summarized in Table 17: General operating conditions.
+          
+tSTAB(LSI)(2) LSI oscillator stabilization 
+time 5% of final frequency - 125 180 μs
+IDD(LSI)(2) LSI oscillator power 
+consumption -- 1 1 0 1 8 0 n A
+1. Guaranteed by characterization results.
+2. Guaranteed by design.
+Table 44. LSI oscillator characteristics(1) (continued)
+Symbol Parameter Conditions Min Typ Max Unit
+Table 45. PLL characteristics(1) 
+1. Guaranteed by design.
+Symbol Parameter Conditions Min Typ Max Unit
+fPLL_IN
+PLL input clock(2)
+2. Take care of using the appropriate division factor M to obtain the specified PLL input clock 
+values.
+-2 . 6 6 - 1 6 M H z
+PLL input clock duty cycle - 45 - 55 %
+fPLL_P_OUT PLL multiplier output clock P
+Voltage scaling Range 1 
+Boost mode 2.0645 - 170
+MHz
+Voltage scaling Range 1 2.0645 - 150
+Voltage scaling Range 2 2.0645 - 26
+fPLL_Q_OUT PLL multiplier output clock Q
+Voltage scaling Range 1 
+Boost mode 8- 1 7 0
+Voltage scaling Range 1 8 - 150
+Voltage scaling Range 2 8 - 26
+fPLL_R_OUT PLL multiplier output clock R
+Voltage scaling Range 1 
+Boost mode 8- 1 7 0
+Voltage scaling Range 1 8 - 150
+Voltage scaling Range 2 8 - 26
+fVCO_OUT PLL VCO output
+Voltage scaling Range 1 96 - 344
+Voltage scaling Range 2 96 - 128
+tLOCK PLL lock time - - 15 40 μs
+Jitter
+RMS cycle-to-cycle jitter
+System clock 150 MHz
+- 28.6 -
+±ps
+RMS period jitter - 21.4 -
+IDD(PLL) PLL power consumption on 
+VDD
+(1)
+VCO freq = 96 MHz - 200 260
+μAVCO freq = 192 MHz - 300 380
+VCO freq = 344 MHz - 520 650

@@ -1,0 +1,38 @@
+DS12589 Rev 6 13/198
+STM32G431x6 STM32G431x8 STM32G431xB Description
+43
+2 Description
+The STM32G431x6/x8/xB devices are based on the high-performance Arm® Cortex®-M4 
+32-bit RISC core. They operate at a frequency of up to 170 MHz. 
+The Cortex-M4 core features a single-precision floating-point unit (FPU), which supports all 
+the Arm single-precision data-processing instructions and all the data types. It also 
+implements a full set of DSP (digital signal processing) instructions and a memory protection 
+unit (MPU) which enhances the application’s security.
+These devices embed high-speed memories (up to 128 Kbytes of Flash memory, and 
+32 Kbytes of SRAM), an extensive range of enhanced I/Os and peripherals connected to 
+two APB buses, two AHB buses and a 32-bit multi-AHB bus matrix.
+The devices also embed several protection mechanisms for embedded Flash memory and 
+SRAM: readout protection, write protection, securable memory area and proprietary code 
+readout protection. 
+The devices embed peripherals allowing mathematical/arithmetic function acceleration 
+(CORDIC for trigonometric functions and FMAC unit for filter functions). 
+They offer two fast 12-bit ADCs (4 Msps), four comparators, three operational amplifiers, 
+four DAC channels (2 external and 2 internal), an internal voltage reference buffer, a low-
+power RTC, one general-purpose 32-bit timers, two 16-bit PWM timers dedicated to motor 
+control, seven general-purpose 16-bit timers, and one 16-bit low-power timer.
+They also feature standard and advanced communication interfaces such as:
+- Three I2Cs
+- Three SPIs multiplexed with two half duplex I2Ss
+- Three USARTs, one UART and one low-power UART.
+- One FDCAN
+- One SAI 
+- USB device
+- UCPD
+The devices operate in the -40 to +85 °C (+105 °C junction) and -40 to +125 °C (+130 °C 
+junction) temperature ranges from a 1.71 to 3.6 V power supply. A comprehensive set of 
+power-saving modes allows the design of low-power applications.
+Some independent power supplies are supported including an analog independent supply 
+input for ADC, DAC, OPAMPs and comparators. A V
+BAT input allows backup of the RTC and 
+the registers.
+The STM32G431x6/x8/xB family offers 9 packages from 32-pin to 100-pin.

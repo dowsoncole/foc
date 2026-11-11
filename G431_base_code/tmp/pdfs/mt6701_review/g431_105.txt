@@ -1,0 +1,44 @@
+DS12589 Rev 6 105/198
+STM32G431x6 STM32G431x8 STM32G431xB Electrical characteristics
+160
+Figure 24. HSI48 frequency versus temperature
+Low-speed internal (LSI) RC oscillator
+          
+NT jitter
+Next transition jitter 
+Accumulated jitter on 28 
+cycles(4)
+-- + / - 0 . 1 5 (2) -n s
+PT jitter
+Paired transition jitter 
+Accumulated jitter on 56 
+cycles(4)
+-- + / - 0 . 2 5 (2) -n s
+1. V DD = 3 V, TA = –40 to 125°C unless otherwise specified.
+2. Guaranteed by design.
+3. Guaranteed by characterization results.
+4. Jitter measurement are performed without clock source activated in parallel.
+Table 44. LSI oscillator characteristics(1) 
+Symbol Parameter Conditions Min Typ Max Unit
+fLSI LSI Frequency
+VDD = 3.0 V, 
+TA = 30 °C 31.04 - 32.96
+kHz
+VDD = 1.62 to 3.6 V, 
+TA = -40 to 125 °C 29.5 - 34
+tSU(LSI)(2) LSI oscillator start-up 
+time - - 80 130 μs
+Table 43. HSI48 oscillator characteristics(1) (continued)
+Symbol Parameter Conditions Min Typ Max Unit
+MSv40989V1
+-6
+-4
+-2
+0
+2
+4
+6
+-50 -30 -10 10 30 50 70 90 110 130
+Avg min max
+°C
+%

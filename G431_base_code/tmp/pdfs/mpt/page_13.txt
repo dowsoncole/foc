@@ -1,0 +1,16 @@
+12
+RS485/RS422 protocol interface
+RS485 Electrical connection diagram:
+Encoder Controller
+It is a differential two-wire interface, both wires need to be terminated with parallel termination resistors. The terminal resistors have been integrated into the encoder. The users only need to configure terminal
+resistors or choose other impedance matching schemes for the differential wires of the controller side. The
+interface uses a two-wire differential A/B signal configuration. Termination resistors are required on both
+lines. The encoder-side termination resistor is integrated inside the encoder, and users should add
+termination resistors or other impedance matching schemes on the controller-side A and B lines. RS422 Electrical connection diagram:
+Encoder Controller The interface uses four differential signal lines, including differential TX output and differential RX input. The RX termination resistor is integrated inside the encoder. Users should add a termination resistor or
+other impedance matching scheme on the controller-side RX line. The underlying protocol of both RS485 and RS422 is UART. Since no clock line is provided, the encoder and
+controller must operate with the same predefined baud rate and data format to ensure proper data
+transmission. Protocol configuration:
+Length Parity Stop bit Flow Control Byte order
+8 bit - 1 - LSB first
+RS485/RS42

@@ -1,0 +1,34 @@
+DS12589 Rev 6 3/198
+STM32G431x6 STM32G431x8 STM32G431xB Contents
+6
+Contents
+1 Introduction . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 12
+2 Description . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 13
+3 Functional overview  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 17
+3.1 Arm ® Cortex®-M4 core with FPU . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 17
+3.2 Adaptive real-time memory accelerator (ART accelerator)  . . . . . . . . . . . 17
+3.3 Memory protection unit . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 17
+3.4 Embedded Flash memory  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 17
+3.5 Embedded SRAM . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 18
+3.6 Multi-AHB bus matrix  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 19
+3.7 Boot modes  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 19
+3.8 CORDIC . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 20
+3.9 Filter mathematical accelerator (FMAC) . . . . . . . . . . . . . . . . . . . . . . . . . . 20
+3.10 Cyclic redundancy check calculation unit (CRC )  . . . . . . . . . . . . . . . . . . . 21
+3.11 Power supply management  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 21
+3.11.1 Power supply schemes  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 21
+3.11.2 Power supply supervisor  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 22
+3.11.3 Voltage regulator  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 22
+3.11.4 Low-power modes . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 23
+3.11.5 Reset mode . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 23
+3.11.6 VBAT operation  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 24
+3.12 Interconnect matrix . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 25
+3.13 Clocks and startup  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 26
+3.14 General-purpose inputs/outputs (GPIOs) . . . . . . . . . . . . . . . . . . . . . . . . . 27
+3.15 Direct memory access controller (DMA) . . . . . . . . . . . . . . . . . . . . . . . . . . 27
+3.16 DMA request router (DMAMUX) . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 28
+3.17 Interrupts and events  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 28
+3.17.1 Nested vectored interrupt controller (NVIC)  . . . . . . . . . . . . . . . . . . . . . . 28
+3.17.2 Extended interrupt/event controller (EXTI)  . . . . . . . . . . . . . . . . . . . . . . 28
+3.18 Analog-to-digital converter (ADC)  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 29
+3.18.1 Temperature sensor . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 29

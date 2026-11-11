@@ -1,0 +1,35 @@
+DS12589 Rev 6 183/198
+STM32G431x6 STM32G431x8 STM32G431xB Package information
+193
+UFBGA64 device marking
+The following figure gives an example of topside marking orientation versus pin 1 identifier 
+location.
+The printed markings may differ depending on the supply chain.
+Other optional marking or inset/upset marks, which identify the parts throughout supply 
+chain operations, are not indicated below.
+Figure 60. UFBGA64 top view example 
+1. Parts marked as ES or E or accompanied by an engin eering sample notification letter are not yet qualified 
+and therefore not approved for use in production. ST is not responsible for any consequences resulting 
+from such use. In no event will ST be liable for the customer using any of these engineering samples in 
+production. ST’s Quality department must be contacted prior to any decision to use these engineering 
+samples to run a qualification activity.
+(1)
+Product
+identification G4A1REI6
+R
+Y WW
+Pin 1                
+identification
+Revision code
+Date code
+MSv63468V1
+(1)
+Product
+identification G431RBI6
+R
+Y WW
+Pin 1                
+identification
+Revision code
+Date code
+MSv62538V1

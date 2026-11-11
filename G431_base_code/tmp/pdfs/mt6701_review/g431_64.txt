@@ -1,0 +1,113 @@
+Pinouts and pin description STM32G431x6 STM32G431x8 STM32G431xB
+64/198 DS12589 Rev 6
+Port D
+PD0 - - - - - - TIM8_
+CH4N
+-- FDCAN1_R
+X
+----- EVENT
+OUT
+PD1 - - - - TIM8_CH4 - TIM8_
+BKIN2
+-- FDCAN1_T
+X
+----- EVENT
+OUT
+P D 2 - - T I M 3 _ E T R - T I M 8 _ B K I N ---------- EVENT
+OUT
+PD3 - - TIM2_CH1/
+TIM2_ETR ---- USART2_
+CTS ------- EVENT
+OUT
+PD4 - - TIM2_CH2 - - - - USART2_
+RTS_DE
+------- EVENT
+OUT
+P D 5 - - - ---- USART2_
+TX
+------- EVENT
+OUT
+PD6 - - TIM2_CH4 SAI1_D1 - - - USART2_
+RX
+----- SAI1_SD_
+A
+- EVENT
+OUT
+PD7 - - TIM2_CH3 - - - - USART2_
+CK
+------- EVENT
+OUT
+P D 8 - - - ---- USART3_
+TX
+------- EVENT
+OUT
+P D 9 - - - ---- USART3_
+RX
+------- EVENT
+OUT
+P D 1 0 - - - ---- USART3_
+CK
+------- EVENT
+OUT
+P D 1 1 - - - ---- USART3_
+CTS
+------- EVENT
+OUT
+PD12 - - TIM4_CH1 - - - - USART3_
+RTS_DE
+------- EVENT
+OUT
+P D 1 3 - - T I M 4 _ C H 2 ------------ EVENT
+OUT
+P D 1 4 - - T I M 4 _ C H 3 ------------ EVENT
+OUT
+P D 1 5 - - T I M 4 _ C H 4 --- S P I 2 _ N S S -------- EVENT
+OUT
+Table 13. Alternate function (continued)
+Port
+AF0 AF1 AF2 AF3 AF4 AF5 AF6 AF7 AF8 AF9 AF10 AF11 AF12 AF13 AF14 AF15
+SYS_AF
+LPTIM1/TI
+M2/5/15/1
+6/17
+I2C3/TIM1/
+2/3/4/8/15/
+GPCOMP1
+I2C3/SAI1/
+USB/TIM8/
+15/
+GPCOMP3
+I2C1/2/3/
+TIM1/8/16/
+17
+SPI1/2/3/
+I2S2/3/
+UART4
+/TIM8/Infra
+red
+SPI2/3/
+I2S2/3/
+TIM1/8/
+Infrared
+USART1/2/
+3
+I2C3/4
+/UART4/
+LPUART1/
+GPCOMP1/
+2/3
+TIM1/8/15/
+FDCAN1
+TIM2/3/4/8/
+17
+LPTIM1/TI
+M1/8/FDCA
+N1
+LPUART1/
+SAI1/TIM1
+SAI1/
+OPAMP2
+UART4/SAI
+1/TIM2/15/
+UCPD1
+EVENT

@@ -1,0 +1,42 @@
+Electrical characteristics STM32G431x6 STM32G431x8 STM32G431xB
+94/198 DS12589 Rev 6
+AHB2
+CRC 1.11 1.05 0.86 0.90 
+µA/MHz
+GPIOA 1.00 0.91 0.73 0.93 
+GPIOB 0.55 0.50 0.41 0.54 
+GPIOC 0.56 0.51 0.42 0.43 
+GPIOD 0.35 0.33 0.26 0.26 
+GPIOE 0.59 0.55 0.45 0.41 
+GPIOF 0.46 0.43 0.36 0.31 
+GPIOG 0.38 0.36 0.29 0.26 
+CCMSRAM 0.32 0.31 0.26 0.25 
+SRAM2 0.70 0.66 0.55 0.55 
+ADC12 AHB clock domain 6.72 6.27 5.17 5.95 
+ADC12 independent clock domain 0.61 0.59 0.46 0.56 
+DAC1 5.57 5.17 4.40 4.99
+DAC3 5.67 5.30 NA NA
+RNG clock domain 3.63 3.37 NA Na
+RNG independent clock domain 1.06 1.00 NA NA
+AHB ALL AHB peripherals 79.97 74.54 57.83 66.98 µA/MHz
+APB1
+AHB to APB1 bridge 0.47 0.37 0.32 0.08 
+µA/MHz
+TIM2 10.84 10.04 8.21 9.31 
+TIM3 9.32 8.65 7.10 8.02 
+TIM4 8.60 8.00 6.61 7.53 
+TIM6 2.88 2.69 2.22 2.66 
+TIM7 2.72 2.53 2.09 2.41 
+CRS 0.65 0.62 0.50 0.57 
+RTC 3.72 3.49 2.92 3.73 
+WWDG 0.77 0.74 0.60 0.71 
+SPI2 4.96 4.63 3.82 4.33 
+SPI3 5.33 4.98 4.09 4.67 
+I2S2 clock domain 3.45 3.23 2.65 2.95 
+I2S2 independent clock domain 1.51 1.40 1.17 1.38 
+I2S3 clock domain 3.86 3.62 2.97 3.49 
+I2S3 independent clock domain 1.47 1.36 1.12 1.18 
+Table 34. Peripheral current consumption (continued)
+BUS Peripheral Range 1 
+Boost Mode Range 1 Range 2 Low-power 
+run and sleep Unit

@@ -1,0 +1,53 @@
+Electrical characteristics STM32G431x6 STM32G431x8 STM32G431xB
+68/198 DS12589 Rev 6
+5.1.6 Power supply scheme
+Figure 16. Power supply scheme
+Caution: Each power supply pair (VDD/VSS, VDDA/VSSA etc.) must be decoupled with filtering ceramic 
+capacitors as shown above. These capacitors must be placed as close as possible to, or 
+below, the appropriate pins on the underside of the PCB to ensure the good functionality of 
+the device.
+MS60206V1
+VDD
+Level shifter
+IO
+logic
+Kernel logic
+(CPU, Digital
+& Memories)
+Backup circuitry
+(LSE, RTC,
+Backup registers)
+IN
+OUT
+Regulator
+GPIOs
+1.55 – 3.6 V
+n x 100 nF
++1 x 4.7 μF
+n x VSS
+n x VDD
+VBAT
+VCORE
+Power switch
+VDDIO
+ADCs/
+DACs/
+OPAMPs/
+COMPs/
+VREFBUF
+VREF-
+VDDA
+10 nF
++1 μF
+VDDA
+VSSA
+VREF
+100 nF +1 μF
+VREF+
+VREF+
+Reset block
+Temp. sensor
+PLL, HSI16, HSI48
+Standby circuitry
+(Wakeup logic, 
+IWDG)

@@ -1,0 +1,56 @@
+DS12589 Rev 6 149/198
+STM32G431x6 STM32G431x8 STM32G431xB Electrical characteristics
+160
+5.3.25 Timer characteristics
+The parameters given in the following tables are guaranteed by design.
+Refer to Section 5.3.14: I/O port characteristics for details on the input/output alternate 
+function characteristics (output compare, input capture, external clock, PWM output).
+          
+Table 78. TIMx(1) characteristics(2) 
+1. TIMx , is used as a general term in which x stands for 1,2,3,4,6,7,8,15,16, or 17.
+2. Guaranteed by design.
+Symbol Parameter Conditions Min Max Unit
+tres(TIM) Timer resolution time
+-1 - t TIMxCLK
+fTIMxCLK = 170 MHz 5.88 - ns
+fEXT
+Timer external clock 
+frequency on CH1 to 
+CH4
+-0 f
+TIMxCLK/2 MHz
+fTIMxCLK = 170 MHz 0 85 MHz
+ResTIM Timer resolution
+TIMx (except TIM2) - 16
+bit
+TIM2 - 32
+tCOUNTER
+16-bit counter clock 
+period
+- 1 65536 t TIMxCLK
+fTIMxCLK = 170 MHz 0.00588 385.5 µs
+tMAX_COUNT
+Maximum possible 
+count with 32-bit 
+counter
+- - 65536 × 65536 t TIMxCLK
+fTIMxCLK = 170 MHz - 25.26 s
+fENC
+Encoder frequency on 
+TI1 and TI2 input pins
+-0 f TIMxCLK/4 MHz
+fTIMxCLK = 170MHz 0 42.5 MHz
+tW(INDEX)
+Index pulsewidth on 
+ETR input -2 - T c k
+tW(TI1, TI2)
+Min pulsewidth  
+on TI1 and TI2 inputs 
+in all encoder modes 
+except directional 
+clock x1
+-2 - T c k
+Min pulsewidth  
+on TI1 and TI2 inputs 
+in directional clock x1
+-3 - T c k

@@ -1,0 +1,47 @@
+DS12589 Rev 6 23/198
+STM32G431x6 STM32G431x8 STM32G431xB Functional overview
+43
+3.11.4 Low-power modes
+By default, the microcontroller is in Run mode after system or power Reset. It is up to the 
+user to select one of the low-power modes described below: 
+• Sleep mode: In Sleep mode, only the CPU is stopped. All peripherals continue to 
+operate and can wake up the CPU when an interrupt/event occurs. 
+• Low-power run mode: This mode is achieved with VCORE supplied by the low-power 
+regulator to minimize the regulator's operating current. The code can be executed from 
+SRAM or from Flash, and the CPU frequency is limited to 2 MHz. The peripherals with 
+independent clock can be clocked by HSI16.
+• Low-power sleep mode: This mode is entered from the low-power run mode. Only the 
+CPU clock is stopped. When wakeup is triggered by an event or an interrupt, the 
+system reverts to the Low power run mode.
+• Stop mode: In Stop mode, the device achieves the lowest power consumption while 
+retaining the SRAM and register contents. All clocks in the VCORE domain are 
+stopped. The PLL, as well as the HSI16 RC oscillator and the HSE crystal oscillator are 
+disabled. The LSE or LSI keep running. The RTC can remain active (Stop mode with 
+RTC, Stop mode without RTC). Some peripherals with wakeup capability can enable 
+the HSI16 RC during Stop mode, so as to get clock for processing the wakeup event. 
+• Standby mode: The Standby mode is used to achieve the lowest power consumption 
+with brown-out reset, BOR. The internal regulator is switched off to power down the 
+VCORE domain. The PLL, as well as the HSI16 RC oscillator and the HSE crystal 
+oscillator are also powered down. The RTC can remain active (Standby mode with 
+RTC, Standby mode without RTC). The BOR always remains active in Standby mode. 
+For each I/O, the software can determine whether a pull-up, a pull-down or no resistor 
+shall be applied to that I/O during Standby mode. Upon entering Standby mode, SRAM 
+and register contents are lost except for registers in the RTC domain and standby 
+circuitry. The device exits Standby mode upon external reset event (NRST pin), IWDG 
+reset event, wakeup event (WKUP pin, configurable rising or falling edge) or RTC 
+event (alarm, periodic wakeup, timestamp, tamper), or when a failure is detected on 
+LSE (CSS on LSE).
+• Shutdown mode: The Shutdown mode allows to achieve the lowest power 
+consumption. The internal regulator is switched off to power down the VCORE domain. 
+The PLL, as well as the HSI16 and LSI RC-oscillators and HSE crystal oscillator are 
+also powered down. The RTC can remain active (Shutdown mode with RTC, Shutdown 
+mode without RTC). The BOR is not available in Shutdown mode. No power voltage 
+monitoring is possible in this mode. Therefore, switching to RTC domain is not 
+supported. SRAM and register contents are lost except for registers in the RTC 
+domain. The device exits Shutdown mode upon external reset event (NRST pin), 
+IWDG reset event, wakeup event (WKUP pin, configurable rising or falling edge) or 
+RTC event (alarm, periodic wakeup, timestamp, tamper). 
+3.11.5 Reset mode 
+In order to improve the consumption under reset, the I/Os state under and after reset is 
+“analog state” (the I/O schmitt trigger is disabled). In addition, the internal reset pull-up is 
+deactivated when the reset source is internal.

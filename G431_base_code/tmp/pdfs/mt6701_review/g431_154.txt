@@ -1,0 +1,56 @@
+Electrical characteristics STM32G431x6 STM32G431x8 STM32G431xB
+154/198 DS12589 Rev 6
+Figure 36. SPI timing diagram - slave mode and CPHA = 1
+1. Measurement points are done at CMOS levels: 0.3 V DD and 0.7 VDD.
+Figure 37. SPI timing diagram - master mode
+1. Measurement points are done at CMOS levels: 0.3 V DD and 0.7 VDD.
+MSv41659V1
+NSS input
+CPHA=1
+CPOL=0
+SCK inputCPHA=1
+CPOL=1
+MISO output
+MOSI input
+tsu(SI) th(SI)
+tw(SCKL)
+tw(SCKH)tsu(NSS)
+tc(SCK)
+ta(SO) tv(SO)
+First bit OUT Next bits OUT
+Next bits IN
+Last bit OUT
+th(SO) tr(SCK)
+tf(SCK) th(NSS)
+tdis(SO)
+First bit IN Last bit IN
+ai14136c
+SCK Output
+CPHA= 0
+MOSI
+OUTPUT
+MISO
+INP UT
+CPHA= 0
+LSB OUT
+LSB IN
+CPOL=0
+CPOL=1
+B IT1 OUT
+NSS input
+tc(SCK)
+tw(SCKH)
+tw(SCKL)
+tr(SCK)
+tf(SCK)
+th(MI)
+High
+SCK Output
+CPHA=1
+CPHA=1
+CPOL=0
+CPOL=1
+tsu(MI)
+tv(MO) th(MO)
+MSB IN BIT6 IN
+MSB OUT

@@ -1,0 +1,58 @@
+DS12589 Rev 6 73/198
+STM32G431x6 STM32G431x8 STM32G431xB Electrical characteristics
+160
+VPVD4 PVD threshold 4
+Rising edge 2.69 2.74 2.79
+V
+Falling edge 2.59 2.64 2.69
+VPVD5 PVD threshold 5
+Rising edge 2.85 2.91 2.96
+V
+Falling edge 2.75 2.81 2.86
+VPVD6 PVD threshold 6
+Rising edge 2.92 2.98 3.04
+V
+Falling edge 2.84 2.90 2.96
+Vhyst_BORH0 Hysteresis voltage of BORH0
+Hysteresis in 
+continuous 
+mode
+-2 0 -
+mV
+Hysteresis in 
+other mode -3 0 -
+Vhyst_BOR_PVD
+Hysteresis voltage of BORH 
+(except BORH0) and PVD -- 1 0 0 - m V
+IDD 
+(BOR_PVD)(2)
+BOR(3) (except BOR0) and 
+PVD consumption from VDD
+-- 1 . 1 1 . 6 µ A
+VPVM1
+VDDA peripheral voltage 
+monitoring (COMP/ADC)
+Rising edge 1.61 1.65 1.69
+V
+Falling edge 1.6 1.64 1.68
+VPVM2
+VDDA peripheral voltage 
+monitoring (OPAMP/DAC)
+Rising edge 1.78 1.82 1.86
+V
+Falling edge 1.77 1.81 1.85
+Vhyst_PVM1 PVM1 hysteresis - - 10 - mV
+Vhyst_PVM2 PVM2 hysteresis - - 10 - mV
+IDD 
+(PVM1/PVM2)
+(2)
+PVM1 and PVM2 
+consumption from VDD
+-- 2 - µ A
+1. Continuous mode means Run/Sleep modes, or temperature sensor enable in Low-power run/Low-power 
+sleep modes.
+2. Guaranteed by design.
+3. BOR0 is enabled in all modes (except shutdown) and  its consumption is therefore included in the supply 
+current characteristics tables.
+Table 19. Embedded reset and power control block characteristics (continued)
+Symbol Parameter Conditions (1) Min Typ Max Unit

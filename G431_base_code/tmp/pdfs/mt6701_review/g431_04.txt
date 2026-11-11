@@ -1,0 +1,37 @@
+Contents STM32G431x6 STM32G431x8 STM32G431xB
+4/198 DS12589 Rev 6
+3.18.2 Internal voltage reference (VREFINT) . . . . . . . . . . . . . . . . . . . . . . . . . . 30
+3.18.3 VBAT battery voltage monitoring . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 30
+3.19 Digital to analog converter (DAC) . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 30
+3.20 Voltage reference buffer (VREFBUF) . . . . . . . . . . . . . . . . . . . . . . . . . . . . 31
+3.21 Comparators (COMP)  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 32
+3.22 Operational amplifier (OPAMP)  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 32
+3.23 Random number generator (RNG) . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 32
+3.24 Timers and watchdogs . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 32
+3.24.1 Advanced motor control timer (TIM1, TIM8)  . . . . . . . . . . . . . . . . . . . . . 33
+3.24.2 General-purpose timers (TIM2, TIM3, TIM4, TIM15, TIM16,  
+TIM17) . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 34
+3.24.3 Basic timers (TIM6 and TIM7)  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 34
+3.24.4 Low-power timer (LPTIM1)  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 35
+3.24.5 Independent watchdog (IWDG) . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 35
+3.24.6 System window watchdog (WWDG)  . . . . . . . . . . . . . . . . . . . . . . . . . . . 35
+3.24.7 SysTick timer . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 35
+3.25 Real-time clock (RTC) and backup registers  . . . . . . . . . . . . . . . . . . . . . . 36
+3.26 Tamper and backup registers (TAMP)  . . . . . . . . . . . . . . . . . . . . . . . . . . . 36
+3.27 Infrared transmitter . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 37
+3.28 Inter-integrated circuit interface (I
+2C) . . . . . . . . . . . . . . . . . . . . . . . . . . . . 38
+3.29 Universal synchronous/asynchronous re ceiver transmitter (USART)  . . . 39
+3.30 Low-power universal asynchronous rece iver transmitter (LPUART)  . . . . 40
+3.31 Serial peripheral interface (SPI) . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 40
+3.32 Serial audio interfaces (SAI) . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 41
+3.32.1 SAI peripheral supports . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 41
+3.33 Controller area network (FDCAN1)  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 42
+3.34 Universal serial bus (USB) . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 42
+3.35 USB Type-C™ / USB Power Delivery controller (UCPD) . . . . . . . . . . . . . 42
+3.36 Clock recovery system (CRS)  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 43
+3.37 Development support . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 43
+3.37.1 Serial wire JTAG debug port (SWJ-DP) . . . . . . . . . . . . . . . . . . . . . . . . . 43
+3.37.2 Embedded trace macrocell™  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 43
+4 Pinouts and pin description . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 44
+4.1 UFQFPN32 pinout description . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 44

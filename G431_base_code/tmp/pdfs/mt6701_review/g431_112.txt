@@ -1,0 +1,46 @@
+Electrical characteristics STM32G431x6 STM32G431x8 STM32G431xB
+112/198 DS12589 Rev 6
+Note: For more information about GPIO properties , refer to the application note AN4899 "STM32 
+GPIO configuration for hardware settings and low-power consumption" available from the 
+ST website www.st.com.
+All I/Os are CMOS- and TTL-compliant (no software configuration required). Their 
+characteristics cover more than the strict CMOS-technology or TTL parameters. The 
+coverage of these requirements is shown in Figure 25 for standard I/Os, and 5 V tolerant 
+I/Os (except FT_c).
+Figure 25. I/O input characteristics
+Output driving current
+The GPIOs (general purpose input/outputs) can sink or source up to ±8 mA, and sink or 
+source up to ± 20 mA (with a relaxed VOL/VOH).
+2. Data based on characterization results, not tested in production 
+3. Guaranteed by design.
+4. This value represents the pad leakage of the I/O itself. The total product pad leakage is provided by this formula: 
+I
+Total_Ileak_max = 10 μA + [number of I/Os where VIN is applied on the pad] ₓ Ilkg(Max).
+5. Pull-up and pull-down resistors are des igned with a true resistance in series with a switchable PMOS/NMOS. This 
+PMOS/NMOS contribution to the series resistance is minimal (~10% order).
+MSv37613V1
+Teste
+d in production CMOS requirement Vih
+ min = 0
+.7xV
+DDIOx
+Based on simulati
+on Vih min = 0.
+61xVDDIOx
++0.05 for 1.08<V
+DDIOx<1.62 or
+ 0.49xV
+DDIOx+0.26 for VDDIOx>1.62
+Based on simu
+lation Vil max =0.43xV
+DDIOx
+-0.1 for 1.08
+<VDDIOx
+<1.62 or  0.39xV
+DDIOx-0.06 for VDDIOx>1.62
+Tested in produ
+ction CMOS req
+uirement Vil m
+ax = 0.3xVdd
+TTL requirement Vih min = 2V
+TTL requirement Vil max = 0.8V

@@ -1,0 +1,19 @@
+6
+Specifications
+System Parameters
+Mounting Axial hollow
+Accuracy ±0.01˚ (assembly dependent)
+Electrical Parameters
+Supply Voltage 4.5 ~ 5.5 V
+Battery Voltage 2.7 ~ 3.6 V
+Connection Wire to board connector
+Current Consumption ≈ 100 mA
+Low-Power Current ≈ 12 μA (static power consumption)
+ESD resistance HBM, max. ±2 kV
+CDM, max. ±1 kV
+Mechanical Parameters
+Rotor Bracket Stainless steel
+Stator Bracket Aluminum alloy
+Environmental Parameters
+Operating
+temperature -40 ~ 85 ℃ / -40 ~ 105 ℃ / -40 ~ 125 ℃

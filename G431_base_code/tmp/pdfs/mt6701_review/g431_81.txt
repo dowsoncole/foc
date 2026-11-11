@@ -1,0 +1,61 @@
+STM32G431x6 STM32G431x8 STM32G431xB Electrical characteristics
+DS12589 Rev 6 81/198
+          
+Table 24. Typical current consumption in Run and Low-power run modes, with different codes 
+running from SRAM1 
+Symbol Parameter
+Conditions
+Code
+TYP 25°C
+Unit
+TYP 25°C
+Unit
+- Voltage scaling Single bank 
+mode
+Single 
+bank 
+mode
+IDD (Run) Supply current in 
+Run mode
+fHCLK = fHSE up to 48 MHZ 
+included, bypass mode 
+PLL ON above 48 MHz all 
+peripherals disable
+Range2 
+fHCLK=26 MHz
+Pseudo-dhrystone 2.85 mA 110
+µA/MHz
+Coremark 2.95 mA 113
+Dhrystone2.1 2.85 mA 110
+Fibonacci 2.85 mA 110
+While(1) 3.05 mA 117
+Range 1 
+fHCLK= 150 MHz
+Pseudo-dhrystone 19.0 mA 127
+µA/MHz
+Coremark 19.5 mA 130
+Dhrystone2.1 19.0 mA 127
+Fibonacci 20.5 mA 137
+While(1) 18.5 mA 123
+Range 1 
+Boost mode 
+fHCLK= 170 MHz
+Pseudo-dhrystone 23.0 mA 135
+µA/MHz
+Coremark 24.0 mA 141
+Dhrystone2.1 23.0 mA 135
+Fibonacci 24.5 mA 144
+While(1) 22.0 mA 129
+IDD
+(LPRun)
+Supply current in 
+Low-power run
+SYSCLK source is HSI 
+fHCLK = 2 MHz  
+all peripherals disable
+Pseudo-dhrystone 850 µA 425
+µA/MHz
+Coremark 870 µA 435
+Dhrystone2.1 840 µA 420
+Fibonacci 855 µA 428
+While(1) 820 µA 410

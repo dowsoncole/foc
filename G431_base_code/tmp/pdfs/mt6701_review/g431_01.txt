@@ -1,0 +1,83 @@
+This is information on a product in full production. 
+October 2021 DS12589 Rev 6 1/198
+ STM32G431x6 STM32G431x8 
+STM32G431xB
+Arm® Cortex®-M4 32-bit MCU+FPU, 170 MHz /213 DMIPS, 
+ up to 128 KB Flash, 32 KB SRAM, rich analog, math accelerator
+Datasheet - production data
+Features
+Includes ST state-of-the-art patented 
+technology
+• Core: Arm® 32-bit Cortex®-M4 CPU with FPU, 
+Adaptive real-time accelerator (ART 
+Accelerator) allowing 0-wait-state execution 
+from Flash memory, frequency up to 170 MHz 
+with 213 DMIPS, MPU, DSP instructions
+• Operating conditions:
+–V
+DD, VDDA voltage range:  
+1.71 V to 3.6 V
+• Mathematical hardware accelerators
+– CORDIC for trigonometric functions 
+acceleration
+– FMAC: filter mathematical accelerator
+• Memories
+– 128 Kbytes of Flash memory with ECC 
+support, proprietary code readout 
+protection (PCROP), securable memory 
+area, 1 Kbyte OTP
+– 22 Kbytes of SRAM, with hardware parity 
+check implemented on the first 16 Kbytes
+– Routine booster: 10 Kbytes of SRAM on 
+instruction and data bus, with hardware 
+parity check (CCM SRAM)
+• Reset and supply management
+– Power-on/power-down reset 
+(POR/PDR/BOR)
+– Programmable voltage detector (PVD)
+– Low-power modes: sleep, stop, standby 
+and shutdown
+–V
+BAT supply for RTC and backup registers
+• Clock management
+–4  to 48 MHz crystal oscillator
+– 32 kHz oscillator with calibration
+– Internal 16 MHz RC with PLL option (± 1%)
+– Internal 32 kHz RC oscillator (± 5%)
+• Up to 86 fast I/Os
+– All mappable on external interrupt vectors
+– Several I/Os with 5 V tolerant capability
+• Interconnect matrix
+• 12-channel DMA controller
+• 2 x ADCs 0.25 µs (up to 23 channels). 
+Resolution up to 16-bit with hardware 
+oversampling, 0 to 3.6 V conversion range
+• 4 x 12-bit DAC channels 
+– 2 x buffered external channels 1 MSPS
+– 2 x unbuffered internal channels 15 MSPS
+• 4 x ultra-fast rail-to-rail analog comparators
+• 3 x operational amplifiers that can be used in 
+PGA mode, all terminals accessible
+• Internal voltage reference buffer (VREFBUF) 
+supporting three output voltages (2.048 V, 
+2.5 V, 2.9 V)
+• 14 timers:
+– 1 x 32-bit timer and 2 x 16-bit timers with up 
+to four IC/OC/PWM or pulse counter and 
+quadrature (incremental) encoder input
+– 2 x 16-bit 8-channel advanced motor 
+control timers, with up to 8 x PWM 
+channels, dead time generation and 
+emergency stop
+LQFP48 (7 x 7 mm)
+LQFP64 (10 x 10 mm)
+LQFP80 (12 x 12 mm)
+LQFP32 (7 x 7 mm) UFBGA64
+ (5 x 5 mm)
+UFQFPN32 (5 x 5 mm)
+UFQFPN48 (7 x 7 mm)
+WLCSP49
+(Pitch 0.4)
+FBGA
+LQFP100 (14 x 14 mm)
+www.st.com

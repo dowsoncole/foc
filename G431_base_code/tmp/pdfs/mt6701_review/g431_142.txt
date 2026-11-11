@@ -1,0 +1,31 @@
+Electrical characteristics STM32G431x6 STM32G431x8 STM32G431xB
+142/198 DS12589 Rev 6
+Figure 32. VREFOUT_TEMP in case VRS = 01
+Figure 33. VREFOUT_TEMP in case VRS = 10
+MSv62523V1
+2.475
+2.48
+2.485
+2.49
+2.495
+2.5
+2.505
+2.51
+-40 -20 0 20 40 60 80 100 120
+V
+°C
+Mean Min Max
+MSv62524V1
+2.87
+2.875
+2.88
+2.885
+2.89
+2.895
+2.9
+2.905
+2.91
+-40 -20 0 20 40 60 80 100 120
+V
+°C
+Mean Min Max

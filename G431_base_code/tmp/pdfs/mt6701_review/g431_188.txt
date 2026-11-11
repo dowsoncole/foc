@@ -1,0 +1,22 @@
+Package information STM32G431x6 STM32G431x8 STM32G431xB
+188/198 DS12589 Rev 6
+Figure 65. LQFP100 - Recommended footprint
+1. Dimensions are expr essed in millimeters.
+k 0.0° 3.5° 7.0° 0.0° 3.5° 7.0°
+ccc - - 0.080 - - 0.0031
+1. Values in inches are converted from mm and rounded to 4 decimal digits.
+Table 99. LQPF100 - Mechanical data (continued)
+Symbol
+millimeters inches (1)
+Min Typ Max Min Typ Max
+75 51
+5076 0.5
+0.3
+16.7 14.3
+100 26
+12.3
+25
+1.2
+16.7
+1
+1L_LQFP100_FP_V1

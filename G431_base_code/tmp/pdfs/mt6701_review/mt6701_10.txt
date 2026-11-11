@@ -1,0 +1,29 @@
+www.magntek.com.cn | 磁技术带来美妙变革 1.8版本  2022.12
+MT6701
+基于差分霍尔的磁性角度传感器芯片
+10
+7.  输出模式
+MT6701提供了ABZ、UVW、模拟信号和PWM等输出形式，用户还可以通过I2C或者SSI接口读
+取芯片14位绝对角度。PUSH输出引脚还可以提供按压检测功能。
+7.1  I/O引脚功能配置
+引脚 I2C SSI ABZ UVW PWM 模拟输出 Push
+3 PWM 模拟输出
+5 Push
+6 SDA DO A U
+7 SCL CLK B V
+8 CSN Z W
+SOP-8封装 I/O配置表
+对于SOP-8封装，ABZ/UVW (非差分), I2C和SSI功能共用引脚 6、引脚7和引脚8。模拟输出和
+PWM功能共用引脚3。
+引脚 I2C SSI ABZ ABZ+UVW 差分ABZ PWM 模拟输出 Push
+5 Push
+6 SDA DO A A A
+7 SCL CLK B B B
+8 CSN Z Z Z
+9 W -Z
+11 U -A
+12 V -B
+15 PWM 模拟输出
+QFN-16封装 I/O配置表
+对于QFN-16封装, ABZ (非差分), I2C和SSI功能共用引脚6、引脚7和引脚8。UVW和–A-B-Z共
+用引脚11、引脚12 和引脚9。模拟输出和PWM功能共用引脚15。

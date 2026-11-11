@@ -1,0 +1,29 @@
+www.magntek.com.cn | 磁技术带来美妙变革 1.8版本  2022.12
+MT6701
+基于差分霍尔的磁性角度传感器芯片
+23
+7.7.3  I2C 写数据
+图-21: I2C 写数据
+0 0 0 0 1 1 0
+Sl ave 
+ACK
+SCL
+SDA
+1st
+Start
+0
+1 2 3 4 5 6 7 8 9
+W ri t e
+A7 A6 A5 A4 A3 A2 A1
+10 11 12 13 14
+A0
+15 16 17
+Sl ave 
+ACK
+18 19 20 21 22 23 24 25 26 27
+D7 D6 D5 D4 D3 D2 D1
+Sl ave I D :  06 Regi ster Address Dat a for W ri ti ng
+Sl ave 
+ACK
+D0
+Stop

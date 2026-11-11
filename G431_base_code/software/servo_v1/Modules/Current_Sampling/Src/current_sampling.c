@@ -10,22 +10,54 @@
 #include "current_sampling.h"
 #include "adc1_current_sampling.h"
 #include "stm32g4xx_hal.h"
+#include "control_timing.h"
 
-#define CURRENT_SAMPLING_CAL_SETTLE_MS  10UL
-#define CURRENT_SAMPLING_CAL_WINDOW_MS   1UL
+#define CURRENT_SAMPLING_CAL_WINDOW_MS    1UL
+#define CURRENT_SAMPLING_CAL_TIMEOUT_MS   5UL
+#define CURRENT_SAMPLING_CAL_MAX_SPAN    64U
+
+/* CH4/TCP0030A physical-current calibration, 2026-10-27:
+   five static U-phase points (-1, -0.5, +0.25, +0.5, +1 A in the old
+   software scale) gave |physical/software| = 0.35530433, R^2 = 0.99858.
+   A first correction followed by physical +/-0.25 A and +/-0.5 A validation
+   gave physical = 1.019661 * command + 0.01643 A (R^2 = 0.999956). A second
+   static pass fixed the U scale. Rotating 0.5 A tests at 2/5 Hz then compared
+   CH4 U-phase fundamental against MCU d-current means and exposed the U/V
+   analog-chain mismatch. The per-phase effective gains below correct both
+   the directly measured U scale and the V contribution inferred from the
+   balanced rotating current. The probe arrow was opposite to the firmware
+   convention; polarity_u/v therefore remains unchanged. */
+#define CURRENT_SAMPLING_EFFECTIVE_GAIN_U 16.89535f
+#define CURRENT_SAMPLING_EFFECTIVE_GAIN_V 17.53506f
+
+/* Precompute the amperes-per-ADC-count gain so the ADC/FOC ISR uses two
+   multiplies instead of rebuilding a denominator and executing divisions. */
+#define CURRENT_SAMPLING_U_A_PER_COUNT \
+  (3300.0f / ((float)ADC1_CS_OVERSAMPLING_RATIO * 4095.0f * 1000.0f * \
+              0.007f * CURRENT_SAMPLING_EFFECTIVE_GAIN_U))
+#define CURRENT_SAMPLING_V_A_PER_COUNT \
+  (3300.0f / ((float)ADC1_CS_OVERSAMPLING_RATIO * 4095.0f * 1000.0f * \
+              0.007f * CURRENT_SAMPLING_EFFECTIVE_GAIN_V))
 
 current_sampling_t g_current_sampling =
 {
+  /* 实物确认值：两相低侧采样电阻均为 7 mOhm。原理图中的阻值标注
+     与实物不一致，板级参数以实物确认值为准。 */
   .shunt_resistor_uohm = 7000UL,
-  .opamp_gain = 6.1f,
+  /* Backward-compatible metadata reports the directly measured U channel.
+     The V correction is an internal per-phase board constant above. */
+  .opamp_gain = CURRENT_SAMPLING_EFFECTIVE_GAIN_U,
   .vref_mv = 3300UL,
   .adc_full_scale = 4095UL,
   .oversampling_ratio = ADC1_CS_OVERSAMPLING_RATIO,
-  .sample_rate_hz = 20000UL,
+  .sample_rate_hz = CONTROL_FREQUENCY_HZ,
   .offset_u = 0U,
   .offset_v = 0U,
-  .polarity_u = 1,
-  .polarity_v = 1,
+  /* 板上低侧分流采样的原始正方向与 FOC 定义（电流流入电机相端为正）
+     相反。实机表现为正 Id 指令下 Id 持续为负，构成正反馈；只在采样
+     换算边界翻转，保持 ADC rank、Clarke/Park 和 PWM 相序定义不变。 */
+  .polarity_u = -1,
+  .polarity_v = -1,
   .raw_u = 0U,
   .raw_v = 0U,
   .sample_sequence = 0UL,
@@ -34,11 +66,16 @@ current_sampling_t g_current_sampling =
   .calibration_target_samples = 0UL,
   .calibration_deadline_ms = 0UL,
   .calibration_sum_u = 0ULL,
-  .calibration_sum_v = 0ULL
+  .calibration_sum_v = 0ULL,
+  .calibration_min_u = UINT16_MAX,
+  .calibration_max_u = 0U,
+  .calibration_min_v = UINT16_MAX,
+  .calibration_max_v = 0U
 };
 
 static current_sampling_conversion_callback_t s_conversion_callback;
 static void *s_conversion_context;
+static void CurrentSampling_PublishRawSample(void);
 
 static uint32_t CurrentSampling_Elapsed(uint32_t now, uint32_t deadline)
 {
@@ -55,6 +92,27 @@ void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
 
   g_current_sampling.raw_u = (uint16_t)ADC1->JDR1;
   g_current_sampling.raw_v = (uint16_t)ADC1->JDR2;
+  CurrentSampling_PublishRawSample();
+}
+
+void CurrentSampling_InjectedFastIrq(void)
+{
+  /* Copy before W1C. Never clear JEOS again after the long FOC callback:
+     a new conversion may have completed while that callback was running. */
+  uint32_t mask = __get_PRIMASK();
+  __disable_irq();
+  uint16_t raw_u = (uint16_t)ADC1->JDR1;
+  uint16_t raw_v = (uint16_t)ADC1->JDR2;
+  ADC1->ISR = ADC_FLAG_JEOC | ADC_FLAG_JEOS;
+  if (!mask) __enable_irq();
+  g_current_sampling.raw_u = raw_u;
+  g_current_sampling.raw_v = raw_v;
+  SET_BIT(hadc1.State, HAL_ADC_STATE_INJ_EOC);
+  CurrentSampling_PublishRawSample();
+}
+
+static void CurrentSampling_PublishRawSample(void)
+{
   g_current_sampling.sample_sequence++;
 
   if (g_current_sampling.calibration_state == CURRENT_SAMPLING_CAL_COLLECTING &&
@@ -63,6 +121,14 @@ void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
   {
     g_current_sampling.calibration_sum_u += g_current_sampling.raw_u;
     g_current_sampling.calibration_sum_v += g_current_sampling.raw_v;
+    if (g_current_sampling.raw_u < g_current_sampling.calibration_min_u)
+      g_current_sampling.calibration_min_u = g_current_sampling.raw_u;
+    if (g_current_sampling.raw_u > g_current_sampling.calibration_max_u)
+      g_current_sampling.calibration_max_u = g_current_sampling.raw_u;
+    if (g_current_sampling.raw_v < g_current_sampling.calibration_min_v)
+      g_current_sampling.calibration_min_v = g_current_sampling.raw_v;
+    if (g_current_sampling.raw_v > g_current_sampling.calibration_max_v)
+      g_current_sampling.calibration_max_v = g_current_sampling.raw_v;
     g_current_sampling.calibration_sample_count++;
   }
 
@@ -70,6 +136,8 @@ void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
       (g_current_sampling.calibration_state != CURRENT_SAMPLING_CAL_COLLECTING) &&
       (g_current_sampling.calibration_state != CURRENT_SAMPLING_CAL_SETTLING))
   {
+    /* PA0 is owned by the outer ADC IRQ: do not shorten its pulse to this
+       callback or clear it before CCR/diagnostic processing has returned. */
     s_conversion_callback(s_conversion_context);
   }
 }
@@ -81,16 +149,61 @@ void CurrentSampling_SetConversionCallback(
   s_conversion_context = context;
 }
 
+uint8_t CurrentSampling_LoadBoardCalibration(void)
+{
+  uint32_t mask = __get_PRIMASK();
+  uint8_t loaded = 0U;
+  __disable_irq();
+  /* Match the analog configuration in the accepted 16 kHz measurement.
+     The requested 20 kHz carrier reuses the same raw offsets and scale;
+     it is not a new zero-offset measurement. Reject other cadences or a
+     software sample-rate setting inconsistent with the carrier. */
+  if (((TIM1->BDTR & TIM_BDTR_MOE) == 0U) &&
+      (g_current_sampling.calibration_state == CURRENT_SAMPLING_CAL_IDLE) &&
+      (g_current_sampling.shunt_resistor_uohm == 7000UL) &&
+      (g_current_sampling.opamp_gain == CURRENT_SAMPLING_EFFECTIVE_GAIN_U) &&
+      (g_current_sampling.vref_mv == 3300UL) &&
+      (g_current_sampling.adc_full_scale == 4095UL) &&
+      (g_current_sampling.oversampling_ratio == 1UL) &&
+      (g_current_sampling.sample_rate_hz == CONTROL_FREQUENCY_HZ) &&
+      ((CONTROL_FREQUENCY_HZ == 20000UL) || (CONTROL_FREQUENCY_HZ == 16000UL) ||
+       (CONTROL_FREQUENCY_HZ == 10000UL)) &&
+      (g_current_sampling.polarity_u == -1) &&
+      (g_current_sampling.polarity_v == -1) &&
+      (CURRENT_SAMPLING_BOARD_OFFSET_U < 4095U) &&
+      (CURRENT_SAMPLING_BOARD_OFFSET_U > 0U) &&
+      (CURRENT_SAMPLING_BOARD_OFFSET_V < 4095U) &&
+      (CURRENT_SAMPLING_BOARD_OFFSET_V > 0U))
+  {
+    g_current_sampling.offset_u = CURRENT_SAMPLING_BOARD_OFFSET_U;
+    g_current_sampling.offset_v = CURRENT_SAMPLING_BOARD_OFFSET_V;
+    /* No new measurement: leave sample count/sums unchanged at their boot
+       values. DONE denotes usable offsets, not samples collected this boot. */
+    g_current_sampling.calibration_state = CURRENT_SAMPLING_CAL_DONE;
+    loaded = 1U;
+  }
+  if (!mask) __enable_irq();
+  return loaded;
+}
+
 void CurrentSampling_RequestCalibration(void)
 {
+  uint32_t mask = __get_PRIMASK();
+  __disable_irq();
   if ((g_current_sampling.calibration_state == CURRENT_SAMPLING_CAL_SETTLING) ||
-      (g_current_sampling.calibration_state == CURRENT_SAMPLING_CAL_COLLECTING))
+      (g_current_sampling.calibration_state == CURRENT_SAMPLING_CAL_COLLECTING) ||
+      ((TIM1->BDTR & TIM_BDTR_MOE) != 0U))
   {
+    if (!mask) __enable_irq();
     return;
   }
 
   g_current_sampling.calibration_sum_u = 0ULL;
   g_current_sampling.calibration_sum_v = 0ULL;
+  g_current_sampling.calibration_min_u = UINT16_MAX;
+  g_current_sampling.calibration_max_u = 0U;
+  g_current_sampling.calibration_min_v = UINT16_MAX;
+  g_current_sampling.calibration_max_v = 0U;
   g_current_sampling.calibration_sample_count = 0UL;
   g_current_sampling.calibration_target_samples =
       (g_current_sampling.sample_rate_hz * CURRENT_SAMPLING_CAL_WINDOW_MS) /
@@ -100,8 +213,11 @@ void CurrentSampling_RequestCalibration(void)
     g_current_sampling.calibration_target_samples = 1UL;
   }
   g_current_sampling.calibration_deadline_ms =
-      HAL_GetTick() + CURRENT_SAMPLING_CAL_SETTLE_MS;
-  g_current_sampling.calibration_state = CURRENT_SAMPLING_CAL_SETTLING;
+      HAL_GetTick() + CURRENT_SAMPLING_CAL_TIMEOUT_MS;
+  /* Analog startup settling is done by the caller before requesting. At
+     20 kHz, 20 complete U/V sequences form the approximately 1-ms window. */
+  g_current_sampling.calibration_state = CURRENT_SAMPLING_CAL_COLLECTING;
+  if (!mask) __enable_irq();
 }
 
 void CurrentSampling_Service(void)
@@ -113,32 +229,47 @@ void CurrentSampling_Service(void)
     if (CurrentSampling_Elapsed(now,
                                 g_current_sampling.calibration_deadline_ms) != 0UL)
     {
+      /* deadline 是采样故障超时，不是正常结束条件。正常校准必须完整采满
+         target，禁止再用“只收到一个样本也算成功”的不确定 offset。 */
       g_current_sampling.calibration_deadline_ms = now +
-          CURRENT_SAMPLING_CAL_WINDOW_MS;
+          CURRENT_SAMPLING_CAL_TIMEOUT_MS;
       g_current_sampling.calibration_state = CURRENT_SAMPLING_CAL_COLLECTING;
     }
   }
   else if (g_current_sampling.calibration_state == CURRENT_SAMPLING_CAL_COLLECTING)
   {
-    if ((g_current_sampling.calibration_sample_count >=
-         g_current_sampling.calibration_target_samples) ||
-        (CurrentSampling_Elapsed(now,
-                                 g_current_sampling.calibration_deadline_ms) != 0UL))
+    if ((TIM1->BDTR & TIM_BDTR_MOE) != 0U)
     {
-      if (g_current_sampling.calibration_sample_count != 0UL)
-      {
-        g_current_sampling.offset_u = (uint16_t)
-            (g_current_sampling.calibration_sum_u /
-             g_current_sampling.calibration_sample_count);
-        g_current_sampling.offset_v = (uint16_t)
-            (g_current_sampling.calibration_sum_v /
-             g_current_sampling.calibration_sample_count);
-        g_current_sampling.calibration_state = CURRENT_SAMPLING_CAL_DONE;
-      }
-      else
+      g_current_sampling.calibration_state = CURRENT_SAMPLING_CAL_ERROR;
+      return;
+    }
+    if (g_current_sampling.calibration_sample_count >=
+        g_current_sampling.calibration_target_samples)
+    {
+      if (g_current_sampling.calibration_min_u == 0U ||
+          g_current_sampling.calibration_min_v == 0U ||
+          g_current_sampling.calibration_max_u >= 4095U ||
+          g_current_sampling.calibration_max_v >= 4095U ||
+          (uint32_t)(g_current_sampling.calibration_max_u - g_current_sampling.calibration_min_u) >
+              CURRENT_SAMPLING_CAL_MAX_SPAN ||
+          (uint32_t)(g_current_sampling.calibration_max_v - g_current_sampling.calibration_min_v) >
+              CURRENT_SAMPLING_CAL_MAX_SPAN)
       {
         g_current_sampling.calibration_state = CURRENT_SAMPLING_CAL_ERROR;
+        return;
       }
+      g_current_sampling.offset_u = (uint16_t)
+          (g_current_sampling.calibration_sum_u /
+           g_current_sampling.calibration_target_samples);
+      g_current_sampling.offset_v = (uint16_t)
+          (g_current_sampling.calibration_sum_v /
+           g_current_sampling.calibration_target_samples);
+      g_current_sampling.calibration_state = CURRENT_SAMPLING_CAL_DONE;
+    }
+    else if (CurrentSampling_Elapsed(now,
+                  g_current_sampling.calibration_deadline_ms) != 0UL)
+    {
+      g_current_sampling.calibration_state = CURRENT_SAMPLING_CAL_ERROR;
     }
   }
 }
@@ -161,19 +292,14 @@ float CurrentSampling_GetCurrentA(current_sampling_phase_t phase)
   uint16_t offset = (phase == CURRENT_SAMPLING_PHASE_V) ?
       g_current_sampling.offset_v : g_current_sampling.offset_u;
 
-  /* raw 和 offset 都是 16 倍过采样后的累加码；零点必须在同一
-     数值空间内相减，不能在这里或校准结果保存时先除以 16。 */
+  /* raw 和 offset 都是同一格式的右对齐 ADC 码，先在原始码空间相减。 */
   raw_delta = (int32_t)raw - (int32_t)offset;
   raw_delta *= (phase == CURRENT_SAMPLING_PHASE_V) ?
       (int32_t)g_current_sampling.polarity_v :
       (int32_t)g_current_sampling.polarity_u;
-  /* 只有从“累加码”换算回单次 ADC 等效电压时，物理安培换算才除以
-     oversampling_ratio。S16 FOC 接口不经过这条物理量换算路径。 */
-  return ((float)raw_delta * (float)g_current_sampling.vref_mv) /
-         ((float)g_current_sampling.oversampling_ratio *
-          (float)g_current_sampling.adc_full_scale *
-          1000.0f * ((float)g_current_sampling.shunt_resistor_uohm / 1000000.0f) *
-          g_current_sampling.opamp_gain);
+  /* JDR contains unshifted sums; use the selected hardware ratio exactly once. */
+  return (float)raw_delta * ((phase == CURRENT_SAMPLING_PHASE_V) ?
+      CURRENT_SAMPLING_V_A_PER_COUNT : CURRENT_SAMPLING_U_A_PER_COUNT);
 }
 
 static int16_t CurrentSampling_ClampS16(int32_t value)
@@ -217,8 +343,10 @@ void CurrentSampling_ReadFeedback_A(float *phase_u_a,
                                     float *phase_v_a,
                                     float *phase_w_a)
 {
-  float phase_u = CurrentSampling_GetCurrentA(CURRENT_SAMPLING_PHASE_U);
-  float phase_v = CurrentSampling_GetCurrentA(CURRENT_SAMPLING_PHASE_V);
+  float phase_u = (float)CurrentSampling_GetSignedDelta(
+      CURRENT_SAMPLING_PHASE_U) * CURRENT_SAMPLING_U_A_PER_COUNT;
+  float phase_v = (float)CurrentSampling_GetSignedDelta(
+      CURRENT_SAMPLING_PHASE_V) * CURRENT_SAMPLING_V_A_PER_COUNT;
   float phase_w = -(phase_u + phase_v);
 
   if (phase_u_a != NULL) *phase_u_a = phase_u;

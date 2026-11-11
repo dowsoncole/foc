@@ -1,0 +1,38 @@
+DS12589 Rev 6 19/198
+STM32G431x6 STM32G431x8 STM32G431xB Functional overview
+43
+3.6 Multi-AHB bus matrix
+The 32-bit multi-AHB bus matrix interconnects all the masters (CPU, DMAs) and the slaves 
+(Flash memory, RAM,AHB and APB peripherals). It also ensures a seamless and efficient 
+operation even when several high-speed peripherals work simultaneously.
+Figure 2. Multi-AHB bus matrix
+3.7 Boot modes
+At startup, a BOOT0 pin (or nBOOT0 option bit)and an nBOOT1 option bit are used to select 
+one of three boot options:
+• Boot from user Flash
+• Boot from system memory
+• Boot from embedded SRAM
+The BOOT0 value may come from the PB8-BOOT0 pin or from an nBOOT0 option bit 
+depending on the value of a user nBOOT_SEL option bit to free the GPIO pad if needed.
+The boot loader is located in the system memory. It is used to reprogram the Flash memory 
+by using USART, I2C, SPI, and USB through the DFU (device firmware upgrade).
+MS47544V1
+Cortex®-M4
+with FPU DMA1 DMA2
+CCM
+SRAM
+AHB1
+peripherals
+AHB2
+peripherals
+SRAM1
+FLASH
+128 KB
+ACCEL
+S-bus
+D-bus
+ICode
+DCode
+I-bus
+BusMatrix-S
+SRAM2

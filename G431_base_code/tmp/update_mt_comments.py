@@ -1,0 +1,2 @@
+from pathlib import Path
+p=Path('software/servo_v1/Modules/Encoder/Inc/mt6701_ssi.h');s=p.read_text(encoding='utf-8');s=s.replace('/* 临时测试默认启用。置 0 可在编译时完全移除 main 中的初始化和调度。 */','/* 默认选择 MT6701 SSI；Encoder_Init/TIM1 DMA 拥有 SPI1。置 0 选择旧 MT6835 后端。 */');s=s.replace('CRC 正确且非全零/全一，与磁场状态无关','CRC 正确且非全一，与磁场状态无关；零角度帧有效').replace('最近一次帧 CRC 正确且非空帧','最近一次帧 CRC 正确且非全一');s=s.replace('/* 主循环调用；不得从控制中断调用。默认每 1 ms 阻塞读一帧，超时 2 ms。 */','/* 独立通信诊断接口；闭环固件不调用，禁止与 Encoder 的 DMA 采样并用。 */');p.write_text(s,encoding='utf-8')

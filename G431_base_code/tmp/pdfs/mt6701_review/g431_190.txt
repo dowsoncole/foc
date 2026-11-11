@@ -1,0 +1,39 @@
+Package information STM32G431x6 STM32G431x8 STM32G431xB
+190/198 DS12589 Rev 6
+6.10 Thermal characteristics
+The maximum chip-junction temperature, TJ max, in degrees Celsius, may be calculated 
+using the following equation:
+TJ max = TA max + (PD max x ΘJA)
+Where:
+• TA max is the maximum ambient temperature in °C,
+• ΘJA is the package junction-to-ambient thermal resistance, in °C/W,
+• PD max is the sum of PINT max and PI/O max (PD max = PINT max + PI/Omax),
+• PINT max is the product of IDD and VDD, expressed in Watts. This is the maximum chip 
+internal power.
+PI/O max represents the maximum power dissipation on output pins where:
+PI/O max = Σ (VOL × IOL) + Σ ((VDDIOx – VOH) × IOH),
+taking into account the actual VOL / IOL and VOH / IOH of the I/Os at low and high level in the 
+application.
+          
+Table 100. Package thermal characteristics 
+Symbol Parameter Value Unit
+ΘJA
+Thermal resistance junction-ambient 
+LQFP100 - 14 × 14 mm 48.9
+°C/W
+Thermal resistance junction-ambient 
+LQFP80 - 12 × 12 mm 49.7
+Thermal resistance junction-ambient 
+LQFP64 - 10 × 10 mm 50.8
+Thermal resistance junction-ambient 
+LQFP48 - 7 × 7 mm 58.4
+Thermal resistance junction-ambient 
+LQFP32 - 7 × 7 mm 58.4
+Thermal resistance junction-ambient 
+UFBGA64 - 5 × 5 mm 44.2
+Thermal resistance junction-ambient 
+UFQFPN48 - 7 × 7 mm 28.6
+Thermal resistance junction-ambient 
+UFQFPN32 - 5 × 5 mm 36.7
+Thermal resistance junction-ambient 
+WLCSP49 - pitch 0.4 59

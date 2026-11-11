@@ -1,0 +1,13 @@
++------------------------------------------
+(1/1) Building context: "servo_v1+servo_v1"
+Using AC6 V6.24.0 compiler, from: 'C:/Users/penghao/AppData/Local/Keil_v5/ARM/ARMCLANG/Bin'
+Building CMake target 'servo_v1+servo_v1'
+Using compiler: AC6 V6.24.0
+[1/4] Building C object CMakeFiles/Group_Modules_Encoder.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/Modules/Encoder/Src/mpt_t485_protocol.o
+[2/4] Building C object CMakeFiles/Group_Modules_Encoder.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/Modules/Encoder/Src/mpt_t485.o
+[3/4] Building C object CMakeFiles/Group_Application_Core.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/Core/Src/main.o
+[4/4] Linking C executable C:\Users\penghao\Desktop\Servo_9948\G431_base_code\software\servo_v1\MDK-ARM\out\servo_v1\servo_v1\servo_v1.axf
+Program Size: Code=66240 RO-data=1388 RW-data=5044 ZI-data=25708  
++------------------------------------------------------------
+Build summary: 1 succeeded, 0 failed - Time Elapsed: 00:00:02
++============================================================

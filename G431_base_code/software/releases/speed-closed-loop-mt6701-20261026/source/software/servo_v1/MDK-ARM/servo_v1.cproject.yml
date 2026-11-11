@@ -1,0 +1,184 @@
+project:
+  packs:
+    - pack: ARM::CMSIS@^6.3.0
+    - pack: Keil::STM32G4xx_DFP@^2.2.0
+    - pack: ARM::CMSIS-NN@^4.0.0
+    - pack: ARM::CMSIS-DSP@^1.10.1
+  setups:
+    - setup: Options for servo_v1
+      processor:
+        fpu: sp
+      add-path:
+        - ../Core/Inc
+        - ../FOC/Inc
+        - ../Servo/Inc
+        - ../Modules/Driver_Communication/Inc
+        - ../Modules/Three_Phase_Driver/Inc
+        - ../Modules/Current_Sampling/Inc
+        - ../Modules/Encoder/Inc
+        - ../Tests/Inc
+        - ../Drivers/STM32G4xx_HAL_Driver/Inc
+        - ../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy
+        - ../Drivers/CMSIS/Device/ST/STM32G4xx/Include
+        - ../Drivers/CMSIS/Include
+      debug: "on"
+      define:
+        - USE_HAL_DRIVER
+        - STM32G431xx
+      misc:
+        - C:
+            - -std=c99
+          C-CPP:
+            - -ffp-mode=std
+            - -fno-finite-math-only
+            - -fno-rtti
+            - -funsigned-char
+            - -fshort-enums
+            - -fshort-wchar
+            - -ffunction-sections
+            - -Wno-packed
+            - -Wno-missing-variable-declarations
+            - -Wno-missing-prototypes
+            - -Wno-missing-noreturn
+            - -Wno-sign-conversion
+            - -Wno-nonportable-include-path
+            - -Wno-reserved-id-macro
+            - -Wno-unused-macros
+            - -Wno-documentation-unknown-command
+            - -Wno-documentation
+            - -Wno-license-management
+            - -Wno-parentheses-equality
+          CPP:
+            - -xc++
+            - -std=c++11
+            - -fno-exceptions
+          ASM:
+            - -masm=auto
+          Link:
+            - --map
+            - --load_addr_map_info
+            - --xref
+            - --callgraph
+            - --symbols
+            - --info sizes
+            - --info totals
+            - --info unused
+            - --info veneers
+            - --strict
+            - --summary_stderr
+            - --info summarysizes
+  linker:
+    - script: servo_v1_servo_v1.sct
+  groups:
+    - group: Application/Startup
+      files:
+        - file: startup_stm32g431xx.s
+    - group: Application/Core
+      files:
+        - file: ../Core/Src/main.c
+        - file: ../Core/Inc/main.h
+        - file: ../Core/Src/gpio.c
+        - file: ../Core/Inc/gpio.h
+        - file: ../Core/Src/stm32g4xx_it.c
+        - file: ../Core/Inc/stm32g4xx_it.h
+        - file: ../Core/Src/stm32g4xx_hal_msp.c
+        - file: ../Core/Inc/stm32g4xx_hal_conf.h
+    - group: Modules/Driver Communication
+      files:
+        - file: ../Modules/Driver_Communication/Src/i2c3_bus.c
+        - file: ../Modules/Driver_Communication/Inc/i2c3_bus.h
+        - file: ../Modules/Driver_Communication/Src/tim6_heartbeat.c
+        - file: ../Modules/Driver_Communication/Inc/tim6_heartbeat.h
+        - file: ../Modules/Driver_Communication/Src/stspin32g4.c
+        - file: ../Modules/Driver_Communication/Inc/stspin32g4.h
+        - file: ../Modules/Driver_Communication/Src/drv_monitor.c
+        - file: ../Modules/Driver_Communication/Inc/drv_monitor.h
+    - group: Modules/Three-Phase Driver
+      files:
+        - file: ../Modules/Three_Phase_Driver/Src/pwm_sampling.c
+        - file: ../Modules/Three_Phase_Driver/Inc/pwm_sampling.h
+        - file: ../Modules/Three_Phase_Driver/Src/tim1_pwm.c
+        - file: ../Modules/Three_Phase_Driver/Inc/tim1_pwm.h
+    - group: Modules/Encoder
+      files:
+        - file: ../Modules/Encoder/Src/mt6701_ssi.c
+        - file: ../Modules/Encoder/Inc/mt6701_ssi.h
+        - file: ../Modules/Encoder/Src/spi3_encoder.c
+        - file: ../Modules/Encoder/Inc/spi3_encoder.h
+        - file: ../Modules/Encoder/Src/encoder.c
+        - file: ../Modules/Encoder/Inc/encoder.h
+        - file: ../Modules/Encoder/Src/spi1_encoder.c
+        - file: ../Modules/Encoder/Inc/spi1_encoder.h
+        - file: ../Modules/Encoder/Src/mt6835.c
+        - file: ../Modules/Encoder/Inc/mt6835.h
+    - group: Tests
+      files:
+        - file: ../Tests/Src/mt6701_spi3_test.c
+        - file: ../Tests/Inc/mt6701_spi3_test.h
+        - file: ../Tests/Src/current_loop_test.c
+        - file: ../Tests/Inc/current_loop_test.h
+        - file: ../Tests/Src/waveform_uart1_port.c
+        - file: ../Tests/Inc/waveform_uart1_port.h
+        - file: ../Tests/Src/tim1_pwm_verify.c
+        - file: ../Tests/Inc/tim1_pwm_verify.h
+        - file: ../Tests/Inc/measurement_manager.h
+        - file: ../Tests/Src/waveform_generator.c
+        - file: ../Tests/Inc/waveform_generator.h
+    - group: Modules/Current Sampling
+      files:
+        - file: ../Modules/Current_Sampling/Src/adc1_current_sampling.c
+        - file: ../Modules/Current_Sampling/Inc/adc1_current_sampling.h
+        - file: ../Modules/Current_Sampling/Src/current_sampling.c
+        - file: ../Modules/Current_Sampling/Inc/current_sampling.h
+    - group: Modules/FOC
+      files:
+        - file: ../FOC/Src/foc_pi.c
+        - file: ../FOC/Inc/foc_pi.h
+        - file: ../FOC/Src/foc_current_tuning.c
+        - file: ../FOC/Inc/foc_current_tuning.h
+        - file: ../FOC/Inc/foc_control_manager.h
+        - file: ../FOC/Inc/foc_modulation.h
+        - file: ../FOC/Src/foc_modulation.c
+        - file: ../FOC/Src/foc_modulation_lut.h
+        - file: ../FOC/Inc/foc_algorithm.h
+        - file: ../FOC/Src/foc_algorithm.c
+        - file: ../FOC/Inc/foc_interface.h
+        - file: ../FOC/Src/foc_interface.c
+    - group: Application/Servo Manager
+      files:
+        - file: ../Servo/Inc/servo_manager.h
+        - file: ../Servo/Src/servo_manager.c
+        - file: ../Servo/Inc/speed_commission.h
+        - file: ../Servo/Src/speed_commission.c
+    - group: Drivers/STM32G4xx_HAL_Driver
+      files:
+        - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_pwr_ex.c
+        - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal.c
+        - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_rcc.c
+        - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_rcc_ex.c
+        - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_flash.c
+        - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_flash_ex.c
+        - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_flash_ramfunc.c
+        - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_gpio.c
+        - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_exti.c
+        - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_dma.c
+        - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_dma_ex.c
+        - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_pwr.c
+        - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_cortex.c
+        - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_i2c.c
+        - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_i2c_ex.c
+        - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_tim.c
+        - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_tim_ex.c
+        - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_adc.c
+        - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_adc_ex.c
+        - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_opamp.c
+        - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_opamp_ex.c
+        - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_uart.c
+        - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_uart_ex.c
+        - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_spi.c
+        - file: ../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_spi_ex.c
+    - group: Drivers/CMSIS
+      files:
+        - file: ../Core/Src/system_stm32g4xx.c
+  components:
+    - component: ARM::CMSIS:CORE

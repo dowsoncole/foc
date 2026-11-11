@@ -1,0 +1,92 @@
+Electrical characteristics STM32G431x6 STM32G431x8 STM32G431xB
+134/198 DS12589 Rev 6
+TW_to_W
+Minimal time between two 
+consecutive writes into the 
+DAC_DORx register to 
+guarantee a correct 
+DAC_OUT for a small 
+variation of the input code 
+(1 LSB) 
+DAC_MCR:MODEx[2:0] = 
+000 or 001 
+DAC_MCR:MODEx[2:0] = 
+010 or 011
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+CL ≤ 50 pF, RL ≥ 5 kΩ 
+ 
+CL ≤ 10 pF
+1
+1.4
+-- µ s
+t
+SAMP
+Sampling time in sample 
+and hold mode (code 
+transition between the 
+lowest input code and the 
+highest input code when 
+DACOUT reaches final 
+value ±1LSB)
+DAC_OUT 
+pin connected
+DAC output buffer 
+ON, C
+SH = 100 nF -0 . 7 3 . 5
+ms
+DAC output buffer 
+OFF, CSH = 100 nF -1 0 . 5 1 8
+DAC_OUT 
+pin not 
+connected 
+(internal 
+connection 
+only)
+DAC output buffer 
+OFF -2 3 . 5 µ s
+ I
+leak Output leakage current Sample and hold mode, 
+DAC_OUT pin connected -- - (3) nA
+CIint
+Internal sample and hold 
+capacitor - 5.2 7 8.8 pF
+tTRIM Middle code offset trim time DAC output buffer ON 50 - - µs
+Voffset
+Middle code offset for 1 trim 
+code step
+VREF+ = 3.6 V - 1500 -
+µV
+VREF+ = 1.8 V - 750 -
+IDDA(DAC) DAC consumption from 
+VDDA
+DAC output 
+buffer ON
+No load, middle 
+code (0x800) - 315 500
+µA
+No load, worst code 
+(0xF1C) - 450 670
+DAC output 
+buffer OFF
+No load, middle 
+code (0x800) -- 0 . 2
+Sample and hold mode, C
+SH = 
+100 nF -
+315 ₓ 
+Ton/(Ton
++Toff)
+(4)
+670 ₓ
+Ton/(Ton
++Toff)
+(4)
+Table 68. DAC 1MSPS characteristics(1) (continued)
+Symbol Parameter Conditions Min Typ Max Unit

@@ -1,0 +1,77 @@
+Electrical characteristics STM32G431x6 STM32G431x8 STM32G431xB
+136/198 DS12589 Rev 6
+          .
+Table 69. DAC 1MSPS accuracy(1) 
+Symbol Parameter Conditions Min Typ Max Unit
+DNL Differential non 
+linearity (2)
+DAC output buffer ON - - ±2
+LSB
+DAC output buffer OFF - - ±2
+- monotonicity 10 bits Guaranteed
+INL Integral non 
+linearity(3)
+DAC output buffer ON 
+CL ≤ 50 pF, RL ≥ 5 kΩ -- ± 4
+DAC output buffer OFF 
+CL ≤ 50 pF, no RL -- ± 4
+Offset Offset error at 
+code 0x800(3)
+DAC output buffer ON 
+CL ≤ 50 pF, RL ≥ 5 kΩ
+VREF+ = 3.6 V - - ±12
+VREF+ = 1.8 V - - ±25
+DAC output buffer OFF 
+CL ≤ 50 pF, no RL -- ± 8
+Offset1 Offset error at 
+code 0x001(4)
+DAC output buffer OFF 
+CL ≤ 50 pF, no RL -- ± 5
+OffsetCal
+Offset Error at 
+code 0x800 
+after calibration
+DAC output buffer ON 
+CL ≤ 50 pF, RL ≥ 5 kΩ
+VREF+ = 3.6 V - - ±5
+VREF+ = 1.8 V - - ±7
+Gain Gain error (5)
+DAC output buffer ON 
+CL ≤ 50 pF, RL ≥ 5 kΩ -- ± 0 . 5
+%
+DAC output buffer OFF 
+CL ≤ 50 pF, no RL -- ± 0 . 5
+TUE
+Total 
+unadjusted 
+error
+DAC output buffer ON 
+CL ≤ 50 pF, RL ≥ 5 kΩ -- ± 3 0
+LSB
+DAC output buffer OFF 
+CL ≤ 50 pF, no RL -- ± 1 2
+TUECal
+Total 
+unadjusted 
+error after 
+calibration
+DAC output buffer ON 
+CL ≤ 50 pF, RL ≥ 5 kΩ -- ± 2 3 L S B
+SNR Signal-to-noise 
+ratio
+DAC output buffer ON 
+CL ≤ 50 pF, RL ≥ 5 kΩ 
+1 kHz, BW 500 kHz
+-7 1 . 2-
+dB
+DAC output buffer OFF 
+CL ≤ 50 pF, no RL, 1 kHz 
+BW 500 kHz
+-7 1 . 6-
+THD Total harmonic 
+distortion
+DAC output buffer ON 
+CL ≤ 50 pF, RL ≥ 5 kΩ, 1 kHz -- 7 8-
+dB
+DAC output buffer OFF 
+CL ≤ 50 pF, no RL, 1 kHz -- 7 9-

@@ -1,0 +1,58 @@
+DS12589 Rev 6 135/198
+STM32G431x6 STM32G431x8 STM32G431xB Electrical characteristics
+160
+Figure 30. 12-bit buffered / non-buffered DAC
+1. The DAC integrates an output buffer to reduce th e output impedance and to drive external loads directly 
+without the use of an external operational amplifier. The buffer can be bypassed by configuring the BOFFx 
+bit in the DAC_CR register.
+IDDV(DAC) DAC consumption from 
+VREF+
+DAC output 
+buffer ON
+No load, middle 
+code (0x800) - 185 240
+µA
+No load, worst code 
+(0xF1C) - 340 400
+DAC output 
+buffer OFF
+No load, middle 
+code (0x800) - 155 205
+Sample and hold mode, buffer ON, 
+CSH = 100 nF, worst case -
+185 ₓ
+Ton/(Ton
++Toff)
+(4)
+400 ₓ
+Ton/(Ton
++Toff)
+(4)
+Sample and hold mode, buffer OFF, 
+C
+SH = 100 nF, worst case -
+155 ₓ
+Ton/(Ton
++Toff)
+(4)
+205 ₓ
+Ton/(Ton
++Toff)
+(4)
+1. Guaranteed by design.
+2. In buffered mode, the output can overshoot above the final  value for low input code (starting from min value).
+3. Refer to Table 53: I/O static characteristics.
+4. Ton is the Refresh phase duration. Toff is the Hold phase duration. Refer to the reference manual RM0440 "STM32G4 
+Series advanced Arm®-based 32-bit MCUs" for more details.
+Table 68. DAC 1MSPS characteristics(1) (continued)
+Symbol Parameter Conditions Min Typ Max Unit
+(1)Buffer
+12-bit
+digital to 
+analog
+converter
+Buffered/non-buffered DAC
+DACx_OUT
+RLOAD
+CLOAD
+ai17157d

@@ -1,0 +1,11 @@
+Electrical characteristics STM32G431x6 STM32G431x8 STM32G431xB
+156/198 DS12589 Rev 6
+SAI characteristics
+Unless otherwise specified, the parameters given in Table 85 for SAI are derived from tests 
+performed under the ambient temperature, fPCLKx frequency and VDD supply voltage condi-
+tions summarized inTable 17: General operating conditions, with the following configuration:
+• Output speed is set to OSPEEDRy[1:0] = 10
+• Capacitive load C = 30 pF
+• Measurement points are done at CMOS levels: 0.5 x VDD
+Refer to Section 5.3.14: I/O port characteristics for more details on the input/output alternate 
+function characteristics (CK,SD,FS).

@@ -1,0 +1,479 @@
+{
+  "date": "2026-10-26",
+  "root": "C:/Users/penghao/Desktop/Servo_9948/G431_base_code",
+  "baseline": "873e79473c8aa3accf8482f3019dae4c45381bd0",
+  "actions": [
+    {
+      "src": "README.md",
+      "dst": "software/docs/log/未注明日期_基础固件架构与审查历史记录.md",
+      "kind": "历史审查与设计",
+      "action": "copy"
+    },
+    {
+      "src": "ADC采样配置审查报告.md",
+      "dst": "software/docs/log/未注明日期_ADC采样配置静态审查.md",
+      "kind": "代码审查",
+      "action": "move"
+    },
+    {
+      "src": "software/servo_v1/MDK-ARM/docs/代码审查报告.md",
+      "dst": "software/docs/log/2026-10-16_伺服固件全模块代码审查.md",
+      "kind": "代码审查",
+      "action": "move"
+    },
+    {
+      "src": "software/servo_v1/MDK-ARM/docs/review_report_2026-10-17.md",
+      "dst": "software/docs/log/2026-10-17_FOC与采样链路代码审查.md",
+      "kind": "代码审查",
+      "action": "move"
+    },
+    {
+      "src": "software/servo_v1/MDK-ARM/docs/review_report_2026-10-18.md",
+      "dst": "software/docs/log/2026-10-18_FOC增量审查与问题跟踪.md",
+      "kind": "代码审查",
+      "action": "move"
+    },
+    {
+      "src": "software/servo_v1/MDK-ARM/docs/review_report_2026-10-19.md",
+      "dst": "software/docs/log/2026-10-19_模式切换与波形链路代码审查.md",
+      "kind": "代码审查",
+      "action": "move"
+    },
+    {
+      "src": "software/servo_v1/MDK-ARM/docs/daily_changes_2026-10-18.md",
+      "dst": "software/docs/log/2026-10-18_伺服状态管理_SVPWM过调制与动态采样开发日志.md",
+      "kind": "开发调试记录",
+      "action": "move"
+    },
+    {
+      "src": "software/servo_v1/MDK-ARM/docs/daily_changes_2026-10-19.md",
+      "dst": "software/docs/log/2026-10-19_FOC电压开环实机运行与时序验证日志.md",
+      "kind": "开发调试记录",
+      "action": "move"
+    },
+    {
+      "src": "software/servo_v1/MDK-ARM/docs/daily_changes_2026-10-19_afternoon.md",
+      "dst": "software/docs/log/2026-10-19_下午_控制模式统一与波形链路开发日志.md",
+      "kind": "开发调试记录",
+      "action": "move"
+    },
+    {
+      "src": "software/servo_v1/MDK-ARM/docs/current_open_loop_dq_closed_loop_fix.md",
+      "dst": "software/docs/log/未注明日期_DQ电流闭环极性与采样时序修复记录.md",
+      "kind": "开发调试记录",
+      "action": "move"
+    },
+    {
+      "src": "software/servo_v1/MDK-ARM/docs/电流采样校准启动设计.md",
+      "dst": "software/docs/log/未注明日期_电流校准启动与复位尖峰设计排查记录.md",
+      "kind": "设计与排查",
+      "action": "move"
+    },
+    {
+      "src": "software/servo_v1/MDK-ARM/docs/issue.md",
+      "dst": "software/docs/log/未注明日期_采样_FOC_编码器与测试待办跟踪.md",
+      "kind": "历史问题跟踪",
+      "action": "move"
+    },
+    {
+      "src": "software/servo_v1/MDK-ARM/docs/电流环速度环验收标准.md",
+      "dst": "software/docs/log/2026-10-23_电流环与速度环验收方案及记录模板.md",
+      "kind": "历史验收方案",
+      "action": "move"
+    },
+    {
+      "src": "software/servo_v1/MDK-ARM/docs/output_position_mpt.md",
+      "dst": "software/docs/log/2026-10-26_MPT输出轴位置闭环接入与实机验收.md",
+      "kind": "开发调试记录",
+      "action": "move"
+    },
+    {
+      "src": "software/servo_v1/MDK-ARM/docs/encoder/encoder_analysis_log_2026-10-20.md",
+      "dst": "software/docs/log/2026-10-20_编码器分层接口与测速方案分析记录.md",
+      "kind": "设计分析",
+      "action": "move"
+    },
+    {
+      "src": "software/servo_v1/MDK-ARM/docs/encoder/spi_logic_analysis_2026-10-22.md",
+      "dst": "software/docs/log/2026-10-22至2026-10-24_MT6835通讯异常与高速时序调试日志.md",
+      "kind": "开发调试记录",
+      "action": "move"
+    },
+    {
+      "src": "software/servo_v1/MDK-ARM/docs/字段/编码器结构体字段说明.md",
+      "dst": "software/docs/log/2026-10-22_SPI提速与编码器隔离调试补充记录.md",
+      "kind": "历史调试摘录",
+      "action": "extract",
+      "startLine": 310,
+      "endLine": 450
+    },
+    {
+      "src": "software/servo_v1/Tests/mt6701_spi3_test.md",
+      "dst": "software/docs/log/2026-10-23_MT6701_SPI3通信方案与实测日志.md",
+      "kind": "开发调试记录",
+      "action": "move"
+    },
+    {
+      "src": "software/servo_v1/FOC/README.md",
+      "dst": "software/docs/log/未注明日期_过调制与动态电流采样设计验证记录.md",
+      "kind": "设计与验证",
+      "action": "move"
+    },
+    {
+      "src": "software/servo_v1/2026-10-22_文档汇总/2026-10-22_文档汇总/2026-10-22_代码审查报告.md",
+      "dst": "software/docs/log/2026-10-22_文档汇总代码审查记录.md",
+      "kind": "代码审查",
+      "action": "move"
+    },
+    {
+      "src": "software/servo_v1/2026-10-22_文档汇总/2026-10-22_文档汇总/2026-10-22_验证记录.md",
+      "dst": "software/docs/log/2026-10-22_文档汇总验证与证据记录.md",
+      "kind": "验证记录",
+      "action": "move"
+    },
+    {
+      "src": "software/servo_v1/2026-10-22_文档汇总/2026-10-22_文档汇总/闭环整定模块实施路径.md",
+      "dst": "software/docs/log/2026-10-22_闭环整定模块实施方案_规划记录.md",
+      "kind": "历史规划",
+      "action": "move"
+    },
+    {
+      "src": "software/servo_v1/2026-10-22_文档汇总/2026-10-22_文档汇总/系统性能评估模块实施路径.md",
+      "dst": "software/docs/log/2026-10-22_系统性能评估实施方案_规划记录.md",
+      "kind": "历史规划",
+      "action": "move"
+    },
+    {
+      "src": "software/servo_v1/2026-10-22_文档汇总/2026-10-22_文档汇总/故障保护模块实施路径.md",
+      "dst": "software/docs/log/2026-10-22_故障保护模块实施方案_规划记录.md",
+      "kind": "历史规划",
+      "action": "move"
+    },
+    {
+      "src": "software/servo_v1/2026-10-22_文档汇总/2026-10-22_文档汇总/串口PC通讯模块实施路径.md",
+      "dst": "software/docs/log/2026-10-22_串口PC通讯实施方案_规划记录.md",
+      "kind": "历史规划",
+      "action": "move"
+    },
+    {
+      "src": "software/servo_v1/2026-10-22_文档汇总/2026-10-22_文档汇总/上位机读写参数表.md",
+      "dst": "software/docs/log/2026-10-22_上位机参数字典草案_规划记录.md",
+      "kind": "历史规划",
+      "action": "move"
+    },
+    {
+      "src": "software/control_analysis/2026-10-20_ADC配置对比实测.md",
+      "dst": "software/docs/log/2026-10-20_ADC配置对比实测.md",
+      "kind": "开发调试记录",
+      "action": "move"
+    },
+    {
+      "src": "software/control_analysis/2026-10-20_Q轴顶格与RS485截帧排查.md",
+      "dst": "software/docs/log/2026-10-20_Q轴顶格与RS485截帧排查.md",
+      "kind": "开发调试记录",
+      "action": "move"
+    },
+    {
+      "src": "software/control_analysis/2026-10-20_固定零电角度DQ电流环工作日志.md",
+      "dst": "software/docs/log/2026-10-20_固定零电角度DQ电流环工作日志.md",
+      "kind": "开发调试记录",
+      "action": "move"
+    },
+    {
+      "src": "software/control_analysis/2026-10-20_实机下载与保护停机记录.md",
+      "dst": "software/docs/log/2026-10-20_实机下载与保护停机记录.md",
+      "kind": "开发调试记录",
+      "action": "move"
+    },
+    {
+      "src": "software/control_analysis/2026-10-20_零给定与串口波形核查.md",
+      "dst": "software/docs/log/2026-10-20_零给定与串口波形核查.md",
+      "kind": "开发调试记录",
+      "action": "move"
+    },
+    {
+      "src": "software/control_analysis/2026-10-21_PI候选实测比较与续测状态.md",
+      "dst": "software/docs/log/2026-10-21_PI候选实测比较与续测状态.md",
+      "kind": "开发调试记录",
+      "action": "move"
+    },
+    {
+      "src": "software/control_analysis/2026-10-21_启动0x0A修复与高速编码器排查.md",
+      "dst": "software/docs/log/2026-10-21_启动0x0A修复与高速编码器排查.md",
+      "kind": "开发调试记录",
+      "action": "move"
+    },
+    {
+      "src": "software/control_analysis/2026-10-21_持续速度闭环与15A保护调试日志.md",
+      "dst": "software/docs/log/2026-10-21_持续速度闭环与15A保护调试日志.md",
+      "kind": "开发调试记录",
+      "action": "move"
+    },
+    {
+      "src": "software/control_analysis/2026-10-21_控制周期修复与重新整定日志.md",
+      "dst": "software/docs/log/2026-10-21_控制周期修复与重新整定日志.md",
+      "kind": "开发调试记录",
+      "action": "move"
+    },
+    {
+      "src": "software/control_analysis/2026-10-21_速度闭环详细工作日志.md",
+      "dst": "software/docs/log/2026-10-21_速度闭环详细工作日志.md",
+      "kind": "开发调试记录",
+      "action": "move"
+    },
+    {
+      "src": "software/control_analysis/2026-10-22_2500rpm停机与高速反馈时序排查.md",
+      "dst": "software/docs/log/2026-10-22_2500rpm停机与高速反馈时序排查.md",
+      "kind": "开发调试记录",
+      "action": "move"
+    },
+    {
+      "src": "software/control_analysis/2026-10-22_PA0编码器通讯标记与逻辑分析仪核对.md",
+      "dst": "software/docs/log/2026-10-22_PA0编码器通讯标记与逻辑分析仪核对.md",
+      "kind": "开发调试记录",
+      "action": "move"
+    },
+    {
+      "src": "software/control_analysis/2026-10-22_取消连续速度相电流软件跳闸.md",
+      "dst": "software/docs/log/2026-10-22_取消连续速度相电流软件跳闸.md",
+      "kind": "开发调试记录",
+      "action": "move"
+    },
+    {
+      "src": "software/control_analysis/MATLAB辨识与整定结果.md",
+      "dst": "software/docs/log/未注明日期_MATLAB速度辨识与整定结果汇总.md",
+      "kind": "辨识结果",
+      "action": "move"
+    },
+    {
+      "src": "software/control_analysis/results/encoder_lifecycle_fix_20261022/README.md",
+      "dst": "software/docs/log/2026-10-22_SPI_DMA生命周期恢复修复交付记录.md",
+      "kind": "修复交付",
+      "action": "move"
+    },
+    {
+      "src": "software/control_analysis/results/encoder_lifecycle_fix_20261022/analysis_before_review.md",
+      "dst": "software/docs/log/2026-10-22_SPI逻辑分析初稿_已被复核修正.md",
+      "kind": "历史诊断初稿",
+      "action": "move"
+    },
+    {
+      "src": "software/control_analysis/results/encoder_lifecycle_fix_20261022/analysis_reviewed.md",
+      "dst": "software/docs/log/2026-10-22_SPI逻辑分析复核与恢复修复记录.md",
+      "kind": "诊断复核",
+      "action": "move"
+    },
+    {
+      "src": "software/control_analysis/results/highspeed_7500_20261022/README.md",
+      "dst": "software/docs/log/2026-10-22_7500rpm速度闭环实板验收记录.md",
+      "kind": "实板验收",
+      "action": "move"
+    },
+    {
+      "src": "software/control_analysis/results/highspeed_7500_release_20261022/README.md",
+      "dst": "software/docs/log/2026-10-22_7500rpm速度闭环发布副本验收记录.md",
+      "kind": "实板验收副本",
+      "action": "move"
+    },
+    {
+      "src": "software/control_analysis/results/highspeed_7500_release_20261022/report.md",
+      "dst": "software/docs/log/2026-10-22_7500rpm发布时SPI诊断记录.md",
+      "kind": "历史诊断",
+      "action": "move"
+    },
+    {
+      "src": "software/control_analysis/results/highspeed_i2t_6arms_18arms_5s_20261022/README.md",
+      "dst": "software/docs/log/2026-10-22_I2t过载保护候选构建与软件验证.md",
+      "kind": "候选验证",
+      "action": "move"
+    },
+    {
+      "src": "software/control_analysis/results/highspeed_csfirst_20261023/README.md",
+      "dst": "software/docs/log/2026-10-23_CS优先候选启动过流与零位漂移记录.md",
+      "kind": "失败记录",
+      "action": "move"
+    },
+    {
+      "src": "software/control_analysis/results/highspeed_diagnosis_20261023/README.md",
+      "dst": "software/docs/log/2026-10-23_8200rpm续测与机械零位漂移排查.md",
+      "kind": "实机排查",
+      "action": "move"
+    },
+    {
+      "src": "software/control_analysis/results/glued_slew_medium_20261023/README.md",
+      "dst": "software/docs/log/2026-10-23_GPIO边沿速率对照与高速故障记录.md",
+      "kind": "对照试验",
+      "action": "move"
+    },
+    {
+      "src": "software/control_analysis/results/secured_align3a_slow_20261023/README.md",
+      "dst": "software/docs/log/2026-10-23_3A慢斜坡对齐候选与验证记录.md",
+      "kind": "候选验证",
+      "action": "move"
+    },
+    {
+      "src": "software/control_analysis/results/zero_bidirectional_candidate_20261023/README.md",
+      "dst": "software/docs/log/2026-10-23_双向零位首版候选启动超时记录.md",
+      "kind": "失败记录",
+      "action": "move"
+    },
+    {
+      "src": "software/control_analysis/results/zero_bidirectional_readyfix_20261023/README.md",
+      "dst": "software/docs/log/2026-10-23_双向零位诊断就绪流程修复记录.md",
+      "kind": "修复记录",
+      "action": "move"
+    },
+    {
+      "src": "software/control_analysis/results/zero_config_guard_20261023/README.md",
+      "dst": "software/docs/log/2026-10-23_MT6835零点配置监测候选记录.md",
+      "kind": "诊断候选",
+      "action": "move"
+    },
+    {
+      "src": "software/control_analysis/results/mt6835_zero_trace_20261023/README.md",
+      "dst": "software/docs/log/2026-10-23_MT6835零位原始故障捕获候选记录.md",
+      "kind": "诊断候选",
+      "action": "move"
+    },
+    {
+      "src": "software/control_analysis/results/mt6701_spi3_cs_20261023_152804/verification.md",
+      "dst": "software/docs/log/2026-10-23_MT6701_SPI3软件片选断点验证.md",
+      "kind": "实机验证",
+      "action": "move"
+    },
+    {
+      "src": "software/control_analysis/results/mt6701_spi3_verify_20261023_150246/verification.md",
+      "dst": "software/docs/log/2026-10-23_MT6701_SPI3首次烧录与通信失败记录.md",
+      "kind": "实机验证",
+      "action": "move"
+    },
+    {
+      "src": "software/control_analysis/results/speed_measured_summary.md",
+      "dst": "software/docs/log/未注明日期_速度测试时域与频域实测汇总.md",
+      "kind": "生成报告",
+      "action": "move"
+    },
+    {
+      "src": "software/servo_v1/README.md",
+      "dst": "software/docs/架构说明.md",
+      "action": "delete",
+      "kind": "重复或过时用户说明"
+    },
+    {
+      "src": "software/control_analysis/README.md",
+      "dst": "software/docs/架构说明.md",
+      "action": "delete",
+      "kind": "重复或过时用户说明"
+    },
+    {
+      "src": "software/control_analysis/速度闭环_用户说明.md",
+      "dst": "software/docs/架构说明.md",
+      "action": "delete",
+      "kind": "重复或过时用户说明"
+    },
+    {
+      "src": "software/servo_v1/MDK-ARM/docs/程序架构与执行逻辑.md",
+      "dst": "software/docs/架构说明.md",
+      "action": "delete",
+      "kind": "重复或过时用户说明"
+    },
+    {
+      "src": "software/servo_v1/MDK-ARM/docs/代码框架说明.md",
+      "dst": "software/docs/架构说明.md",
+      "action": "delete",
+      "kind": "重复或过时用户说明"
+    },
+    {
+      "src": "software/servo_v1/MDK-ARM/docs/电流采样.md",
+      "dst": "software/docs/架构说明.md",
+      "action": "delete",
+      "kind": "重复或过时用户说明"
+    },
+    {
+      "src": "software/servo_v1/MDK-ARM/docs/control_loop_organization.md",
+      "dst": "software/docs/架构说明.md",
+      "action": "delete",
+      "kind": "重复或过时用户说明"
+    },
+    {
+      "src": "software/servo_v1/MDK-ARM/docs/foc.md",
+      "dst": "software/docs/架构说明.md",
+      "action": "delete",
+      "kind": "重复或过时用户说明"
+    },
+    {
+      "src": "software/servo_v1/MDK-ARM/docs/pc_waveform_protocol.md",
+      "dst": "software/docs/架构说明.md",
+      "action": "delete",
+      "kind": "重复或过时用户说明"
+    },
+    {
+      "src": "software/servo_v1/MDK-ARM/docs/rs485_waveform_test.md",
+      "dst": "software/docs/架构说明.md",
+      "action": "delete",
+      "kind": "重复或过时用户说明"
+    },
+    {
+      "src": "software/servo_v1/MDK-ARM/docs/run.md",
+      "dst": "software/docs/架构说明.md",
+      "action": "delete",
+      "kind": "重复或过时用户说明"
+    },
+    {
+      "src": "software/servo_v1/MDK-ARM/docs/running与MOE配合关系.md",
+      "dst": "software/docs/架构说明.md",
+      "action": "delete",
+      "kind": "重复或过时用户说明"
+    },
+    {
+      "src": "software/servo_v1/MDK-ARM/docs/字段/速度闭环结构体字段说明.md",
+      "dst": "software/docs/架构说明.md",
+      "action": "delete",
+      "kind": "重复或过时用户说明"
+    },
+    {
+      "src": "software/servo_v1/MDK-ARM/docs/encoder/README.md",
+      "dst": "software/docs/架构说明.md",
+      "action": "delete",
+      "kind": "重复或过时用户说明"
+    },
+    {
+      "src": "software/servo_v1/MDK-ARM/docs/encoder/encoder_user_guide.md",
+      "dst": "software/docs/架构说明.md",
+      "action": "delete",
+      "kind": "重复或过时用户说明"
+    },
+    {
+      "src": "software/servo_v1/2026-10-22_文档汇总/2026-10-22_文档汇总/README.md",
+      "dst": "software/docs/架构说明.md",
+      "action": "delete",
+      "kind": "重复或过时用户说明"
+    },
+    {
+      "src": "software/servo_v1/2026-10-22_文档汇总/2026-10-22_文档汇总/项目入口.md",
+      "dst": "software/docs/架构说明.md",
+      "action": "delete",
+      "kind": "重复或过时用户说明"
+    },
+    {
+      "src": "software/servo_v1/2026-10-22_文档汇总/2026-10-22_文档汇总/项目简明说明.md",
+      "dst": "software/docs/架构说明.md",
+      "action": "delete",
+      "kind": "重复或过时用户说明"
+    },
+    {
+      "src": "software/servo_v1/2026-10-22_文档汇总/2026-10-22_文档汇总/项目技术说明.md",
+      "dst": "software/docs/架构说明.md",
+      "action": "delete",
+      "kind": "重复或过时用户说明"
+    }
+  ],
+  "excluded": [
+    "software/releases/",
+    "software/control_analysis/results/**/source/",
+    "software/control_analysis/results/**/source_snapshot/",
+    "hardware/",
+    "tmp/"
+  ],
+  "note": "原始数据、固件、脚本与历史源码快照留在原位置；只迁移活跃工程文档及散落的开发报告。"
+}

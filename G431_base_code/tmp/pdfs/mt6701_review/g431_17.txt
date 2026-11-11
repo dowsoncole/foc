@@ -1,0 +1,40 @@
+DS12589 Rev 6 17/198
+STM32G431x6 STM32G431x8 STM32G431xB Functional overview
+43
+3 Functional overview
+3.1 Arm ® Cortex®-M4 core with FPU
+The Arm® Cortex®-M4 with FPU processor is the latest generation of Arm processors for 
+embedded systems. It was developed to provide a low-cost platform that meets the needs of 
+the MCU implementation, with a reduced pin count and with low-power consumption, while 
+delivering outstanding computational performance and an advanced response to interrupts.
+The Arm
+® Cortex®-M4 with FPU 32-bit RISC processor features an exceptional code-
+efficiency, delivering the expected high-performance from an Arm core in a memory size 
+usually associated with 8-bit and 16-bit devices.
+The processor supports a set of DSP instructions which allows an efficient signal processing 
+and a complex algorithm execution. Its single precision FPU speeds up the software 
+development by using metalanguage development tools to avoid saturation.
+With its embedded Arm core, the STM32G431x6/x8/xB family is compatible with all Arm 
+tools and software.
+Figure 1 shows the general block diagram of the STM32G431x6/x8/xB devices.
+3.2 Adaptive real-time memory  accelerator (ART accelerator)
+The ART accelerator is a memory accelerator that is optimized for the STM32 industry-
+standard Arm® Cortex®-M4 processors. It balances the inherent performance advantage of 
+the Arm® Cortex®-M4 over Flash memory technologies, which normally requires the 
+processor to wait for the Flash memory at higher frequencies.
+3.3 Memory protection unit
+The memory protection unit (MPU) is used to manage the CPU accesses to the memory 
+and to prevent one task to accidentally corrupt the memory or the resources used by any 
+other active task. This memory area is organized into up to 8 protected areas, which can be 
+divided in up into 8 subareas each. The protection area sizes range between 32 bytes and 
+the whole 4 gigabytes of addressable memory.
+The MPU is especially helpful for applications where some critical or certified code has to be 
+protected against the misbehavior of other tasks. It is usually managed by an RTOS (real-
+time operating system). If a program accesses a memory location that is prohibited by the 
+MPU, the RTOS can detect it and take action. In an RTOS environment, the kernel can 
+dynamically update the MPU area setting based on the process to be executed.
+The MPU is optional and can be bypassed for applications that do not need it.
+3.4 Embedded Flash memory
+The STM32G431x6/x8/xB devices feature up to 128 Kbytes of embedded Flash memory 
+which is available for storing programs and data. 
+Flexible protections can be configured thanks to the option bytes:

@@ -1,0 +1,32 @@
+www.magntek.com.cn | 磁技术带来美妙变革 1.8版本  2022.12
+MT6701
+基于差分霍尔的磁性角度传感器芯片
+25
+SSI协议时序如图-24，通信起始于CSN的下降沿，在CLK的上升沿发送数据 ，CSN拉高后整个
+通信停止。SSI通信请严格按照时序图，发送正确的跳变沿以及准确的时钟脉冲个数。
+7.8.1  SSI时序图
+图-24: SSI 时序图
+SSI 时序参数
+参数 描述 最小值 典型值 最大值 单位
+TH CSN上升沿和CLK下降沿时间间隔 100 - ns
+TCLK 时钟周期 64 - ns
+TCLKL 时钟低电平时间 30 - ns
+TCLKH 时钟高电平时间 30 - ns
+TL CLK 最后一个下降沿和CSN上升沿时间间隔 0.5•TCLK - ns
+TR 数字信号上升沿(20pf负载) - 10 - ns
+TF 数字信号下降沿(20pf负载） - 10 - ns
+TDV DO数据等待时间 (20pf负载) - - 15 ns
+CSN
+(Input)
+CLK
+(Input)
+DO
+(Output)
+TH TCLK TCLKL TCLKH
+TDV
+TL
+Data N Data N+1
+CSN, CLK, DO
+0.8VDD
+0.2VDD
+TR TF

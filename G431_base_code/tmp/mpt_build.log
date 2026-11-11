@@ -1,0 +1,77 @@
++------------------------------------------
+(1/1) Cleaning context: "servo_v1+servo_v1"
++------------------------------------------
+(1/1) Building context: "servo_v1+servo_v1"
+Using AC6 V6.24.0 compiler, from: 'C:/Users/penghao/AppData/Local/Keil_v5/ARM/ARMCLANG/Bin'
+Building CMake target 'servo_v1+servo_v1'
+Using compiler: AC6 V6.24.0
+[1/61] Building C object CMakeFiles/Group_Application_Core.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/Core/Src/gpio.o
+[2/61] Building C object CMakeFiles/Group_Modules_Encoder.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/Modules/Encoder/Src/mpt_t485_protocol.o
+[3/61] Building C object CMakeFiles/Group_Modules_Three-Phase_Driver.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/Modules/Three_Phase_Driver/Src/pwm_sampling.o
+[4/61] Building C object CMakeFiles/Group_Modules_Encoder.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/Servo/Src/output_position_math.o
+[5/61] Building C object CMakeFiles/Group_Modules_Driver_Communication.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/Modules/Driver_Communication/Src/i2c3_bus.o
+[6/61] Building C object CMakeFiles/Group_Application_Core.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/Core/Src/stm32g4xx_it.o
+[7/61] Building C object CMakeFiles/Group_Modules_Driver_Communication.dir/23581a5b8af5e9a50293133ff52032e6/G431_base_code/software/servo_v1/Modules/Driver_Communication/Src/tim6_heartbeat.o
+[8/61] Building C object CMakeFiles/Group_Application_Core.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/Core/Src/stm32g4xx_hal_msp.o
+[9/61] Building ASM object CMakeFiles/Group_Application_Startup.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/startup_stm32g431xx.o
+armclang: warning: argument unused during compilation: '-MD' [-Wunused-command-line-argument]
+armclang: warning: argument unused during compilation: '-MT CMakeFiles/Group_Application_Startup.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/MDK-ARM/startup_stm32g431xx.o' [-Wunused-command-line-argument]
+armclang: warning: argument unused during compilation: '-MF CMakeFiles\Group_Application_Startup.dir\C_\Users\penghao\Desktop\Servo_9948\G431_base_code\software\servo_v1\MDK-ARM\startup_stm32g431xx.o.d' [-Wunused-command-line-argument]
+Warning: A1950W: The legacy armasm assembler is deprecated. Consider using the armclang integrated assembler instead.
+0 Errors, 1 Warning
+[10/61] Building C object CMakeFiles/Group_Modules_Encoder.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/Servo/Src/output_position.o
+[11/61] Building C object CMakeFiles/Group_Modules_Driver_Communication.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/Modules/Driver_Communication/Src/stspin32g4.o
+[12/61] Building C object CMakeFiles/Group_Modules_Driver_Communication.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/Modules/Driver_Communication/Src/drv_monitor.o
+[13/61] Building C object CMakeFiles/Group_Modules_Encoder.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/Modules/Encoder/Src/mpt_t485.o
+[14/61] Building C object CMakeFiles/Group_Modules_Encoder.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/Modules/Encoder/Src/spi3_encoder.o
+[15/61] Building C object CMakeFiles/Group_Modules_Encoder.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/Modules/Encoder/Src/mt6701_ssi.o
+[16/61] Building C object CMakeFiles/Group_Tests.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/Tests/Src/current_loop_test.o
+[17/61] Building C object CMakeFiles/Group_Modules_Three-Phase_Driver.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/Modules/Three_Phase_Driver/Src/tim1_pwm.o
+[18/61] Building C object CMakeFiles/Group_Modules_Encoder.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/Modules/Encoder/Src/mt6835.o
+[19/61] Building C object CMakeFiles/Group_Modules_Encoder.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/Modules/Encoder/Src/spi1_encoder.o
+[20/61] Building C object CMakeFiles/Group_Tests.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/Tests/Src/mt6701_spi3_test.o
+[21/61] Building C object CMakeFiles/Group_Modules_FOC.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/FOC/Src/foc_interface.o
+[22/61] Building C object CMakeFiles/Group_Tests.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/Tests/Src/waveform_uart1_port.o
+[23/61] Building C object CMakeFiles/Group_Tests.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/Tests/Src/tim1_pwm_verify.o
+[24/61] Building C object CMakeFiles/Group_Modules_Encoder.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/Modules/Encoder/Src/encoder.o
+[25/61] Building C object CMakeFiles/Group_Tests.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/Tests/Src/waveform_generator.o
+[26/61] Building C object CMakeFiles/Group_Modules_FOC.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/FOC/Src/foc_current_tuning.o
+[27/61] Building C object CMakeFiles/Group_Modules_FOC.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/FOC/Src/foc_modulation.o
+[28/61] Building C object CMakeFiles/Group_Modules_Current_Sampling.dir/23581a5b8af5e9a50293133ff52032e6/G431_base_code/software/servo_v1/Modules/Current_Sampling/Src/adc1_current_sampling.o
+[29/61] Building C object CMakeFiles/Group_Modules_FOC.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/FOC/Src/foc_pi.o
+[30/61] Building C object CMakeFiles/Group_Application_Servo_Manager.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/Servo/Src/servo_manager.o
+[31/61] Building C object CMakeFiles/Group_Modules_FOC.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/FOC/Src/foc_algorithm.o
+[32/61] Building C object CMakeFiles/Group_Application_Core.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/Core/Src/main.o
+[33/61] Building C object CMakeFiles/Group_Modules_Current_Sampling.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/Modules/Current_Sampling/Src/current_sampling.o
+[34/61] Building C object CMakeFiles/Group_Drivers_STM32G4xx_HAL_Driver.dir/01125ee793e075b7c28def12d52c856c/software/servo_v1/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_flash_ramfunc.o
+[35/61] Building C object CMakeFiles/Group_Drivers_STM32G4xx_HAL_Driver.dir/23581a5b8af5e9a50293133ff52032e6/G431_base_code/software/servo_v1/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal.o
+[36/61] Building C object CMakeFiles/Group_Drivers_STM32G4xx_HAL_Driver.dir/01125ee793e075b7c28def12d52c856c/software/servo_v1/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_pwr_ex.o
+[37/61] Building C object CMakeFiles/Group_Drivers_STM32G4xx_HAL_Driver.dir/01125ee793e075b7c28def12d52c856c/software/servo_v1/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_flash.o
+[38/61] Building C object CMakeFiles/Group_Drivers_STM32G4xx_HAL_Driver.dir/01125ee793e075b7c28def12d52c856c/software/servo_v1/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_gpio.o
+[39/61] Building C object CMakeFiles/Group_Drivers_STM32G4xx_HAL_Driver.dir/01125ee793e075b7c28def12d52c856c/software/servo_v1/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_rcc.o
+[40/61] Building C object CMakeFiles/Group_Drivers_STM32G4xx_HAL_Driver.dir/01125ee793e075b7c28def12d52c856c/software/servo_v1/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_rcc_ex.o
+[41/61] Building C object CMakeFiles/Group_Drivers_STM32G4xx_HAL_Driver.dir/01125ee793e075b7c28def12d52c856c/software/servo_v1/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_exti.o
+[42/61] Building C object CMakeFiles/Group_Drivers_STM32G4xx_HAL_Driver.dir/01125ee793e075b7c28def12d52c856c/software/servo_v1/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_flash_ex.o
+[43/61] Building C object CMakeFiles/Group_Drivers_STM32G4xx_HAL_Driver.dir/01125ee793e075b7c28def12d52c856c/software/servo_v1/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_dma_ex.o
+[44/61] Building C object CMakeFiles/Group_Drivers_STM32G4xx_HAL_Driver.dir/01125ee793e075b7c28def12d52c856c/software/servo_v1/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_pwr.o
+[45/61] Building C object CMakeFiles/Group_Application_Servo_Manager.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/Servo/Src/speed_commission.o
+[46/61] Building C object CMakeFiles/Group_Drivers_STM32G4xx_HAL_Driver.dir/01125ee793e075b7c28def12d52c856c/software/servo_v1/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_dma.o
+[47/61] Building C object CMakeFiles/Group_Drivers_STM32G4xx_HAL_Driver.dir/01125ee793e075b7c28def12d52c856c/software/servo_v1/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_cortex.o
+[48/61] Building C object CMakeFiles/Group_Drivers_STM32G4xx_HAL_Driver.dir/01125ee793e075b7c28def12d52c856c/software/servo_v1/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_i2c_ex.o
+[49/61] Building C object CMakeFiles/Group_Drivers_STM32G4xx_HAL_Driver.dir/01125ee793e075b7c28def12d52c856c/software/servo_v1/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_opamp_ex.o
+[50/61] Building C object CMakeFiles/Group_Drivers_STM32G4xx_HAL_Driver.dir/01125ee793e075b7c28def12d52c856c/software/servo_v1/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_spi_ex.o
+[51/61] Building C object CMakeFiles/Group_Drivers_STM32G4xx_HAL_Driver.dir/01125ee793e075b7c28def12d52c856c/software/servo_v1/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_opamp.o
+[52/61] Building C object CMakeFiles/Group_Drivers_CMSIS.dir/C_/Users/penghao/Desktop/Servo_9948/G431_base_code/software/servo_v1/Core/Src/system_stm32g4xx.o
+[53/61] Building C object CMakeFiles/Group_Drivers_STM32G4xx_HAL_Driver.dir/01125ee793e075b7c28def12d52c856c/software/servo_v1/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_uart_ex.o
+[54/61] Building C object CMakeFiles/Group_Drivers_STM32G4xx_HAL_Driver.dir/01125ee793e075b7c28def12d52c856c/software/servo_v1/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_adc_ex.o
+[55/61] Building C object CMakeFiles/Group_Drivers_STM32G4xx_HAL_Driver.dir/01125ee793e075b7c28def12d52c856c/software/servo_v1/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_tim_ex.o
+[56/61] Building C object CMakeFiles/Group_Drivers_STM32G4xx_HAL_Driver.dir/01125ee793e075b7c28def12d52c856c/software/servo_v1/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_adc.o
+[57/61] Building C object CMakeFiles/Group_Drivers_STM32G4xx_HAL_Driver.dir/01125ee793e075b7c28def12d52c856c/software/servo_v1/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_spi.o
+[58/61] Building C object CMakeFiles/Group_Drivers_STM32G4xx_HAL_Driver.dir/01125ee793e075b7c28def12d52c856c/software/servo_v1/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_uart.o
+[59/61] Building C object CMakeFiles/Group_Drivers_STM32G4xx_HAL_Driver.dir/01125ee793e075b7c28def12d52c856c/software/servo_v1/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_i2c.o
+[60/61] Building C object CMakeFiles/Group_Drivers_STM32G4xx_HAL_Driver.dir/01125ee793e075b7c28def12d52c856c/software/servo_v1/Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_tim.o
+[61/61] Linking C executable C:\Users\penghao\Desktop\Servo_9948\G431_base_code\software\servo_v1\MDK-ARM\out\servo_v1\servo_v1\servo_v1.axf
+Program Size: Code=66060 RO-data=1388 RW-data=5044 ZI-data=25708  
++------------------------------------------------------------
+Build summary: 1 succeeded, 0 failed - Time Elapsed: 00:00:14
++============================================================

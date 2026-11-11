@@ -1,0 +1,38 @@
+17
+Return data:
+Byte B0 B(1 ~ n) B(n + 1)
+Data content Operation request Return Data CRC
+B(1 ~ n), Operation Types and Corresponding Return data（M: Multi-turn Data, A:
+Single-turn Position, C: Setting Counter, S: Status ）:
+Operation
+type
+Description
+Model version
+n
+Return Data
+b6 b5
+Single￾turn
+Resolution
+Multi-turn
+Resolution
+B1 B2 B3 B4 B5 B6
+0 0 Get data
+≤16 — 3 S A0 A1
+≤16 16 5 S A0 A1 M0 M1
+>16 — 4 S A0 A1 A2
+>16 16 6 S A0 A1 A2 M0 M1
+0 1 Set zero
+position
+2 S C
+1 0 Set address 2 S C
+Operation type
+Request n
+Data
+b6 b5 B1 B2 B3
+0 0 Get data 3 S A0 A1
+0 1 Set zero position 2 S C
+1 0 Set address 2 S C
+For detailed descriptions of the status bit, refer to the Status section. Note : (1) If the operation type does not exist in the B(1 ~ n) table, e.g., 0b11, no response will be returned.. (2) C represents the consecutive setting count returned during encoder configuration. When the returned value reaches 10, the
+setting is executed immediately. This process may take up to approximately 50 ms, during which the encoder will not respond to any commands. (3) The factory default address is 0x1F (0b11111). Set zero position:
+To prevent accidental zero setting, operation types 00 and 01 must be sent alternately for a total of 10 consecutive cycles (00, 01, 00, 01, …, 00, 01). Each command must be sent only after the encoder response to the previous command has been
+BUS

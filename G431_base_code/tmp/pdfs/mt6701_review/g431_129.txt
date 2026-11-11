@@ -1,0 +1,65 @@
+DS12589 Rev 6 129/198
+STM32G431x6 STM32G431x8 STM32G431xB Electrical characteristics
+160
+          
+Table 65. ADC accuracy (Multiple ADCs operation) - limited test conditions 1(1)(2)(3) 
+Symbol Parameter Conditions (4) Min Typ Max Unit
+ET Total unadjusted 
+error
+Multiple ADC operation
+ADC clock frequency:
+single ended ≤ 52 MHz, 
+differential ≤ 56 MHz, 
+VDDA = VREF= 3.3 V,
+25°C,
+Continuous mode, 
+sampling time:
+Fast channels: 2.5 cycles
+Slow channels: 6.5 cycles 
+LQFP100 package
+Single ended - 4.5 -
+LSB
+Differential - 4.1 -
+EO Offset error
+Single ended - 1.3 -
+Differential - 0.4 -
+EG Gain error
+Single ended - 3.9 -
+Differential - 3.4 -
+ED Differential 
+linearity error
+Single ended - 1.5 -
+Differential - 1.2 -
+EL Integral linearity 
+error
+Single ended - 1.7 -
+Differential - 2.1 -
+ENOB Effective 
+number of bits
+Single ended - 10.7 -
+bits
+Differential - 10.9 -
+SINAD
+Signal-to-noise 
+and distortion 
+ratio
+Single ended - 66.3 -
+dB
+Differential - 67.2 -
+SNR Signal-to-noise 
+ratio
+Single ended - 67.3 -
+Differential - 68.6 -
+THD Total harmonic 
+distortion
+Single ended - -73.5 -
+dB
+Differential - -73 -
+1. Data based on characterization result, not tested in production.
+2. ADC DC accuracy values are measured after internal calibration.
+3. ADC accuracy vs. negative Injection Current: Injecting negative current on any analog input pins should be avoided 
+as this significantly reduces the accuracy of the conversion being performed on another analog input. It is 
+recommended to add a Schottky diode (pin to ground) to analog pins which may potentially inject negative current.
+4. The I/O analog switch voltage booster is enabled when V
+DDA < 2.4 V (BOOSTEN = 1 in the SYSCFG_CFGR1 when 
+VDDA < 2.4 V). It is disabled when VDDA ≥ 2.4 V. No oversampling.

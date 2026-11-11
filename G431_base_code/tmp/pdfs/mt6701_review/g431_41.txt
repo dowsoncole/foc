@@ -1,0 +1,44 @@
+DS12589 Rev 6 41/198
+STM32G431x6 STM32G431x8 STM32G431xB Functional overview
+43
+3.32 Serial audio interfaces (SAI) 
+The device embeds 1 SAI. The SAI bus interface handles communications between the 
+microcontroller and the serial audio protocol. 
+3.32.1 SAI peripheral supports
+• Two independent audio sub-blocks which can be transmitters or receivers with their 
+respective FIFO. 
+• 8-word integrated FIFOs for each audio sub-block. 
+• Synchronous or asynchronous mode between the audio sub-blocks. 
+• Master or slave configuration independent for both audio sub-blocks. 
+• Clock generator for each audio block to target independent audio frequency sampling 
+when both audio sub-blocks are configured in master mode. 
+• Data size configurable: 8-, 10-, 16-, 20-, 24-, 32-bit. 
+• Peripheral with large configurability and flexibility allowing to target as example the 
+following audio protocol: I2S, LSB or MSB-justified, PCM/DSP , TDM, AC’97 and SPDIF 
+out. 
+• Up to 16 slots available with configurable size and with the possibility to select which 
+ones are active in the audio frame. 
+• Number of bits by frame may be configurable. 
+• Frame synchronization active level configurable (offset, bit length, level). 
+• First active bit position in the slot is configurable. 
+• LSB first or MSB first for data transfer. 
+• Mute mode. 
+• Stereo/Mono audio frame capability. 
+• Communication clock strobing edge configurable (SCK). 
+• Error flags with associated interrupts if enabled respectively. 
+– Overrun and underrun detection. 
+– Anticipated frame synchronization signal detection in slave mode. 
+– Late frame synchronization signal detection in slave mode. 
+– Codec not ready for the AC’97 mode in reception.
+• Interruption sources when enabled: 
+– Errors. 
+– FIFO requests. 
+• DMA interface with 2 dedicated channels to handle access to the dedicated integrated 
+FIFO of each SAI audio sub-block. 
+          
+Table 10. SAI features implementation 
+SAI features Support (1)
+I2S, LSB or MSB-justified, PCM/DSP , TDM, AC’97 X
+Mute mode X
+Stereo/Mono audio frame capability X
+16 slots X

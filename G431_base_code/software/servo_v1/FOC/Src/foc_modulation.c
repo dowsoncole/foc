@@ -1,5 +1,6 @@
 #include "foc_modulation.h"
 #include "foc_modulation_lut.h"
+#include "foc_memory.h"
 
 #include <math.h>
 #include <string.h>
@@ -53,7 +54,75 @@ static float modulation_hold(float duty, float hold)
   return modulation_clamp(0.5f + ((duty - 0.5f) / (1.0f - hold)), 0.0f, 1.0f);
 }
 
-uint8_t FOC_ModulationCompute(const foc_modulation_parameters_t *parameters,
+/* Keep the production linear path out of the OVM register/stack frame.
+   Inlining the two paths together makes even linear PWM save d8..d15. */
+#if defined(__GNUC__) || defined(__clang__)
+#define FOC_MODULATION_NOINLINE __attribute__((noinline))
+#elif defined(_MSC_VER)
+#define FOC_MODULATION_NOINLINE __declspec(noinline)
+#else
+#define FOC_MODULATION_NOINLINE
+#endif
+
+static FOC_MODULATION_NOINLINE uint8_t modulation_linear(
+    const foc_modulation_parameters_t *parameters, float voltage_limit,
+    float alpha, float beta, foc_modulation_output_t *output)
+{
+  float span, limit, magnitude_squared;
+  float a, b, c, maximum, minimum, zero, midpoint;
+  if (output == 0) return 0U;
+  (void)FOC_CLEAR_OBJECT(output);
+  if (!isfinite(alpha) || !isfinite(beta) || !isfinite(voltage_limit) ||
+      voltage_limit < 0.0f || !isfinite(parameters->duty_min) ||
+      !isfinite(parameters->duty_max) || parameters->duty_min < 0.0f ||
+      parameters->duty_max > 1.0f ||
+      parameters->duty_min >= parameters->duty_max) return 0U;
+  span = parameters->duty_max - parameters->duty_min;
+  if (span < 1.0e-6f) return 0U;
+  limit = span * FOC_MODULATION_LINEAR_MAX;
+  if (voltage_limit < limit) limit = voltage_limit;
+  magnitude_squared = alpha * alpha + beta * beta;
+  if (!isfinite(magnitude_squared)) return 0U;
+  /* Preserve the original boundary comparison and operation order exactly. */
+  if (magnitude_squared >= (limit * limit) * 0.999999f)
+  {
+    float magnitude = sqrtf(magnitude_squared);
+    if (magnitude > limit)
+    {
+      float gain = limit / magnitude;
+      alpha *= gain;
+      beta *= gain;
+      output->limited = 1U;
+    }
+  }
+  a = alpha;
+  b = -0.5f * alpha + 0.8660254038f * beta;
+  c = -0.5f * alpha - 0.8660254038f * beta;
+  maximum = a > b ? a : b;
+  if (c > maximum) maximum = c;
+  minimum = a < b ? a : b;
+  if (c < minimum) minimum = c;
+  zero = -0.5f * (maximum + minimum);
+  midpoint = 0.5f * (parameters->duty_min + parameters->duty_max);
+  output->phase_a_duty = modulation_clamp(midpoint + a + zero,
+      parameters->duty_min, parameters->duty_max);
+  output->phase_b_duty = modulation_clamp(midpoint + b + zero,
+      parameters->duty_min, parameters->duty_max);
+  output->phase_c_duty = modulation_clamp(midpoint + c + zero,
+      parameters->duty_min, parameters->duty_max);
+  output->fundamental_alpha = alpha;
+  output->fundamental_beta = beta;
+  output->fundamental_limit = limit;
+  output->alpha_voltage = (2.0f * output->phase_a_duty - output->phase_b_duty -
+      output->phase_c_duty) / 3.0f;
+  output->beta_voltage = (output->phase_b_duty - output->phase_c_duty) * 0.5773502692f;
+  output->sector = modulation_sector(a, b, c);
+  output->region = FOC_MODULATION_REGION_LINEAR;
+  output->valid = 1U;
+  return 1U;
+}
+
+static FOC_MODULATION_NOINLINE uint8_t modulation_generic(const foc_modulation_parameters_t *parameters,
                               float voltage_limit,
                               float alpha, float beta,
                               foc_modulation_output_t *output)
@@ -63,7 +132,7 @@ uint8_t FOC_ModulationCompute(const foc_modulation_parameters_t *parameters,
   float da, db, dc;
 
   if (output == 0) return 0U;
-  (void)memset(output, 0, sizeof(*output));
+  (void)FOC_CLEAR_OBJECT(output);
   if ((parameters == 0) || !isfinite(alpha) || !isfinite(beta) ||
       !isfinite(voltage_limit) || (voltage_limit < 0.0f) ||
       !isfinite(parameters->duty_min) || !isfinite(parameters->duty_max) ||
@@ -80,10 +149,58 @@ uint8_t FOC_ModulationCompute(const foc_modulation_parameters_t *parameters,
   if (span < 1.0e-6f) return 0U;
   limit = span * ((parameters->mode == FOC_MODULATION_LINEAR_ONLY) ?
                    FOC_MODULATION_LINEAR_MAX : FOC_MODULATION_SIX_STEP_MAX);
-  limit = fminf(limit, voltage_limit);
+  /* Both operands are finite and nonnegative after validation above. */
+  if (voltage_limit < limit) limit = voltage_limit;
+  /* Linear min/max PWM in physical pu units, including radial saturation.
+     Cancel normalization by span followed by multiplication by span. Near
+     the limit retain the exact sqrt comparison used by the generic path.
+     This also bounds the anti-windup path that can modulate twice per ISR. */
+  float magnitude_squared = alpha * alpha + beta * beta;
+  float linear_limit = span * FOC_MODULATION_LINEAR_MAX;
+  if (parameters->mode == FOC_MODULATION_LINEAR_ONLY || limit <= linear_limit ||
+      magnitude_squared < linear_limit * linear_limit * 0.999999f)
+  {
+    if (!isfinite(magnitude_squared)) return 0U;
+    if (magnitude_squared >= (limit * limit) * 0.999999f)
+    {
+      magnitude = sqrtf(magnitude_squared);
+      if (magnitude > limit)
+      {
+        gain = limit / magnitude;
+        alpha *= gain;
+        beta *= gain;
+        output->limited = 1U;
+      }
+    }
+    a = alpha;
+    b = -0.5f * alpha + 0.8660254038f * beta;
+    c = -0.5f * alpha - 0.8660254038f * beta;
+    maximum = a > b ? a : b;
+    if (c > maximum) maximum = c;
+    minimum = a < b ? a : b;
+    if (c < minimum) minimum = c;
+    zero = -0.5f * (maximum + minimum);
+    float midpoint = 0.5f * (parameters->duty_min + parameters->duty_max);
+    output->phase_a_duty = modulation_clamp(midpoint + a + zero,
+        parameters->duty_min, parameters->duty_max);
+    output->phase_b_duty = modulation_clamp(midpoint + b + zero,
+        parameters->duty_min, parameters->duty_max);
+    output->phase_c_duty = modulation_clamp(midpoint + c + zero,
+        parameters->duty_min, parameters->duty_max);
+    output->fundamental_alpha = alpha;
+    output->fundamental_beta = beta;
+    output->fundamental_limit = limit;
+    output->alpha_voltage = (2.0f * output->phase_a_duty - output->phase_b_duty -
+        output->phase_c_duty) / 3.0f;
+    output->beta_voltage = (output->phase_b_duty - output->phase_c_duty) * 0.5773502692f;
+    output->sector = modulation_sector(a, b, c);
+    output->region = FOC_MODULATION_REGION_LINEAR;
+    output->valid = 1U;
+    return 1U;
+  }
   magnitude = sqrtf(alpha * alpha + beta * beta);
   if (!isfinite(magnitude)) return 0U;
-  fundamental = fminf(magnitude, limit);
+  fundamental = magnitude < limit ? magnitude : limit;
   output->fundamental_limit = limit;
   output->limited = (magnitude > limit) ? 1U : 0U;
   gain = (magnitude > 0.0f) ? (fundamental / magnitude) : 0.0f;
@@ -120,8 +237,10 @@ uint8_t FOC_ModulationCompute(const foc_modulation_parameters_t *parameters,
   b = (-0.5f * alpha + 0.8660254038f * beta) * gain;
   c = (-0.5f * alpha - 0.8660254038f * beta) * gain;
   output->sector = modulation_sector(a, b, c);
-  maximum = fmaxf(a, fmaxf(b, c));
-  minimum = fminf(a, fminf(b, c));
+  maximum = a > b ? a : b;
+  if (c > maximum) maximum = c;
+  minimum = a < b ? a : b;
+  if (c < minimum) minimum = c;
   spread = maximum - minimum;
 
   /* OVM1 保角度径向限幅：T1+T2>1 时按其和归一化，T0=0。
@@ -150,4 +269,13 @@ uint8_t FOC_ModulationCompute(const foc_modulation_parameters_t *parameters,
                           0.5773502692f;
   output->valid = 1U;
   return 1U;
+}
+
+uint8_t FOC_ModulationCompute(const foc_modulation_parameters_t *parameters,
+                              float voltage_limit, float alpha, float beta,
+                              foc_modulation_output_t *output)
+{
+  if (parameters != 0 && parameters->mode == FOC_MODULATION_LINEAR_ONLY)
+    return modulation_linear(parameters, voltage_limit, alpha, beta, output);
+  return modulation_generic(parameters, voltage_limit, alpha, beta, output);
 }

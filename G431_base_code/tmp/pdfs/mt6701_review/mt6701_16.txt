@@ -1,0 +1,22 @@
+www.magntek.com.cn | 磁技术带来美妙变革 1.8版本  2022.12
+MT6701
+基于差分霍尔的磁性角度传感器芯片
+16
+Z信号的宽度由一个3比特位宽的寄存器‘Z_PUL_WID[2:0]’来定义；
+寄存器Z_Pulse_Width[2:0] 宽度 (LSBs) 寄存器Z_Pulse_Width[2:0] 宽度(LSBs)
+000 1 100 12
+001 2 101 16
+010 4 110 180°
+011 8 111 1
+Z信号宽度寄存器‘Z_PUL_WID[2:0]’( EEPROM)
+寄存器 位7 位6 位5 位4 位3 位2 位1 位0
+Zero_MSB NA Z_PULSE_WIDTH[2:0] ZERO[11:8]
+Zero_LSB ZERO[7:0]
+Z信号角度位置寄存器(EEPROM)
+ABZ 分辨率寄存器(EEPROM)
+Z信号的绝对角度位置由一个12比特位宽的寄存器定义，对应0~360°。
+寄存器 位7 位6 位5 位4 位3 位2 位1 位0
+ABZ_RES UVW_RESp3:0] NA NA ABZ_RES[9:8]
+ABZ_RES ABZ_RES[7:0]
+ABZ输出分辨率由一个10比特位宽的寄存器‘ABZ_RES[9:0]’来定义;
+* 关于EEPROM编程, 请参考第8章

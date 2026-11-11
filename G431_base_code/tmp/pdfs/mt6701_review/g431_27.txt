@@ -1,0 +1,41 @@
+DS12589 Rev 6 27/198
+STM32G431x6 STM32G431x8 STM32G431xB Functional overview
+43
+3.14 General-purpose in puts/outputs (GPIOs)
+Each of the GPIO pins can be configured by software as output (push-pull or open-drain), as 
+input (with or without pull-up or pull-down) or as peripheral alternate function. Most of the 
+GPIO pins are shared with digital or analog alternate functions. Fast I/O toggling can be 
+achieved thanks to their mapping on the AHB2 bus.
+The I/Os alternate function configuration can be locked if needed following a specific 
+sequence in order to avoid spurious writing to the I/Os registers.
+3.15 Direct memory a ccess controller (DMA)
+The device embeds 2 DMAs. Refer to Table 4: DMA implementation for the features 
+implementation.
+Direct memory access (DMA) is used in order to provide a high-speed data transfer 
+between peripherals and memory as well as from memory to memory. Data can be quickly 
+moved by DMA without any CPU actions. This keeps the CPU resources free for other 
+operations.
+The two DMA controllers have 12 channels in total, each one dedicated to manage memory 
+access requests from one or more peripherals. Each controller has an arbiter for handling 
+the priority between DMA requests. 
+The DMA supports:
+• 12 independently configurable channels (requests)
+– Each channel is connected to a dedicated hardware DMA request, a software 
+trigger is also supported on each channel. This configuration is done by software.
+• Priorities between requests from channels of one DMA are both software 
+programmable (4 levels: very high, high, medium, low) or hardware programmable in 
+case of equality (request 1 has priority over request 2, etc.)
+• Independent source and destination transfer size (byte, half word, word), emulating 
+packing and unpacking. Source/destination addresses must be aligned on the data 
+size.
+• Support for circular buffer management
+• 3 event flags (DMA half transfer, DMA transfer complete and DMA transfer error) 
+logically ORed together in a single interrupt request for each channel
+• Memory-to-memory transfer
+• Peripheral-to-memory, memory-to-peripheral, and peripheral-to-peripheral transfers 
+• Access to Flash, SRAM, APB and AHB peripherals as source and destination
+• Programmable number of data to be transferred: up to 65536.
+          
+Table 4. DMA implementation 
+DMA features DMA1 DMA2
+Number of regular channels 6 6

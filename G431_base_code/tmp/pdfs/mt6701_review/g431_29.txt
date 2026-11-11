@@ -1,0 +1,45 @@
+DS12589 Rev 6 29/198
+STM32G431x6 STM32G431x8 STM32G431xB Functional overview
+43
+3.18 Analog-to-digital converter (ADC)
+The device embeds two successive approximation analog-to-digital converters with the 
+following features:
+• 12-bit native resolution, with built-in calibration
+• 4 Msps maximum conversion rate with full resolution
+– Down to 41.67 ns sampling time
+– Increased conversion rate for lower resolution (up to 6.66 Msps for 6-bit 
+resolution)
+• One external reference pin is available on all packages, allowing the input voltage 
+range to be independent from the power supply
+• Single-ended and differential mode inputs
+• Low-power design
+– Capable of low-current operation at low conversion rate (consumption decreases 
+linearly with speed)
+– Dual clock domain architecture: ADC speed independent from CPU frequency
+• Highly versatile digital interface
+– Single-shot or continuous/discontinuous  sequencer-based scan mode: 2 groups 
+of analog signals conversions can be programmed to differentiate background and 
+high-priority real-time conversions
+– Each ADC support multiple trigger inputs for synchronization with on-chip timers 
+and external signals
+– Results stored into a data register or in RAM with DMA controller support
+– Data pre-processing: left/right alignment and per channel offset compensation
+– Built-in oversampling unit for enhanced SNR
+– Channel-wise programmable sampling time
+– Analog watchdog for automatic voltage monitoring, generating interrupts and 
+trigger for selected timers
+– Hardware assistant to prepare the context of the injected channels to allow fast 
+context switching
+– Flexible sample  time control
+– Hardware gain and offset compensation
+3.18.1 Temperature sensor
+The temperature sensor (TS) generates a voltage VTS that varies linearly with temperature. 
+The temperature sensor is internally connected to the ADC1_IN16 input channel which is 
+used to convert the sensor output voltage into a digital value.
+The sensor provides good linearity but it has to be calibrated to obtain good overall 
+accuracy of the temperature measurement. As the offset of the temperature sensor varies 
+from chip to chip due to process variation, the uncalibrated internal temperature sensor is 
+suitable for applications that detect temperature changes only.
+To improve the accuracy of the temperature sensor measurement, each device is 
+individually factory-calibrated by ST. The temperature sensor factory calibration data are 
+stored by ST in the system memory area, accessible in read-only mode.

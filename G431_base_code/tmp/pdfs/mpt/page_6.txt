@@ -1,0 +1,24 @@
+5
+Electrical connections
+Connectors
+Wire-to-Board Connector
+Model See the Size
+Type Wire to board
+Wire
+MPT-10 and MPT-15 use 4P × AWG34 Teflon twisted-pair cable, while all other sizes use 4P
+× AWG32 Teflon twisted-pair cable. Pad Connector
+Pads under the connector (model suffix: PC) require manual soldering to the corresponding
+pins. Glue fixation is recommended.
+Pin descriptions
+Pin Color
+S B A R T D P
+SSI BISS-C RS422 RS485 T485 BUS PERIOD
+1 Gray Battery -
+2 White Battery +
+3 Orange Data - SLO-（Data-） TX - - - - TX -
+4 Yellow Data + SLO+（Data+） TX + - - - TX +
+5 Green Clock - MA-（CLK-） RX - B B B -
+6 Blue Clock + MA+（CLK+） RX + A A A -
+7 Black 0V（GND）
+8 Red +5V
+* Battery +/- only applies to battery-backed multi-turn (BM) versions * Battery - is internally connected to GND. * Shield layer is recommended to be grounded at the driver side.

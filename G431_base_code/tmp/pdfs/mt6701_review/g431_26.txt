@@ -1,0 +1,42 @@
+Functional overview STM32G431x6 STM32G431x8 STM32G431xB
+26/198 DS12589 Rev 6
+3.13 Clocks and startup
+The clock controller distributes the clocks coming from different oscillators to the core and 
+the peripherals. It also manages clock gating for low-power modes and ensures clock 
+robustness. It features: 
+• Clock prescaler: to get the best trade-off between speed and current consumption, 
+the clock frequency to the CPU and peripherals can be adjusted by a programmable 
+prescaler 
+• Safe clock switching: clock sources can be changed safely on the fly in run mode 
+through a configuration register. 
+• Clock management: to reduce power consumption, the clock controller can stop the 
+clock to the core, individual peripherals or memory. 
+• System clock source: three different sources can deliver SYSCLK system clock: 
+– 4 - 48 MHz high-speed oscillator with ex ternal crystal or ceramic resonator (HSE). 
+It can supply clock to system PLL. The HSE can also be configured in bypass 
+mode for an external clock. 
+– 16 MHz high-speed internal RC oscillator (H SI16), trimmable by software. It can 
+supply clock to system PLL. 
+– System PLL with maximum output frequen cy of 170 MHz. It can be fed with HSE 
+or HSI16 clocks. 
+• RC48 with clock recovery system (HSI48): internal HSIRC48 MHz clock source can 
+be used to drive the USB or the RNG peripherals.
+• Auxiliary clock source: two ultra-low-power clock sources for the real-time clock 
+(RTC): 
+– 32.768 kHz low-speed oscillator with exte rnal crystal (LSE), supporting four drive 
+capability modes. The LSE can also be configured in bypass mode for using an 
+external clock. 
+– 32 kHz low-speed internal RC oscillator (LSI) with ±5% accuracy, also used to 
+clock an independent watchdog. 
+• Peripheral clock sources: several peripherals (I2S, USART, I2C, LPTimer, ADC, SAI, 
+RNG) have their own clock independent of the system clock. 
+• Clock security system (CSS): in the event of HSE clock failure, the system clock is 
+automatically switched to HSI16 and, if enabled, a software interrupt is generated. LSE 
+clock failure can also be detected and generate an interrupt. 
+• Clock-out capability: 
+– MCO: microcontroller clock output: it outputs one of the internal clocks for external 
+use by the application 
+– LSCO: low speed clock output: it outputs LSI or LSE in all low-power modes.
+Several prescalers allow to configure the AHB frequency, the High-speed APB (APB2) and 
+the low speed APB (APB1) domains. The maximum frequency of the AHB and the APB 
+domains is 170 MHz.

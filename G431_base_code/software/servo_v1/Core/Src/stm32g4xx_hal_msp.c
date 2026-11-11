@@ -23,6 +23,8 @@
 /* USER CODE BEGIN Includes */
 #include "tim1_pwm.h"
 #include "adc1_current_sampling.h"
+#include "spi1_encoder.h"
+#include "mt6701_ssi.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -110,7 +112,7 @@ void HAL_I2C_MspDeInit(I2C_HandleTypeDef *hi2c)
 }
 
 /**
-  * @brief  SPI1 clock and GPIO for the MT6835 magnetic encoder.
+  * @brief  SPI1 / SPI3 encoder clocks and GPIO.
   *         PA5 = SCK, PA6 = MISO, PA7 = MOSI, all AF5 (DS12589 Table 13).
   *         PA4 (software CSN) is configured by MX_SPI1_Encoder_Init() itself
   *         so the chip select is high before the SPI peripheral comes up.
@@ -121,7 +123,11 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef *hspi)
 
   if (hspi->Instance == SPI1)
   {
+#if MT6701_SSI_ENABLE
+    __HAL_RCC_GPIOB_CLK_ENABLE();
+#else
     __HAL_RCC_GPIOA_CLK_ENABLE();
+#endif
     __HAL_RCC_SPI1_CLK_ENABLE();
 
     /* A debugger reset can leave SPI1 enabled with the previous CR1/CR2
@@ -135,12 +141,45 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef *hspi)
     PA6     ------> SPI1_MISO
     PA7     ------> SPI1_MOSI
     */
+#if MT6701_SSI_ENABLE
+    /* DS12589 Table 13: PB3=SCK, PB4=MISO, PB5=MOSI, AF5.
+       SSI ignores MOSI; finite dummy TX generates exactly 24 clocks. */
+    GPIO_InitStruct.Pin = GPIO_PIN_3 | GPIO_PIN_4 | GPIO_PIN_5;
+#else
     GPIO_InitStruct.Pin = GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7;
+#endif
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    /* Bias SPI1 lines high when their external driver is inactive. */
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    /* Same compile-time edge-rate setting as software CS, without changing
+       the 5.25 MHz clock. OSPEEDR does not drive the sensor's MISO output. */
+    GPIO_InitStruct.Speed = SPI1_ENC_OUTPUT_GPIO_SPEED;
     GPIO_InitStruct.Alternate = GPIO_AF5_SPI1;
+#if MT6701_SSI_ENABLE
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+#else
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+#endif
+  }
+  else if (hspi->Instance == SPI3)
+  {
+    __HAL_RCC_GPIOB_CLK_ENABLE();
+    __HAL_RCC_SPI3_CLK_ENABLE();
+    __HAL_RCC_SPI3_FORCE_RESET();
+    __HAL_RCC_SPI3_RELEASE_RESET();
+
+    /* MT6701 SSI: PB3=SCK, PB4=MISO, AF6; PB6 CSN 由配置接口管理。
+       PB3/PB4 复用后不可同时用于 SWO/JTAG，调试连接使用 SWD。 */
+    GPIO_InitStruct.Pin = GPIO_PIN_3;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF6_SPI3;
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+    /* 断线时稳定读为全一帧，由测试层判无效。 */
+    GPIO_InitStruct.Pin = GPIO_PIN_4;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
   }
 }
 
@@ -149,7 +188,16 @@ void HAL_SPI_MspDeInit(SPI_HandleTypeDef *hspi)
   if (hspi->Instance == SPI1)
   {
     __HAL_RCC_SPI1_CLK_DISABLE();
+#if MT6701_SSI_ENABLE
+    HAL_GPIO_DeInit(GPIOB, GPIO_PIN_3 | GPIO_PIN_4 | GPIO_PIN_5);
+#else
     HAL_GPIO_DeInit(GPIOA, GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7);
+#endif
+  }
+  else if (hspi->Instance == SPI3)
+  {
+    __HAL_RCC_SPI3_CLK_DISABLE();
+    HAL_GPIO_DeInit(GPIOB, GPIO_PIN_3 | GPIO_PIN_4);
   }
 }
 
@@ -215,15 +263,16 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim)
   {
     __HAL_RCC_TIM1_CLK_ENABLE();
 
-    /* Current-loop class timing, split across the two TIM1 vectors:
-         TIM1_CC_IRQn          reserved (CC4IE disabled; ADC uses TRGO2 hardware)
-         TIM1_UP_TIM16_IRQn    period boundary    -> state machine
-       Both are one step above the TIM6 heartbeat, and they are the only
-       interrupts allowed to preempt each other. */
+    /* TIM1 update launches encoder DMA at priority 0; ADC/FOC uses priority 1.
+       TIM1_CC is reserved (CC4IE disabled; ADC uses TRGO2 hardware). Equal
+       priority timer/DMA IRQs do not preempt one another. TIM6 is lower. */
     HAL_NVIC_SetPriority(TIM1_CC_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(TIM1_CC_IRQn);
 
-    HAL_NVIC_SetPriority(TIM1_UP_TIM16_IRQn, 1, 0);
+    /* Encoder DMA is launched on this fixed PWM boundary. Equal priority with
+       DMA (0), above ADC (1): an ADC callback must not postpone the launch to
+       just before the NEXT boundary and create back-to-back busy triggers. */
+    HAL_NVIC_SetPriority(TIM1_UP_TIM16_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(TIM1_UP_TIM16_IRQn);
   }
 }

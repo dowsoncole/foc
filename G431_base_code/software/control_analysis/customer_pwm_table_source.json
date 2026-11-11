@@ -1,0 +1,27 @@
+{
+  "source_name": "客户需求PWM给定方式.xlsx",
+  "source_sha256": "a106c254ccb2f595118bef84115075920d0de21538f7eea85644652a6ba658f1",
+  "sheet": "PWM table due 1 sec",
+  "range": "B2:P301",
+  "carrier_hz": 300,
+  "frequencies_hz": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+  ],
+  "frames_per_second": 300,
+  "source_commands_sha256": "6ef3a8b871ce95ea824741f29d082f665001385478c52530d84f592d1753421d",
+  "note": "Literal commands only. 16..30 Hz are not supplied. No external PWM interface is implemented."
+}

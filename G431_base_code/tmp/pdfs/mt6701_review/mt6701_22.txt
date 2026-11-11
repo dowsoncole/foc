@@ -1,0 +1,74 @@
+www.magntek.com.cn | 磁技术带来美妙变革 1.8版本  2022.12
+MT6701
+基于差分霍尔的磁性角度传感器芯片
+22
+7.7.2  I2C 读取角度
+MT6701做为I2C从机的地址是b’0000110（这一地址可以通过编程改为 b’1000110 ）。14位绝
+对角度数据保存在0x03和0x04寄存器中，请按照如图-20所示的读取0x03和0x04的角度数据。
+注意：要先读0x03再读0x04。
+图-20: I2C 单字节读数据
+寄存器地址 位7 位6 位5 位4 位3 位2 位1 位0
+0x03 Angle[13:6]
+0x04 Angle[5:0] NA NA
+角度数据寄存器
+0~360° 绝对角度可按照如下公式计算:
+13
+0
+2
+= 360 16384
+i
+i
+Angle i
+ =
+  •
+•
+
+0 0 0 0 1 1 0
+SCL
+SDA 0
+Sl ave I D :  06
+37 38 39 40 41 42 43 44 45
+0 0 0 0 0 1 0
+46 47 48 49 50
+0
+Regi ster Address: 04
+51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72
+0 0 0 0 1 1 0 1 D7 D6 D5 D4 D3 D2 D1 D0
+Sl ave I D :  06 Dat a of  0x04
+0 0 0 0 1 1 0
+Slave 
+ACK
+SCL
+SDA
+1st
+Start
+0
+1 2 3 4 5 6 7 8 9
+W ri te
+0 0 0 0 0 0 1
+10 11 12 13 14
+1
+15 16 17
+Slave 
+ACK
+18
+2nd
+Start
+19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36
+0 0 0 0 1 1 0 1 D7 D6 D5 D4 D3 D2 D1 D0
+Read Stop
+Sl ave I D :  06 Regi ster Address: 03 Sl ave I D :  06 Dat a of  0x03
+M aster 
+No ACK
+Slave 
+ACK
+1st
+Start
+Slave 
+ACKW ri te Slave 
+ACK
+2nd
+Start Read StopM aster 
+No ACK
+Slave 
+ACK

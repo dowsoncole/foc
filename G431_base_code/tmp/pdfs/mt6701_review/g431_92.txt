@@ -1,0 +1,37 @@
+Electrical characteristics STM32G431x6 STM32G431x8 STM32G431xB
+92/198 DS12589 Rev 6
+I/O system current consumption
+The current consumption of the I/O system has two components: static and dynamic.
+I/O static current consumption
+All the I/Os used as inputs with pull-up generate current consumption when the pin is 
+externally held low. The value of this current consumption can be simply computed by using 
+the pull-up/pull-down resistors values given in Table 53: I/O static characteristics.
+For the output pins, any external pull-down or external load must also be considered to 
+estimate the current consumption.
+Additional I/O current consumption is due to I/Os configured as inputs if an intermediate 
+voltage level is externally applied. This current consumption is caused by the input Schmitt 
+trigger circuits used to discriminate the input value. Unless this specific configuration is 
+required by the application, this supply current consumption can be avoided by configuring 
+these I/Os in analog mode. This is notably the case of ADC, OPAMP, COMP input pins 
+which should be configured as analog inputs.
+Caution: Any floating input pin can also settle to an intermediate voltage level or switch inadvertently, 
+as a result of external electromagnetic noise. To avoid current consumption related to 
+floating pins, they must either be configured in analog mode, or forced internally to a definite 
+digital value. This is done either by using pull-up/down resistors or by configuring the pins in 
+output mode.
+I/O dynamic current consumption
+In addition to the internal peripheral current consumption measured previously (see 
+Table 35: Low-power mode wakeup timings), the I/Os used by an application also contribute 
+to the current consumption. When an I/O pin switches, it uses the current from the I/O 
+supply voltage to supply the I/O pin circuitry and to charge/discharge the capacitive load 
+(internal or external) connected to the pin:
+where
+I
+SW is the current sunk by a switching I/O to charge/discharge the capacitive load
+VDD is the I/O supply voltage
+fSW is the I/O switching frequency
+C is the total capacitance seen by the I/O pin: C = CINT+ CEXT + CS 
+CS is the PCB board capacitance including the pad pin. 
+The test pin is configured in push-pull output mode and is toggled by software at a fixed 
+frequency.
+ISW VDDIOx fSW C××=

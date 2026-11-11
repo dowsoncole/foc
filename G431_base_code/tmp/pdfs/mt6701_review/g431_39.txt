@@ -1,0 +1,42 @@
+DS12589 Rev 6 39/198
+STM32G431x6 STM32G431x8 STM32G431xB Functional overview
+43
+3.29 Universal synchronous/asynch ronous receiver transmitter 
+(USART)
+The STM32G431x6/x8/xB devices have three embedded universal synchronous receiver 
+transmitters (USART1, USART2 and USART3) and one universal asynchronous receiver 
+transmitters (UART4).
+These interfaces provide asynchronous communication, IrDA SIR ENDEC support, 
+multiprocessor communication mode, single-wire half-duplex communication mode and 
+have LIN master/slave capability. They provide hardware management of the CTS and RTS 
+signals, and RS485 driver enable.
+The USART1, USART2 and USART3 also provide a Smartcard mode (ISO 7816 compliant) 
+and an SPI-like communication capability. 
+The USART comes with a Transmit FIFO (TXFIFO) and a Receive FIFO (RXFIFO). FIFO 
+mode is enabled by software and is disabled by default.
+All USART have a clock domain independent from the CPU clock, allowing the USARTx 
+(x=1,2,3,4) to wake up the MCU from Stop mode. The wakeup from Stop mode can be done 
+on: 
+• Start bit detection
+• Any received data frame
+• A specific programmed data frame
+• Some specific TXFIFO/RXFIFO status interrupts when FIFO mode is enabled
+All USART interfaces can be served by the DMA controller.
+          
+Table 9. USART/UART/LPUART features 
+USART modes/features(1) USART1 USART2 USART3 UART4 LPUART1
+Hardware flow control for modem X X X X X
+Continuous communication using DMA X X X X X
+Multiprocessor communication X X X X X
+Synchronous mode X X X - -
+Smartcard mode X X X - -
+Single-wire half-duplex communication X X X X X
+IrDA SIR ENDEC block X X X X -
+LIN mode X X X X -
+Dual clock domain X X X X X
+Wakeup from Stop mode X X X X X
+Receiver timeout interrupt X X X X -
+Modbus communication X X X X -
+Auto baud rate detection X (4 modes) -
+Driver Enable X X X X X
+LPUART/USART data length 7, 8 and 9 bits

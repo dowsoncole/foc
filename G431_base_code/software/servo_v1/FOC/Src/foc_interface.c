@@ -94,7 +94,9 @@ void FOC_ControllerStop(foc_controller_t *controller)
   *         执行时间恒定），因此在 20 kHz 中断里调用是安全的。
   *         一旦报告不安全，立即停环并关断输出，不等待上层轮询发现。
   */
-void FOC_ControllerStep(foc_controller_t *controller)
+static void foc_controller_step(foc_controller_t *controller,
+                                uint8_t voltage_mode,
+                                const foc_voltage_command_t *command)
 {
   if ((controller == 0) || (controller->running == 0U))
   {
@@ -171,7 +173,15 @@ void FOC_ControllerStep(foc_controller_t *controller)
     return;
   }
 
-  FOC_AlgorithmStep(&controller->algorithm, &controller->input);
+  if (voltage_mode)
+  {
+    controller->algorithm.output.valid = 0U;
+    if (command != 0)
+      (void)FOC_AlgorithmVoltageFeedbackStep(&controller->algorithm,
+          command->d_voltage_v, command->q_voltage_v, command->dc_bus_voltage_v,
+          &controller->input);
+  }
+  else FOC_AlgorithmStep(&controller->algorithm, &controller->input);
   if (controller->algorithm.output.valid == 0U)
   {
     controller->fault_flags |= FOC_FAULT_ALGORITHM;
@@ -191,6 +201,18 @@ void FOC_ControllerStep(foc_controller_t *controller)
   }
   /* 必须放在 write_voltage 之后：此时 MOE 打开才不会暴露旧 CCR。 */
   controller->feedback_ready = 1U;
+}
+
+void FOC_ControllerStep(foc_controller_t *controller)
+{
+  foc_controller_step(controller, 0U, 0);
+}
+
+void FOC_ControllerVoltageStep(foc_controller_t *controller,
+                                const foc_voltage_command_t *command)
+{
+  /* NULL is a fault, never an implicit fallback to the current PI. */
+  foc_controller_step(controller, 1U, command);
 }
 
 void FOC_ControllerClearFaults(foc_controller_t *controller)

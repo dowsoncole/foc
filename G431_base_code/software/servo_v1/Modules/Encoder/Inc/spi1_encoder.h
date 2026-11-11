@@ -9,11 +9,11 @@
   *            PA4 -> 软件片选 CSN（普通推挽输出，不用硬件 NSS）
   *            PA5 -> SPI1_SCK
  *            硬件 SPI 模式：PA6 -> MISO，PA7 -> MOSI
- *            软件 SPI 模式：当前交叉接线时 PA6 -> MT6835 DI，PA7 <- MT6835 DO
+ *            软件 SPI：默认与硬件 SPI 同映射；历史交叉接线须显式选择
   *
   *          为什么片选用软件 GPIO 而不用硬件 NSS：
-  *            1. MT6835 的一帧是 24 bit（4 bit 命令 + 12 bit 地址 + 8 bit 数据），
-  *               不是 8 的整数倍，硬件 NSS 按 8/16 bit 数据帧管理片选，管不住；
+  *            1. 普通寄存器事务是 24 bit，角度 burst 事务是 48 bit；
+  *               CSN 必须覆盖整个事务，不能在各 8 bit 字节间脉冲释放；
   *            2. 手册要求每帧「CSN 下降沿开始、上升沿结束」，且 CSN 下降沿会
   *               锁存角度寄存器 0x003~0x006（手册 §7.6.9），软件片选才能精确
   *               控制锁存时刻。
@@ -23,7 +23,9 @@
   *
   *          SPI 工作模式由 MT6835 决定（手册 §7.6.2）：模式 3（CPOL=1, CPHA=1），
   *          数据在 SCK 下降沿变化、上升沿采样；SCK 上限 16 MHz。本配置取
-  *          APB2 168 MHz 的 16 分频 = 10.5 MHz，留出时序余量。
+  *          APB2 168 MHz 的 32 分频 = 5.25 MHz；输出边沿配置由
+  *          SPI1_ENC_OUTPUT_GPIO_SPEED 选择，不改变 SCK 分频。
+  *          启动可靠性和最高转速仍需分别实测验证。
   *
   *          本文件只配置外设并交出句柄，不知道 MT6835 的寄存器语义；
   *          器件读写由 L2 的 mt6835.c 完成。
@@ -39,32 +41,49 @@ extern "C" {
 #endif
 
 #include "stm32g4xx_hal.h"
+#include "mt6701_ssi.h"
 
 /* --------------------------------------------------------------------------*/
 /* 硬件常量                                                                  */
 /* --------------------------------------------------------------------------*/
 
-/* 1：使用 GPIO 模拟 SPI，适配 PA6/PA7 交叉接线；
-   0：使用 SPI1 外设，硬件连线应为 PA6=MISO、PA7=MOSI。 */
+/* Diagnostic selection: GPIO SPI uses the SAME normal pin mapping by default.
+   Hardware SPI remains the delivery default after the bounded comparison. */
 #define MT6835_USE_SOFTWARE_SPI       0U
+#define MT6835_SOFT_SPI_CROSSWIRED     0U
 
 /* SPI1 挂在 APB2；APB2 不分频时 SPI1 内核时钟 = SYSCLK = 168 MHz。 */
 #define SPI1_ENC_PERIPHERAL_CLOCK_HZ   168000000UL
 
-/* 分频 16 -> SCK = 10.5 MHz。MT6835 上限 16 MHz（手册 §7.6.2/§7.6.3），
-   取 10.5 MHz 而不是 21 MHz（8 分频会超标），给板上走线和电平转换留余量。 */
-#define SPI1_ENC_BAUDRATE_PRESCALER    SPI_BAUDRATEPRESCALER_16
-#define SPI1_ENC_SCK_HZ                (SPI1_ENC_PERIPHERAL_CLOCK_HZ / 16UL)
+/* SPI only supports power-of-two divisors. 168 MHz / 32 = 5.25 MHz is the
+   closest available setting to the requested 5 MHz.
+   A 24-clock MT6701 SSI frame takes 4.571 us at this SCK frequency.
+   CRC, sensor alarms and the configured feedback-age limit remain active. */
+#define SPI1_ENC_BAUDRATE_PRESCALER    SPI_BAUDRATEPRESCALER_32
+#define SPI1_ENC_SCK_HZ                (SPI1_ENC_PERIPHERAL_CLOCK_HZ / 32UL)
+/* Shared CS/SCK/MOSI edge selection; does not alter SCK frequency or the
+   sensor's MISO driver. MEDIUM failed the 8400-rpm board comparison on
+   2026-10-23, so retain the original VERY_HIGH baseline, not a claimed fix. */
+#define SPI1_ENC_OUTPUT_GPIO_SPEED    GPIO_SPEED_FREQ_VERY_HIGH
+
+#if SPI1_ENC_SCK_HZ > 16000000UL
+#error "MT6835 SPI clock exceeds the 16 MHz sensor limit"
+#endif
 
 /* 软件片选引脚。空闲必须为高（手册：非通信状态 SCK 保持高、CSN 释放）。 */
+#if MT6701_SSI_ENABLE
+#define MT6835_CSN_Pin GPIO_PIN_6
+#define MT6835_CSN_GPIO_Port GPIOB
+#else
 #define MT6835_CSN_Pin                 GPIO_PIN_4
 #define MT6835_CSN_GPIO_Port           GPIOA
+#endif
 #define MT6835_CAL_EN_Pin              GPIO_PIN_4
 #define MT6835_CAL_EN_GPIO_Port        GPIOC
 #define MT6835_SCK_Pin                 GPIO_PIN_5
 #define MT6835_SCK_GPIO_Port           GPIOA
-#if (MT6835_USE_SOFTWARE_SPI != 0U)
-/* 当前 PCB 交叉接线：PA6 实际连接编码器 DI，PA7 实际连接编码器 DO。 */
+#if (MT6835_SOFT_SPI_CROSSWIRED != 0U)
+/* Historical crosswired assembly only; not the verified current assembly. */
 #define MT6835_SOFT_MOSI_Pin           GPIO_PIN_6
 #define MT6835_SOFT_MOSI_GPIO_Port     GPIOA
 #define MT6835_SOFT_MISO_Pin           GPIO_PIN_7
@@ -108,21 +127,28 @@ HAL_StatusTypeDef MX_SPI1_Encoder_Init(void);
 
 /**
   * @brief  编码器 SPI 收发抽象。上层不关心当前使用 SPI1 外设还是 GPIO 模拟。
+  * @note   此阻塞接口仅供线程上下文；与异步 DMA 互斥，忙时不操作 CSN。
   */
 HAL_StatusTypeDef MT6835_SPI_TransmitReceive(const uint8_t *tx, uint8_t *rx,
                                              uint16_t size, uint32_t timeout);
 
-/* DMA 异步事务：函数只负责启动，CSN 在完成/错误回调后释放。回调运行在
+/* 收发抽象统一拥有 CSN，调用方不得另外拉低/释放片选。同步与异步互斥。
+   DMA 异步事务：函数只负责启动，CSN 在完成/错误回调后释放。回调运行在
    DMA 中断上下文，不得阻塞。任一时刻只允许一个事务。 */
 HAL_StatusTypeDef MT6835_SPI_TransmitReceiveAsync(
     const uint8_t *tx, uint8_t *rx, uint16_t size,
     mt6835_spi_async_callback_t callback, void *context);
 HAL_StatusTypeDef MT6835_SPI_AbortAsync(void);
 uint8_t MT6835_SPI_IsBusy(void);
+/* Bounded master-peripheral resynchronization after a bad CRC. Only when
+   software ownership is idle; also clears stuck BSY/DMA state. Never touches EEPROM and
+   never waits for a timeout. Does not acknowledge motor/controller faults. */
+HAL_StatusTypeDef MT6835_SPI_ResyncIdle(void);
 
 /* 中断文件通过这两个入口分发 DMA IRQ，避免暴露 DMA 句柄。 */
 void SPI1_Encoder_DmaRxIrqHandler(void);
 void SPI1_Encoder_DmaTxIrqHandler(void);
+void SPI1_Encoder_SpiIrqHandler(void);
 
 #ifdef __cplusplus
 }

@@ -1,0 +1,37 @@
+www.magntek.com.cn | 磁技术带来美妙变革 1.8版本  2022.12
+MT6701
+基于差分霍尔的磁性角度传感器芯片
+27
+图-26: 按压旋钮功能
+MT6701通过动态检测芯片感应到的磁场强度来实现按钮功能 。当MT6701检测到快速（时间小
+于‘PUSH_DIFF_DLY ’寄存器定义的时间）的磁场增加（磁场变化量需要大于‘PUSH_THRD’寄
+存器定义的百分比），PUSH引脚会输出高电平。检测到一个快速的磁场衰减后，PUSH会输出低电平。
+7.9  按钮输出
+寄存器PUSH_THRD 变化百分比
+0 +44%
+1 +50%
+2 +38%
+3 +31%
+PUSH_THRD 寄存器(EEPROM)
+Magnetic Field
+0° Time
+Push 
+Released
+Push 
+Pressed
+PUSH_THRD
+Push
+Threshold
+PUSH_DIFF_DLY PUSH_DIFF_DLY
+PUSH_TIME_OUT
+Push
+寄存器PUSH_DIFF_DLY 时间 (S)
+0 0.5
+1 0.25
+PUSH_DIFF_DLY 寄存器(EEPROM)
+寄存器PUSH_TIME_OUT 时间(S)
+0 8
+1 16
+2 4
+3 2
+PUSH_TIME_OUT 寄存器(EEPROM)

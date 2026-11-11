@@ -1,0 +1,62 @@
+DS12589 Rev 6 145/198
+STM32G431x6 STM32G431x8 STM32G431xB Electrical characteristics
+160
+tWAKEUP
+Wake up time from 
+OFF state.
+Normal mode
+CLOAD ≤ 50 pf, 
+RLOAD ≥ 4 kΩ 
+follower 
+configuration
+-36
+µs
+High-speed mode
+C
+LOAD ≤ 50 pf,  
+RLOAD ≥ 
+20 kΩ 
+follower 
+configuration
+-36
+Ibias
+OPAMP input bias 
+current See lleak parameter in Table 53: I/O static characteristics for given pin.
+PGA gain
+Non inverting gain 
+value(4)
+PGA Gain = 2 0.1 ≤ Out 
+dynamic range ≤ VDDA - 
+0.1
+VDDA < 2.2 -2 - 2
+%
+VDDA ≥ 2.2 -1 - 1
+PGA Gain=4, 100mV ≤ Output dynamic 
+range ≤ VDDA - 100mV -1 - 1
+PGA Gain=8 100mV ≤ Output dynamic 
+range ≤ VDDA - 100mV -1 - 1
+PGA Gain=16, 100mV ≤ Output dynamic 
+range ≤ VDDA - 100mV -1 - 1
+PGA Gain=32 200mV ≤ Output ≤ VDDA - 
+200mV -2 - 2
+PGA Gain=64 200mV ≤ Output dynamic 
+range ≤ VDDA - 200mV -2 - 2
+Inverting gain value
+PGA Gain = -1
+100mV ≤ Output dynamic 
+range ≤ VDDA - 100mV
+VDDA < 2.2 -2 - 2
+%
+VDDA ≥ 2.2 -1 - 1
+PGA Gain=-3, 100mV ≤ Output dynamic 
+range ≤ VDDA - 100mV -1 - 1
+PGA Gain=-7 100mV ≤ Output dynamic 
+range ≤ VDDA - 100mV -1 - 1
+PGA Gain=-15, 100mV ≤ Output dynamic 
+range ≤ VDDA - 100mV -1 - 1
+PGA Gain=-31 200mV ≤ Output ≤ VDDA - 
+200mV -2 - 2
+PGA Gain=-63 200mV ≤ Output dynamic 
+range ≤ VDDA - 200mV -5 - 2
+Table 74. OPAMP characteristics(1) (2) (continued)
+Symbol Parameter Conditions Min Typ Max Unit

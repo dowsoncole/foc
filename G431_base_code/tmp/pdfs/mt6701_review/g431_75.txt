@@ -1,0 +1,43 @@
+DS12589 Rev 6 75/198
+STM32G431x6 STM32G431x8 STM32G431xB Electrical characteristics
+160
+Figure 18. VREFINT versus temperature 
+5.3.5 Supply current characteristics
+The current consumption is a function of several parameters and factors such as the 
+operating voltage, ambient temperature, I/O pin loading, device software configuration, 
+operating frequencies, I/O pin switching rate, program location in memory and executed 
+binary code
+The current consumption is measured as described in Figure 17: Current consumption 
+measurement.
+Typical and maximum current consumption
+The MCU is placed under the following conditions:
+• All I/O pins are in analog input mode
+• All peripherals are disabled except when explicitly mentioned
+• The Flash memory access time is adjusted with the minimum wait states number, 
+depending on the fHCLK frequency (refer to the table “number of wait states according 
+to CPU clock (HCLK) frequency” available in the reference manual RM0440 
+"STM32G4 Series advanced Arm
+®-based 32-bit MCUs").
+• When the peripherals are enabled fPCLK = fHCLK
+• The voltage scaling Range 1 is adjusted to fHCLK frequency as follows:
+– Voltage Range 1 Boost mode for 150 MHz < f HCLK ≤ 170 MHz
+– Voltage Range 1 Normal mode for 26 MHz < f HCLK ≤ 150 MHz
+The parameters given in Table 21 to Table 24 are derived from tests performed under 
+ambient temperature and supply voltage conditions summarized in Table 17: General 
+operating conditions.
+MSv40169V2
+1.185
+1.19
+1.195
+1.2
+1.205
+1.21
+1.215
+1.22
+1.225
+1.23
+1.235
+-40 -20 0 20 40 60 80 100 120
+V
+°C
+Mean Min Max

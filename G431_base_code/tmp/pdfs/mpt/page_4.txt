@@ -1,0 +1,46 @@
+3
+Size
+Series Size Rotor type Stator type
+Inner rotor
+thread
+Rotor ID(H7) Stator fit
+OD（h7）
+Stator
+mounting
+PD
+Stator back
+install
+directly
+(2) Connector model
+A B C
+10
+MPT-10-20 Thread Front M10x0.4mm 9
+20 16.6 -
+X0600WRS-08-LPV01HF
+MPT-10B-20 Bonding Front - 9 10 12.6 - MPT-10-20H Thread Front/Back M10x0.4mm 9 ✓
+MPT-10B-20H Bonding Front/Back - 9 10 12.6 ✓
+15
+MPT-13-25 Thread Front M13x0.4mm 12
+25 21.6 - MPT-13-25H Thread Front/Back M13x0.4mm 12 ✓
+MPT-14-25 Thread Front M14x0.4mm 13 - MPT-14-25H Thread Front/Back M14x0.4mm 13 ✓
+MPT-15-25 Thread Front M15x0.4mm 14 - MPT-15B-25 Bonding Front - 14 15 17.6 - MPT-15-25H Thread Front/Back M15x0.4mm 14 ✓
+MPT-15B-25H Bonding Front/Back - 14 15 17.6 ✓
+20
+MPT-20-30 Thread Front M20x0.4mm 19
+30 26.6 -
+X0800WRS-08HF-LPV01
+MPT-20B-30 Bonding Front - 19 20 22.6 - MPT-20-30H Thread Front/Back M20x0.4mm 19 ✓
+MPT-20B-30H Bonding Front/Back - 19 20 22.6 ✓
+25
+MPT-25-35 Thread Front M25x0.4mm 24
+35 31.6 - MPT-25B-35 Bonding Front - 24 25 27.6 - MPT-25-35H Thread Front/Back M25x0.4mm 24 ✓
+MPT-25B-35H Bonding Front/Back - 24 25 27.6 ✓
+30
+MPT-30-40 Thread Front M30x0.4mm 29
+40 36.6 - MPT-30B-40 Bonding Front - 29 30 32.6 - MPT-30-40H Thread Front/Back M30x0.4mm 29 ✓
+MPT-30B-40H Bonding Front/Back - 29 30 32.6 ✓
+35
+MPT-35-45 Thread Front M35x0.4mm 34
+45 41.6 - MPT-35B-45 Bonding Front - 34 35 37.6 - MPT-35-45H Thread Front/Back M35x0.4mm 34 ✓
+MPT-35B-45H Bonding Front/Back - 34 35 37.6 ✓
+Download 3D models: https://kingkong.tech/encoder/MPT

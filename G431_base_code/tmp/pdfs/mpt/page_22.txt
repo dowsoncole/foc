@@ -1,0 +1,22 @@
+21
+Error Bit, Warning Bit, and Status Bit:
+Bit
+Position
+b7 b6 b5 b4 b3 b2 b1 b0
+Function Error Bit Warning Bit Status Bits
+(1) The BiSS-C protocol does not provide detailed status bit information. When an error or warning occurs, the corresponding error bit or warning bit in the output is asserted. The
+specific cause can then be identified through the status bits. LED and Status Bit Mapping:
+Only available in battery multi-turn or flash
+multi-turn versions b3 b2 b1 b0
+b5 b4
+Battery
+Multi-turn
+Battery Disconnect Battery Low Voltage Reserved
+Flash
+Multi-turn
+Single-turn Rotation
+Exceeds ±90° Reserved
+LED
+Flashing
+Yes Yes No No No No
+Status

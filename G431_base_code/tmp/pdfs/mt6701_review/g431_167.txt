@@ -1,0 +1,39 @@
+DS12589 Rev 6 167/198
+STM32G431x6 STM32G431x8 STM32G431xB Package information
+193
+6.3 UFQFPN48 package information
+This UFQFPN is a 48-lead, 7x7 mm, 0.5 mm pitch, ultra thin fine pitch quad flat package.
+Figure 46. UFQFPN48 - Outline
+1. Drawing is not to scale.
+2. All leads/pads should also be soldered to the PCB to improve the lead/pad solder joint life.
+3. There is an exposed die pad on the underside of the UFQFPN48 package. It is recommended to connect 
+and solder this back-side pad to PCB ground.
+A0B9_ME_V3
+D
+Pin 1 identifier
+laser marking area
+EE
+D
+Y
+D2
+E2
+Exposed pad 
+area
+Z
+1
+48
+Detail Z
+R 0.125 typ.
+1
+48
+L
+C 0.500x45°
+pin1 corner
+A
+Seating 
+plane
+A1
+be
+ddd
+Detail Y
+T

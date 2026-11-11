@@ -1,0 +1,20 @@
+16
+BUS (High speed bus) protocol interface
+Electrical connection diagram:
+Encoder Controller
+The interface uses a two-wire differential A/B signal configuration. Termination resistors are required on
+both lines. The encoder-side termination resistor is integrated inside the encoder, and a termination
+resistor should be added on the controller side. The protocol uses RS485 electrical signaling and UART data format, with a default baud rate of 2.5 Mbps. The interface receives a 1-byte command request, returns the corresponding encoder data according to
+the request, and appends a CRC-8 (x⁸ + 1) checksum at the end of the data for verification. Version Selection:
+Single-turn Resolution Multi-turn Resolution Model
+XX — XX-D
+16 XXM-D
+Protocol Configuration:
+Character Length Parity Stop bit Flow control Bit Order
+8 bit — 1 — LSB first
+Timing Diagram:
+Command B0 B1 B(N-1)
+(1) The current angular position data is latched at the red point. Command Request Data:
+Data Bits b7 b6 ~ b5 b4 ~ b0
+Data content Odd Parity Operation Type Device Address
+BUS

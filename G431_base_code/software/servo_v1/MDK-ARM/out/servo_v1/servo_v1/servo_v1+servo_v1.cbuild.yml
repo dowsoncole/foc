@@ -1,5 +1,5 @@
 build:
-  generated-by: csolution version 2.15.1+p3-gf46d68bf
+  generated-by: csolution version 2.15.0
   solution: ../../../servo_v1.csolution.yml
   project: ../../../servo_v1.cproject.yml
   context: servo_v1+servo_v1
@@ -26,13 +26,15 @@ build:
       path: ${CMSIS_PACK_ROOT}/ARM/CMSIS/6.3.0
     - pack: Keil::STM32G4xx_DFP@2.2.0
       path: ${CMSIS_PACK_ROOT}/Keil/STM32G4xx_DFP/2.2.0
-  optimize: debug
+  optimize: speed
   debug: on
   misc:
     ASM:
       - -masm=auto
     C:
       - -std=c99
+      - -ffp-mode=std
+      - -fno-finite-math-only
       - -fno-rtti
       - -funsigned-char
       - -fshort-enums
@@ -54,6 +56,8 @@ build:
       - -xc++
       - -std=c++11
       - -fno-exceptions
+      - -ffp-mode=std
+      - -fno-finite-math-only
       - -fno-rtti
       - -funsigned-char
       - -fshort-enums
@@ -203,6 +207,26 @@ build:
           category: header
     - group: Modules/Encoder
       files:
+        - file: ../../../../Modules/Encoder/Src/mpt_t485.c
+          category: sourceC
+        - file: ../../../../Modules/Encoder/Src/mpt_t485_protocol.c
+          category: sourceC
+        - file: ../../../../Servo/Src/output_position.c
+          category: sourceC
+        - file: ../../../../Servo/Src/output_position_math.c
+          category: sourceC
+        - file: ../../../../Modules/Encoder/Src/mt6701_ssi.c
+          category: sourceC
+        - file: ../../../../Modules/Encoder/Inc/mt6701_ssi.h
+          category: header
+        - file: ../../../../Modules/Encoder/Src/spi3_encoder.c
+          category: sourceC
+        - file: ../../../../Modules/Encoder/Inc/spi3_encoder.h
+          category: header
+        - file: ../../../../Modules/Encoder/Src/encoder.c
+          category: sourceC
+        - file: ../../../../Modules/Encoder/Inc/encoder.h
+          category: header
         - file: ../../../../Modules/Encoder/Src/spi1_encoder.c
           category: sourceC
         - file: ../../../../Modules/Encoder/Inc/spi1_encoder.h
@@ -213,6 +237,18 @@ build:
           category: header
     - group: Tests
       files:
+        - file: ../../../../Tests/Src/mt6701_spi3_test.c
+          category: sourceC
+        - file: ../../../../Tests/Inc/mt6701_spi3_test.h
+          category: header
+        - file: ../../../../Tests/Src/current_loop_test.c
+          category: sourceC
+        - file: ../../../../Tests/Inc/current_loop_test.h
+          category: header
+        - file: ../../../../Tests/Src/waveform_uart1_port.c
+          category: sourceC
+        - file: ../../../../Tests/Inc/waveform_uart1_port.h
+          category: header
         - file: ../../../../Tests/Src/tim1_pwm_verify.c
           category: sourceC
         - file: ../../../../Tests/Inc/tim1_pwm_verify.h
@@ -222,10 +258,6 @@ build:
         - file: ../../../../Tests/Src/waveform_generator.c
           category: sourceC
         - file: ../../../../Tests/Inc/waveform_generator.h
-          category: header
-        - file: ../../../../Tests/Src/mt6835_verify.c
-          category: sourceC
-        - file: ../../../../Tests/Inc/mt6835_verify.h
           category: header
     - group: Modules/Current Sampling
       files:
@@ -239,6 +271,16 @@ build:
           category: header
     - group: Modules/FOC
       files:
+        - file: ../../../../FOC/Src/foc_pi.c
+          category: sourceC
+        - file: ../../../../FOC/Inc/foc_pi.h
+          category: header
+        - file: ../../../../FOC/Src/foc_current_tuning.c
+          category: sourceC
+        - file: ../../../../FOC/Inc/foc_current_tuning.h
+          category: header
+        - file: ../../../../FOC/Inc/foc_control_manager.h
+          category: header
         - file: ../../../../FOC/Inc/foc_modulation.h
           category: header
         - file: ../../../../FOC/Src/foc_modulation.c
@@ -258,6 +300,10 @@ build:
         - file: ../../../../Servo/Inc/servo_manager.h
           category: header
         - file: ../../../../Servo/Src/servo_manager.c
+          category: sourceC
+        - file: ../../../../Servo/Inc/speed_commission.h
+          category: header
+        - file: ../../../../Servo/Src/speed_commission.c
           category: sourceC
     - group: Drivers/STM32G4xx_HAL_Driver
       files:

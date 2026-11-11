@@ -22,11 +22,14 @@
 #include "stm32g4xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "speed_commission.h"
 #include "tim6_heartbeat.h"
 #include "tim1_pwm.h"
 #include "adc1_current_sampling.h"
+#include "current_sampling.h"
 #include "encoder.h"
 #include "spi1_encoder.h"
+#include "timing_probes.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -175,7 +178,7 @@ void DebugMon_Handler(void)
 void PendSV_Handler(void)
 {
   /* USER CODE BEGIN PendSV_IRQn 0 */
-
+  SpeedCommission_OuterService();
   /* USER CODE END PendSV_IRQn 0 */
   /* USER CODE BEGIN PendSV_IRQn 1 */
 
@@ -206,14 +209,31 @@ void SysTick_Handler(void)
 /* USER CODE BEGIN 1 */
 void ADC1_2_IRQHandler(void)
 {
+  /* First software probe operation. This is IRQ entry, not ADC hardware
+     conversion completion; latency/exception stacking precede this edge. */
+  TimingProbe_AdcBegin();
   uint32_t entry_cycles = DWT->CYCCNT;
-  /* Timing probe: JEOS has asserted when this vector is entered.  The HAL
-     handler dispatches the injected conversion callback, which runs FOC and
-     commits the new CCR values before returning. */
-  GPIOA->BSRR = GPIO_PIN_0;
-  HAL_ADC_IRQHandler(&hadc1);
-  GPIOA->BSRR = ((uint32_t)GPIO_PIN_0 << 16U);
+  g_tim1_pwm_adc_entry_cycle = entry_cycles;
+  /* Keep both the fast and HAL fallback paths inside the same pulse. */
+  uint32_t pending = ADC1->ISR & ADC1->IER;
+  if (hadc1.Instance == ADC1 && (pending & ADC_IT_JEOS) &&
+      !(ADC1->IER & ADC_IT_JEOC) &&
+      !(ADC1->ISR & (ADC_FLAG_OVR | ADC_FLAG_JQOVF | ADC_FLAG_AWD1 | ADC_FLAG_AWD2 | ADC_FLAG_AWD3)) &&
+      !(pending & ~(ADC_IT_JEOC | ADC_IT_JEOS)) &&
+      hadc1.ErrorCode == HAL_ADC_ERROR_NONE &&
+      !(hadc1.State & (HAL_ADC_STATE_ERROR_INTERNAL | HAL_ADC_STATE_ERROR_CONFIG)) &&
+      (ADC1->JSQR & ADC_JSQR_JEXTEN) && !(ADC1->CFGR & ADC_CFGR_JAUTO))
+    CurrentSampling_InjectedFastIrq();
+  else
+    HAL_ADC_IRQHandler(&hadc1);
   Encoder_RecordFocIsrCycles(DWT->CYCCNT - entry_cycles);
+#if FOC_TARGET_IRQ_PROFILE
+  extern void FocIrqProfile_Record(uint32_t cycles);
+  FocIrqProfile_Record(DWT->CYCCNT - entry_cycles);
+#endif
+  /* FOC, CCR preload writes and deadline diagnostics have all returned.
+     Only the compiler epilogue / hardware exception return follows. */
+  TimingProbe_AdcEnd();
 }
 
 void DMA1_Channel1_IRQHandler(void)
@@ -228,7 +248,7 @@ void DMA1_Channel2_IRQHandler(void)
 
 void SPI1_IRQHandler(void)
 {
-  HAL_SPI_IRQHandler(&hspi1);
+  SPI1_Encoder_SpiIrqHandler();
 }
 
 /**
@@ -258,14 +278,22 @@ void TIM1_CC_IRQHandler(void)
   * @brief This function handles TIM1 update interrupt.
   *
   * The period boundary, once per PWM period thanks to the repetition counter.
-  * HAL_TIM_IRQHandler() dispatches it to HAL_TIM_PeriodElapsedCallback(), which
-  * is shared with the TIM6 heartbeat and therefore filters on the instance: this
-  * event currently costs one comparison and is otherwise unused. It is enabled
-  * from the start because the current loop needs a period boundary that does not
-  * depend on the ADC finishing.
+  * TIM1 starts encoder SPI/DMA directly, then dispatches the application
+  * PWM-boundary callback. TIM16 sampling is disabled. ADC still schedules FOC
+  * from JEOS; this ISR never waits for completion of SPI or the current loop.
   */
 void TIM1_UP_TIM16_IRQHandler(void)
 {
-  HAL_TIM_IRQHandler(&htim1);
+  TimingProbe_Tim1UpdateBegin();
+  if ((TIM1->SR & TIM_SR_UIF) && (TIM1->DIER & TIM_DIER_UIE))
+  {
+    /* Update-only vector; clear first, retain the shared application callback.
+       Do not scan unrelated capture/compare channels at every PWM boundary. */
+    TIM1->SR = ~TIM_SR_UIF;
+    Encoder_OnPwmPeriodIsr();
+    HAL_TIM_PeriodElapsedCallback(&htim1);
+  }
+  /* Last explicit operation: PD2 covers the full update IRQ body. */
+  TimingProbe_Tim1UpdateEnd();
 }
 /* USER CODE END 1 */

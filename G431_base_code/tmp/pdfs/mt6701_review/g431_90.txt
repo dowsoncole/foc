@@ -1,0 +1,54 @@
+Electrical characteristics STM32G431x6 STM32G431x8 STM32G431xB
+90/198 DS12589 Rev 6
+IDD
+(Shutdown with 
+RTC)
+Supply current 
+in Shutdown 
+mode (backup 
+registers 
+retained) RTC 
+enabled
+RTC 
+clocked by 
+LSE 
+bypassed 
+at 32768 
+Hz
+1.8 V 280 355 800 1800 4500 - - - - -
+nA
+2.4 V 400 500 1050 2250 5350 - - - - -
+3 V 745 985 1850 3400 7100 - - - - -
+3.6 V 2450 3250 4850 7100 11500 - - - - -
+RTC 
+clocked by 
+LSE 
+quartz
+(2) in 
+low drive 
+mode
+1.8 V 275 375 775 1650 - - - - - -
+2.4 V 375 495 950 2050 - - - - - -
+3 V 515 640 1200 2550 - - - - - -
+3.6 V 710 925 1750 3300 - - - - - -
+IDD(wakeup 
+from 
+Shutdown)
+Supply current 
+during wakeup 
+from Shutdown 
+mode
+Wakeup 
+clock is 
+HSI16 = 
+16 MHz
+(3)
+3  V 0 . 2 4 - - - - ----- m A
+1. Guaranteed by characterization re sults, unless otherwise specified.
+2. Based on characterization done with a 32.768 kHz crystal (MC306- G-06Q-32.768, manufacturer JFVNY) with two 6.8 pF loading capacitors. 
+3. Wakeup with code execution from Flash. Average val ue given for a typical wakeup time as specified in Table 35: Low-power mode wakeup timings.
+Table 32. Current consumption in Shutdown mode (continued)
+Symbol Parameter
+Conditions TYP MAX (1)
+Unit
+- VDD 25°C 55°C 85°C 105°C 125°C 25°C 55°C 85°C 105°C 125°C

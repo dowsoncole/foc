@@ -2,20 +2,24 @@
 
 from __future__ import annotations
 
+import faulthandler
+import csv
 import json
 import math
 import random
 import sys
+import traceback
+import time
 from collections import deque
 from collections.abc import Sequence
 from datetime import datetime
 from pathlib import Path
 
 from PyQt5.QtCore import QEvent, QPoint, QPointF, QRectF, Qt, QTimer
-from PyQt5.QtGui import QColor, QFont, QLinearGradient, QPainter, QPainterPath, QPen
+from PyQt5.QtGui import QColor, QFont, QFontMetrics, QLinearGradient, QPainter, QPainterPath, QPen
 from PyQt5.QtWidgets import (
-    QApplication, QButtonGroup, QCheckBox, QComboBox, QDoubleSpinBox, QFileDialog,
-    QFrame, QGraphicsScene, QGraphicsView, QGridLayout, QHBoxLayout, QHeaderView,
+    QApplication, QButtonGroup, QCheckBox, QComboBox, QDialog, QDoubleSpinBox, QFileDialog,
+    QFrame, QGraphicsScene, QGraphicsView, QGridLayout, QHBoxLayout, QHeaderView, QLayout,
     QLabel, QLineEdit, QListWidget, QListWidgetItem, QMainWindow, QMessageBox,
     QProgressBar, QPushButton, QScrollArea, QSpinBox, QTableWidget,
     QTableWidgetItem, QTextEdit, QToolButton, QVBoxLayout, QWidget,
@@ -38,6 +42,42 @@ SHELL, PANEL, PANEL_ALT = "#0d0c10", "#151419", "#1c1b21"
 BORDER, TEXT, MUTED = "#45424a", "#f4f1f3", "#9f9aa2"
 CYAN, BLUE, AMBER, RED, GREEN = "#c92f4d", "#8f99a4", "#d9ae68", "#e85a70", "#59c98b"
 DESIGN_WIDTH, DESIGN_HEIGHT = 1440, 900
+CRASH_LOG_PATH = Path(__file__).resolve().parent / "logs" / "servo_crash.log"
+_CRASH_LOG_STREAM = None
+
+
+def write_crash_report(context: str, exception: BaseException | None = None) -> None:
+    """Append a durable traceback without allowing logging itself to fail the UI."""
+    try:
+        CRASH_LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
+        timestamp = datetime.now().astimezone().isoformat(timespec="seconds")
+        if exception is None:
+            details = "".join(traceback.format_exception(*sys.exc_info()))
+        else:
+            details = "".join(traceback.format_exception(type(exception), exception, exception.__traceback__))
+        with CRASH_LOG_PATH.open("a", encoding="utf-8") as stream:
+            stream.write(f"\n[{timestamp}] {context}\n{details}")
+    except Exception:
+        pass
+
+
+def install_crash_logging() -> None:
+    """Capture Python and native faults in a file that survives an abrupt exit."""
+    global _CRASH_LOG_STREAM
+    try:
+        CRASH_LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
+        _CRASH_LOG_STREAM = CRASH_LOG_PATH.open("a", encoding="utf-8", buffering=1)
+        faulthandler.enable(_CRASH_LOG_STREAM, all_threads=True)
+    except Exception:
+        _CRASH_LOG_STREAM = None
+
+    previous_hook = sys.excepthook
+
+    def logged_excepthook(exc_type, exc_value, exc_traceback) -> None:
+        write_crash_report("未捕获的界面异常", exc_value)
+        previous_hook(exc_type, exc_value, exc_traceback)
+
+    sys.excepthook = logged_excepthook
 
 
 class ResponsiveView(QGraphicsView):
@@ -159,10 +199,31 @@ class ScopeChart(QWidget):
         self.channel_units = ["", "", "", ""]
         self.hover_position: QPoint | None = None
         self.y_range = 100.0
+        self.sample_rate_hz = 20.0
+        self.time_window_samples: int | None = None
+        self.view_end_offset = 0
+        self.space_pressed = False
+        self.dragging = False
+        self.drag_last_x = 0
+        self.data_source: "ScopeChart | None" = None
+        self.on_double_click = None
         self.dirty = True
+        self.selected_channel = 0
         self.setMinimumHeight(270)
         self.setAttribute(Qt.WA_OpaquePaintEvent)
         self.setMouseTracking(True)
+        self.setFocusPolicy(Qt.StrongFocus)
+
+    def series_data(self):
+        return self.data_source.data if self.data_source is not None else self.data
+
+    def set_data_source(self, source: "ScopeChart") -> None:
+        self.data_source = source
+        self.sample_rate_hz = source.sample_rate_hz
+        self.channel_names = list(source.channel_names)
+        self.channel_units = list(source.channel_units)
+        self.visible = list(source.visible)
+        self.update()
 
     def set_capacity(self, capacity: int) -> None:
         """Resize every channel buffer, keeping the most recent samples."""
@@ -174,7 +235,14 @@ class ScopeChart(QWidget):
             deque(series, maxlen=capacity) for series in self.data
         ]
         self.data = resized
+        if self.time_window_samples is not None:
+            self.time_window_samples = min(self.time_window_samples, capacity)
+        self.view_end_offset = min(self.view_end_offset, max(0, capacity - 2))
         self.dirty = True
+
+    def set_sample_rate(self, rate_hz: float) -> None:
+        self.sample_rate_hz = max(float(rate_hz), 0.001)
+        self.update()
 
     def set_theme(self, theme_name: str) -> None:
         self.theme_name = theme_name
@@ -197,6 +265,7 @@ class ScopeChart(QWidget):
     def clear(self) -> None:
         self.data = [deque(maxlen=self.capacity) for _ in range(4)]
         self.dirty = True
+        self.view_end_offset = 0
         self.update()
 
     def set_channel_names(self, names: Sequence[str], units: Sequence[str] | None = None) -> None:
@@ -205,33 +274,160 @@ class ScopeChart(QWidget):
             self.channel_units = list(units[:4])
         self.update()
 
+    def mousePressEvent(self, event) -> None:
+        if event.button() == Qt.LeftButton:
+            self.setFocus(Qt.MouseFocusReason)
+            self.dragging = True
+            self.drag_last_x = event.x()
+            self.setCursor(Qt.ClosedHandCursor)
+            event.accept()
+            return
+        super().mousePressEvent(event)
+
     def mouseMoveEvent(self, event) -> None:
+        if self.dragging and event.buttons() & Qt.LeftButton:
+            delta = event.x() - self.drag_last_x
+            self.drag_last_x = event.x()
+            self.pan_time(delta)
+            event.accept()
+            return
         self.hover_position = event.pos()
         self.update()
 
+    def mouseReleaseEvent(self, event) -> None:
+        if event.button() == Qt.LeftButton and self.dragging:
+            self.dragging = False
+            self.unsetCursor()
+            event.accept()
+            return
+        super().mouseReleaseEvent(event)
+
+    def mouseDoubleClickEvent(self, event) -> None:
+        if event.button() == Qt.LeftButton and callable(self.on_double_click):
+            self.on_double_click()
+            event.accept()
+            return
+        super().mouseDoubleClickEvent(event)
+
+    def enterEvent(self, event) -> None:
+        # The scope must receive Space before the first click, including when
+        # embedded in the main window's graphics proxy.
+        self.setFocus(Qt.MouseFocusReason)
+        super().enterEvent(event)
+
+    def focusOutEvent(self, event) -> None:
+        self.space_pressed = False
+        super().focusOutEvent(event)
+
+    def keyPressEvent(self, event) -> None:
+        if event.key() == Qt.Key_Space:
+            self.space_pressed = True
+            event.accept()
+            return
+        super().keyPressEvent(event)
+
+    def keyReleaseEvent(self, event) -> None:
+        if event.key() == Qt.Key_Space:
+            self.space_pressed = False
+            event.accept()
+            return
+        super().keyReleaseEvent(event)
+
     def leaveEvent(self, event) -> None:
         self.hover_position = None
+        self.space_pressed = False
         self.update()
         super().leaveEvent(event)
 
     def wheelEvent(self, event) -> None:
-        """Zoom the vertical current scale around zero with the mouse wheel."""
+        """Wheel zooms amplitude; Space+wheel zooms the time axis."""
         steps = event.angleDelta().y() / 120.0
         if steps:
-            self.zoom_vertical(steps)
+            if self.space_pressed:
+                self.zoom_time(steps, event.pos().x())
+            else:
+                self.zoom_vertical(steps)
             event.accept()
             return
         super().wheelEvent(event)
 
     def zoom_vertical(self, steps: float) -> None:
         factor = 0.8 ** steps
-        self.y_range = clamp(self.y_range * factor, 0.1, 1000.0)
+        self.y_range = clamp(self.y_range * factor, 0.1, 1e9)
         self.dirty = True
         self.update()
+
+    def _current_span(self, length: int) -> int:
+        if length <= 1:
+            return max(length, 1)
+        requested = self.time_window_samples if self.time_window_samples is not None else length
+        return max(2, min(int(requested), length))
+
+    def plot_area(self) -> QRectF:
+        source = self.data_source or self
+        units = {unit for unit, visible in zip(source.channel_units, source.visible) if visible and unit}
+        unit = f" {units.pop()}" if len(units) == 1 else ""
+        metrics = QFontMetrics(QFont("Segoe UI", 8))
+        width = max(metrics.horizontalAdvance(f"{sign}{self.y_range:g}{unit}") for sign in ("+", "-"))
+        return QRectF(self.rect()).adjusted(max(58, width + 16), 18, -26, -64)
+
+    def zoom_time(self, steps: float, anchor_x: float | None = None) -> None:
+        length = max((len(series) for series in self.series_data()), default=0)
+        if length < 2:
+            return
+        current = self._current_span(length)
+        start, _ = self.visible_bounds(length)
+        if anchor_x is None and self.hover_position is not None:
+            anchor_x = self.hover_position.x()
+        area = self.plot_area()
+        ratio = 1.0 if anchor_x is None else clamp((anchor_x - area.left()) / max(area.width(), 1), 0, 1)
+        anchor_sample = start + ratio * (current - 1)
+        target = int(round(current * (0.8 ** steps)))
+        self.time_window_samples = min(length, max(8, target))
+        new_start = round(anchor_sample - ratio * (self.time_window_samples - 1))
+        new_start = max(0, min(length - self.time_window_samples, new_start))
+        self.view_end_offset = length - new_start - self.time_window_samples
+        self.dirty = True
+        self.update()
+
+    def pan_time(self, delta_pixels: int) -> None:
+        length = max((len(series) for series in self.series_data()), default=0)
+        span = self._current_span(length)
+        if length <= span or self.width() <= 0:
+            return
+        sample_delta = round(delta_pixels / self.width() * span)
+        self.view_end_offset = max(0, min(length - span, self.view_end_offset + sample_delta))
+        self.dirty = True
+        self.update()
+
+    def visible_bounds(self, length: int) -> tuple[int, int]:
+        span = self._current_span(length)
+        end = max(span, length - self.view_end_offset)
+        end = min(end, length)
+        return end - span, end
 
     def flush(self) -> None:
         if self.dirty and self.isVisible():
             self.update()
+
+    @staticmethod
+    def display_points(values, columns):
+        """Preserve each pixel bucket's extrema and temporal order."""
+        step = max(1, math.ceil(len(values) / max(1, columns // 2)))
+        for start in range(0, len(values), step):
+            bucket = values[start:start + step]
+            if step == 1:
+                yield start, bucket[0]
+            else:
+                low = min(range(len(bucket)), key=bucket.__getitem__)
+                high = max(range(len(bucket)), key=bucket.__getitem__)
+                offsets = {low, high}
+                if start == 0:
+                    offsets.add(0)
+                if start + step >= len(values):
+                    offsets.add(len(bucket) - 1)
+                for offset in sorted(offsets):
+                    yield start + offset, bucket[offset]
 
     def paintEvent(self, event) -> None:
         del event
@@ -245,8 +441,33 @@ class ScopeChart(QWidget):
         background.setColorAt(0, QColor("#ffffff" if self.theme_name == "light" else "#19181d"))
         background.setColorAt(0.08, QColor(chart_background))
         background.setColorAt(1, QColor("#ebe9ec" if self.theme_name == "light" else "#0d0c10"))
+        corner_background = QColor("#efedf0" if self.theme_name == "light" else "#1b1a1f")
+        painter.fillRect(self.rect(), corner_background)
+        chart_shape = QPainterPath()
+        chart_shape.addRoundedRect(QRectF(self.rect()).adjusted(0, 0, -1, -1), 6, 6)
+        painter.save()
+        painter.setClipPath(chart_shape)
         painter.fillRect(self.rect(), background)
-        area = QRectF(self.rect()).adjusted(48, 18, -18, -35)
+        if self.data_source is not None:
+            self.sample_rate_hz = self.data_source.sample_rate_hz
+            self.channel_names = list(self.data_source.channel_names)
+            self.channel_units = list(self.data_source.channel_units)
+            self.visible = list(self.data_source.visible)
+        series_data = self.series_data()
+        longest = max((len(series) for series in series_data), default=0)
+        start, end = self.visible_bounds(longest)
+        painter.setFont(QFont("Segoe UI", 8))
+        visible_units = {
+            self.channel_units[index]
+            for index in range(4)
+            if self.visible[index] and self.channel_units[index]
+        }
+        axis_unit = f" {visible_units.pop()}" if len(visible_units) == 1 else ""
+        top_label = f"+{self.y_range:g}{axis_unit}"
+        bottom_label = f"-{self.y_range:g}{axis_unit}"
+        label_width = max(painter.fontMetrics().horizontalAdvance(top_label), painter.fontMetrics().horizontalAdvance(bottom_label))
+        left_margin = max(58, label_width + 16)
+        area = self.plot_area()
         painter.setPen(QPen(QColor(grid_color), 1, Qt.DotLine))
         for i in range(9):
             x = area.left() + area.width() * i / 8
@@ -255,65 +476,212 @@ class ScopeChart(QWidget):
             y = area.top() + area.height() * i / 6
             painter.drawLine(QPointF(area.left(), y), QPointF(area.right(), y))
         painter.setPen(QColor(axis_color))
-        painter.setFont(QFont("Segoe UI", 8))
-        visible_units = {
-            self.channel_units[index]
-            for index in range(4)
-            if self.visible[index] and self.channel_units[index]
-        }
-        axis_unit = f" {visible_units.pop()}" if len(visible_units) == 1 else ""
-        painter.drawText(7, int(area.top() + 5), f"+{self.y_range:g}{axis_unit}")
-        painter.drawText(28, int(area.center().y() + 4), "0")
-        painter.drawText(7, int(area.bottom()), f"-{self.y_range:g}{axis_unit}")
-        painter.drawText(int(area.right() - 66), self.height() - 12, "TIME / ms")
-        for index, series in enumerate(self.data):
-            if not self.visible[index] or len(series) < 2:
+        painter.drawText(QRectF(5, area.top() - 9, left_margin - 11, 20), Qt.AlignLeft | Qt.AlignVCenter, top_label)
+        painter.drawText(QRectF(5, area.center().y() - 10, left_margin - 11, 20), Qt.AlignHCenter | Qt.AlignVCenter, "0")
+        painter.drawText(QRectF(5, area.bottom() - 10, left_margin - 11, 20), Qt.AlignLeft | Qt.AlignVCenter, bottom_label)
+        for i in range(9):
+            sample_index = start + (end - start - 1) * i / 8 if end > start else 0
+            relative_ms = (sample_index - max(longest - 1, 0)) / self.sample_rate_hz * 1000.0
+            label = f"{relative_ms:.0f}"
+            x = area.left() + area.width() * i / 8
+            if i == 0:
+                label_rect, alignment = QRectF(area.left(), area.bottom() + 5, 66, 18), Qt.AlignLeft
+            elif i == 8:
+                label_rect, alignment = QRectF(area.right() - 66, area.bottom() + 5, 66, 18), Qt.AlignRight
+            else:
+                label_rect, alignment = QRectF(x - 33, area.bottom() + 5, 66, 18), Qt.AlignHCenter
+            painter.drawText(label_rect, alignment | Qt.AlignVCenter, label)
+        painter.drawText(QRectF(area.right() - 100, area.bottom() + 26, 100, 18), Qt.AlignRight | Qt.AlignVCenter, "TIME / ms")
+        clipped = False
+        painter.setRenderHint(QPainter.Antialiasing, False)
+        for index, series in enumerate(series_data):
+            if not self.visible[index]:
                 continue
+            window = list(series)[start:end]
+            if len(window) < 2:
+                continue
+            clipped = clipped or any(abs(value) > self.y_range for value in window)
             path = QPainterPath()
-            for i, value in enumerate(series):
-                x = area.left() + area.width() * i / (len(series) - 1)
+            for i, value in self.display_points(window, min(800, int(area.width()))):
+                x = area.left() + area.width() * i / (len(window) - 1)
                 y = area.center().y() - clamp(value, -self.y_range, self.y_range) * area.height() / (2.0 * self.y_range)
                 path.moveTo(x, y) if i == 0 else path.lineTo(x, y)
-            if index == 0:
+            if index == (self.data_source.selected_channel if self.data_source else self.selected_channel):
                 fill = QPainterPath(path)
                 fill.lineTo(area.right(), area.center().y())
                 fill.lineTo(area.left(), area.center().y())
                 gradient = QLinearGradient(area.topLeft(), area.bottomLeft())
-                gradient.setColorAt(0, QColor(201, 47, 77, 44))
-                gradient.setColorAt(1, QColor(201, 47, 77, 0))
+                shade = QColor(self.COLORS[index])
+                shade.setAlpha(45)
+                gradient.setColorAt(0, shade)
+                shade.setAlpha(0)
+                gradient.setColorAt(1, shade)
                 painter.fillPath(fill, gradient)
-            painter.setPen(QPen(QColor(self.COLORS[index]), 1.8, Qt.SolidLine, Qt.RoundCap))
+            painter.setPen(QPen(QColor(self.COLORS[index]), 1.5, Qt.SolidLine, Qt.FlatCap))
             painter.drawPath(path)
-        self._draw_hover(painter, area)
+        painter.setRenderHint(QPainter.Antialiasing, True)
+        if clipped:
+            painter.setPen(QColor("#b45f16"))
+            painter.drawText(QRectF(area.left(), area.bottom() + 26, area.width() - 110, 18),
+                             Qt.AlignLeft | Qt.AlignVCenter, "超出显示量程 · 滚轮调整幅值；请核对数据源数值")
+        self._draw_hover(painter, area, series_data, start, end)
+        painter.restore()
 
-    def _draw_hover(self, painter: QPainter, area: QRectF) -> None:
+    def _draw_hover(self, painter: QPainter, area: QRectF, series_data, start: int, end: int) -> None:
         point = self.hover_position
-        longest = max((len(series) for series in self.data), default=0)
-        if point is None or longest == 0 or not area.contains(QPointF(point)):
+        span = end - start
+        if point is None or span <= 0 or not area.contains(QPointF(point)):
             return
         ratio = (point.x() - area.left()) / max(area.width(), 1.0)
-        sample_index = max(0, min(longest - 1, round(ratio * (longest - 1))))
-        x = area.left() if longest == 1 else area.left() + area.width() * sample_index / (longest - 1)
+        sample_index = start + max(0, min(span - 1, round(ratio * (span - 1))))
+        x = area.left() if span == 1 else area.left() + area.width() * (sample_index - start) / (span - 1)
         painter.setPen(QPen(QColor("#76717a"), 1, Qt.DashLine))
         painter.drawLine(QPointF(x, area.top()), QPointF(x, area.bottom()))
         rows = []
-        for channel, series in enumerate(self.data):
+        for channel, series in enumerate(series_data):
             if self.visible[channel] and sample_index < len(series):
                 unit = f" {self.channel_units[channel]}" if self.channel_units[channel] else ""
                 rows.append((channel, f"{self.channel_names[channel]}  {series[sample_index]:+.3f}{unit}"))
         if not rows:
             return
-        box_width, line_height = 150, 19
+        painter.setFont(QFont("Segoe UI", 8))
+        metrics = painter.fontMetrics()
+        box_width = max(metrics.horizontalAdvance(text) for _, text in rows) + 20
+        box_width = min(box_width, max(80, int(area.width()) - 8))
+        line_height = max(19, metrics.height() + 4)
         box_height = 12 + line_height * len(rows)
-        box_x = min(max(point.x() + 12, int(area.left())), int(area.right() - box_width))
+        preferred_x = point.x() + 12
+        if preferred_x + box_width > area.right():
+            preferred_x = point.x() - box_width - 12
+        box_x = min(max(preferred_x, int(area.left()) + 4), int(area.right() - box_width) - 4)
         box_y = min(max(point.y() + 12, int(area.top())), int(area.bottom() - box_height))
         painter.setPen(QPen(QColor("#8e8991"), 1))
         painter.setBrush(QColor(255, 255, 255, 235) if self.theme_name == "light" else QColor(18, 17, 21, 238))
         painter.drawRoundedRect(QRectF(box_x, box_y, box_width, box_height), 5, 5)
-        painter.setFont(QFont("Segoe UI", 8))
         for row, (channel, text) in enumerate(rows):
             painter.setPen(QColor(self.COLORS[channel]))
-            painter.drawText(box_x + 9, box_y + 18 + row * line_height, text)
+            safe_text = metrics.elidedText(text, Qt.ElideRight, int(box_width) - 18)
+            painter.drawText(QRectF(box_x + 9, box_y + 6 + row * line_height, box_width - 18, line_height), Qt.AlignLeft | Qt.AlignVCenter, safe_text)
+
+
+class ScopePopup(QDialog):
+    """Large non-modal view sharing the live samples of the embedded scope."""
+
+    def __init__(self, source: ScopeChart, parent=None) -> None:
+        super().__init__(parent)
+        self.setWindowFlags(
+            Qt.Window
+            | Qt.WindowTitleHint
+            | Qt.WindowSystemMenuHint
+            | Qt.WindowMinMaxButtonsHint
+            | Qt.WindowCloseButtonHint
+        )
+        self.setAttribute(Qt.WA_DeleteOnClose, False)
+        self.setWindowTitle("实时波形 - 独立视图")
+        available = QApplication.primaryScreen().availableGeometry()
+        target_width = min(2400, int(available.width() * 0.96))
+        target_height = min(1520, int(available.height() * 0.96))
+        self.resize(target_width, target_height)
+        self.move(
+            available.left() + (available.width() - target_width) // 2,
+            available.top() + (available.height() - target_height) // 2,
+        )
+        self.setMinimumSize(760, 480)
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(8, 8, 8, 8)
+        self.chart = ScopeChart()
+        self.chart.set_data_source(source)
+        self.chart.set_theme(source.theme_name)
+        self.chart.y_range = source.y_range
+        layout.addWidget(self.chart, 1)
+        self.overlay_controls = QFrame(self.chart)
+        self.overlay_controls.setObjectName("scope-overlay-controls")
+        controls_layout = QHBoxLayout(self.overlay_controls)
+        controls_layout.setContentsMargins(6, 5, 6, 5)
+        controls_layout.setSpacing(6)
+        self.help_button = QToolButton()
+        self.help_button.setObjectName("scope-help-button")
+        self.help_button.setText("操作帮助  ?")
+        self.help_button.setCheckable(True)
+        controls_layout.addWidget(self.help_button)
+        self.overlay_controls.adjustSize()
+        self.help_panel = QFrame(self.chart)
+        self.help_panel.setObjectName("scope-help-panel")
+        self.help_panel.setAttribute(Qt.WA_StyledBackground, True)
+        help_layout = QGridLayout(self.help_panel)
+        help_layout.setContentsMargins(14, 10, 14, 10)
+        help_layout.setSpacing(5)
+        help_layout.setHorizontalSpacing(24)
+        for shortcut, description in (
+            ("鼠标滚轮", "缩放波形幅值"),
+            ("空格 + 鼠标滚轮", "缩放时间轴"),
+            ("按住鼠标左键拖动", "左右浏览历史波形"),
+            ("鼠标悬停", "查看对应采样点数值"),
+        ):
+            row_index = help_layout.rowCount()
+            for column, text in enumerate((shortcut, description)):
+                label = QLabel(text)
+                label.setObjectName("scope-help-row")
+                label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+                help_layout.addWidget(label, row_index, column)
+        self.help_button.toggled.connect(self.help_panel.setVisible)
+        self.help_button.toggled.connect(self._position_overlays)
+        self.help_button.setChecked(True)
+        self.help_panel.setVisible(True)
+        self.help_panel.adjustSize()
+        self.overlay_controls.raise_()
+        self.refresh_timer = QTimer(self)
+        self.refresh_timer.setInterval(33)
+        self.refresh_timer.timeout.connect(self.chart.update)
+        self.refresh_timer.start()
+        self.set_theme(source.theme_name)
+
+    def resizeEvent(self, event) -> None:
+        super().resizeEvent(event)
+        self._position_overlays()
+
+    def _position_overlays(self, checked=None) -> None:
+        del checked
+        margin = 14
+        self.overlay_controls.adjustSize()
+        controls_x = max(margin, self.chart.width() - self.overlay_controls.width() - margin)
+        self.overlay_controls.move(controls_x, margin)
+        self.overlay_controls.raise_()
+        self.help_panel.adjustSize()
+        help_x = max(margin, self.chart.width() - self.help_panel.width() - margin)
+        help_y = self.overlay_controls.y() + self.overlay_controls.height() + 7
+        self.help_panel.move(help_x, help_y)
+        self.help_panel.raise_()
+
+    def set_theme(self, theme_name: str) -> None:
+        self.chart.set_theme(theme_name)
+        self.help_panel.setStyleSheet(
+            "QFrame#scope-help-panel { background: white; border: 1px solid #c8c4ca; border-radius: 6px; }"
+            "QLabel { color: #343038; background: transparent; border: none; }"
+        )
+        if theme_name == "light":
+            self.setStyleSheet("""
+                QDialog { background:#e9e8eb; }
+                QFrame#scope-overlay-controls { background:rgba(255,255,255,235); border:1px solid #c8c4ca; border-radius:6px; }
+                QToolButton#scope-help-button { color:#9d1733; background:#f9e8ec; border:1px solid #d99aaa; border-radius:5px; padding:7px 12px; font-weight:700; }
+                QToolButton#scope-help-button:checked { color:white; background:#bd2946; border-color:#9d1733; }
+                QFrame#scope-help-panel { background:rgba(255,255,255,250); border:1px solid #c8c4ca; border-radius:6px; }
+                QLabel#scope-help-row { color:#343038; background:transparent; }
+            """)
+        else:
+            self.setStyleSheet("""
+                QDialog { background:#0d0c10; }
+                QFrame#scope-overlay-controls { background:rgba(25,24,29,235); border:1px solid #45424a; border-radius:6px; }
+                QToolButton#scope-help-button { color:#e85a70; background:#2b1018; border:1px solid #8f243b; border-radius:5px; padding:7px 12px; font-weight:700; }
+                QToolButton#scope-help-button:checked { color:white; background:#ad203d; }
+                QFrame#scope-help-panel { background:rgba(255,255,255,250); border:1px solid #817b85; border-radius:6px; }
+                QLabel#scope-help-row { color:#343038; background:transparent; }
+            """)
+        self._position_overlays()
+
+    def closeEvent(self, event) -> None:
+        self.refresh_timer.stop()
+        super().closeEvent(event)
 
 
 class MotionTracker(QWidget):
@@ -521,14 +889,17 @@ class ServoWindow(QMainWindow):
         self.timer.setInterval(50)
         self.timer.timeout.connect(self.update_simulation)
         self.scope_timer = QTimer(self)
-        self.scope_timer.setInterval(50)
+        self.scope_timer.setInterval(100)  # Fixed acquisition period: 100 ms
         self.scope_timer.timeout.connect(self.sample_scope)
-        self.scope_running = True
+        self.scope_running = False
         self.scope_trigger_mode = "自动"
         self.scope_trigger_remaining = -1
         self.scope_trigger_ready = True
+        self.scope_faulted = False
         self.scope_clock = 0.0
         self.scope_last_trigger: float | None = None
+        self.scope_trigger_source = 0
+        self.scope_trigger_level_value = 0.0
         self.waveform_source = None
         self.waveform_source_rate = 1000
         self.waveform_idle_ticks = 0
@@ -569,6 +940,12 @@ class ServoWindow(QMainWindow):
         self.setFixedSize(target_width, target_height)
         self.pages = AnimatedStackedWidget(duration=220)
         self.scope, self.log_view = ScopeChart(), QTextEdit()
+        self.scope.set_channel_names(
+            ("等待通道", "--", "--", "--"),
+            ("", "", "", ""),
+        )
+        self.scope.on_double_click = self.open_scope_popup
+        self.scope_popup: ScopePopup | None = None
         self.motion_tracker = MotionTracker()
         self.nav_buttons: list[QPushButton] = []
         self.connection_pills: list[StatusPill] = []
@@ -700,6 +1077,8 @@ class ServoWindow(QMainWindow):
         self.design_view.setBackgroundBrush(QColor("#e8e6e9" if self.theme_name == "light" else "#08080a"))
         self.theme_button.setText("DARK" if self.theme_name == "light" else "LIGHT")
         self.scope.set_theme(self.theme_name)
+        if self.scope_popup is not None:
+            self.scope_popup.set_theme(self.theme_name)
         self.motion_tracker.set_theme(self.theme_name)
         self.ambient_overlay.set_theme(self.theme_name)
         for pill in self.findChildren(StatusPill):
@@ -857,9 +1236,12 @@ class ServoWindow(QMainWindow):
 
     def build_scope_page(self) -> QWidget:
         page, layout = self.page_shell("实时示波器", "多通道信号采集、触发与波形观察")
+        # Propagate the chart's minimum height through its frame and scroll page.
+        layout.setSizeConstraint(QLayout.SetMinimumSize)
+        layout.setSpacing(10)
         toolbar = QHBoxLayout()
         self.scope_action_buttons = []
-        for text, slot, primary in (("开始采集", lambda: self.set_scope_running(True), True), ("停止采集", lambda: self.set_scope_running(False), False), ("清除波形", self.clear_scope, False)):
+        for text, slot, primary in (("开始采集", lambda: self.set_scope_running(True), True), ("停止采集", lambda: self.set_scope_running(False), False), ("清除波形", self.clear_scope, False), ("导出波形", self.export_scope_data, False)):
             button = QPushButton(text)
             if primary:
                 button.setObjectName("primary-button")
@@ -868,28 +1250,27 @@ class ServoWindow(QMainWindow):
             toolbar.addWidget(button)
         self.scope_action_buttons[0].setEnabled(False)
         self.scope_period, self.scope_trigger, self.scope_source = QComboBox(), QComboBox(), QComboBox()
-        self.scope_period.addItems(("10 ms", "20 ms", "50 ms", "100 ms"))
-        self.scope_period.setCurrentText("50 ms")
+        self.scope_period.addItems(("100 ms",))
+        self.scope_period.setCurrentText("100 ms")
+        self.scope_period.setToolTip("上位机读取接收缓存的固定间隔 100 ms，不改变设备采样率。")
         self.scope_period.currentTextChanged.connect(self.set_scope_period)
         self.scope_trigger.addItems(("自动", "上升沿", "下降沿", "单次"))
         self.scope_trigger.currentTextChanged.connect(self.set_scope_trigger)
         self.scope_source.addItems(("CH1", "CH2", "CH3", "CH4"))
-        self.scope_source.currentIndexChanged.connect(self.reset_scope_trigger_reference)
+        self.scope_source.currentIndexChanged.connect(self.set_scope_trigger_source)
         self.scope_trigger_level = QDoubleSpinBox()
         self.scope_trigger_level.setRange(-100.0, 100.0)
         self.scope_trigger_level.setDecimals(1)
         self.scope_trigger_level.setSuffix(" %")
         self.scope_trigger_level.setMaximumWidth(105)
-        self.scope_trigger_level.valueChanged.connect(self.reset_scope_trigger_reference)
+        self.scope_trigger_level.valueChanged.connect(self.set_scope_trigger_level)
         toolbar.addStretch()
         self.scope_status = StatusPill()
-        self.scope_status.set_state("自动采集中", "run")
+        self.scope_status.set_state("等待数据源", "off")
         toolbar.addWidget(self.scope_status)
         layout.addLayout(toolbar)
         settings = QHBoxLayout()
-        settings.addWidget(self.label("采样周期", "field-label"))
-        settings.addWidget(self.scope_period)
-        settings.addSpacing(12)
+        # 接收周期固定 100 ms，不在 UI 展示该选项。
         settings.addWidget(self.label("触发方式", "field-label"))
         settings.addWidget(self.scope_trigger)
         settings.addSpacing(12)
@@ -913,7 +1294,7 @@ class ServoWindow(QMainWindow):
         transport = QHBoxLayout()
         transport.addWidget(self.label("数据源", "field-label"))
         self.waveform_source_combo = QComboBox()
-        self.waveform_source_combo.addItems(("仿真模型", "RS485 串口", "内置正弦演示"))
+        self.waveform_source_combo.addItems(("RS485 串口", "内置正弦演示"))
         self.waveform_source_combo.currentTextChanged.connect(self.on_waveform_source_changed)
         transport.addWidget(self.waveform_source_combo)
         transport.addSpacing(12)
@@ -936,7 +1317,7 @@ class ServoWindow(QMainWindow):
         transport.addStretch()
         layout.addLayout(transport)
         self.waveform_status = StatusPill()
-        self.waveform_status.set_state("数据源：仿真模型", "off")
+        self.waveform_status.set_state("等待打开 RS485 串口", "warn")
         status_row = QHBoxLayout()
         status_row.addWidget(self.label("链路统计", "field-label"))
         self.waveform_stats_label = QLabel("尚未采集")
@@ -948,9 +1329,27 @@ class ServoWindow(QMainWindow):
         self.refresh_serial_ports()
         self.sync_serial_controls()
         self.sync_scope_controls()
-        panel = self.panel("实时波形", "ENGINEERING VALUE · 鼠标悬停查看数值 · 滚轮缩放")
-        panel.layout().addWidget(self.scope)
-        layout.addWidget(panel, 1)
+        statistics_toolbar = QHBoxLayout()
+        self.scope_heading_label = self.label("实时波形", "section-title")
+        statistics_toolbar.addWidget(self.scope_heading_label)
+        statistics_toolbar.addStretch()
+        statistics_toolbar.addWidget(self.label("统计通道", "field-label"))
+        self.scope_statistics_channel = QComboBox()
+        self.scope_statistics_channel.addItem("等待通道数据")
+        self.scope_statistics_channel.currentIndexChanged.connect(self.update_scope_statistics)
+        self.scope_statistics_channel.setMinimumWidth(290)
+        self.scope_statistics_channel.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.scope_statistics_channel.setEnabled(False)
+        statistics_toolbar.addWidget(self.scope_statistics_channel)
+        layout.addLayout(statistics_toolbar)
+        self.scope_panel = QFrame()
+        self.scope_panel.setObjectName("panel")
+        scope_panel_layout = QVBoxLayout(self.scope_panel)
+        scope_panel_layout.setSizeConstraint(QLayout.SetMinimumSize)
+        scope_panel_layout.setContentsMargins(1, 1, 1, 1)
+        scope_panel_layout.setSpacing(0)
+        scope_panel_layout.addWidget(self.scope)
+        layout.addWidget(self.scope_panel, 1)
         stats = QHBoxLayout()
         self.scope_stats = []
         for name in ("峰值", "谷值", "均方根", "频率估计"):
@@ -1364,15 +1763,7 @@ class ServoWindow(QMainWindow):
             if self.waveform_source is not None:
                 # Statistics belong to the live serial stream; leave them alone.
                 return
-            values = list(self.scope.data[0])
-            if values:
-                rms = math.sqrt(sum(value * value for value in values) / len(values))
-                statistics = (max(values), min(values), rms, abs(self.model.speed) / 60.0)
-                for label, value in zip(self.scope_stats, statistics):
-                    label.setText(f"{value:.1f}")
-            else:
-                for label in self.scope_stats:
-                    label.setText("--")
+            self.update_scope_statistics()
 
     def set_di_input(self, index: int, checked: bool) -> None:
         self.raw_di_states[index] = checked
@@ -1422,10 +1813,10 @@ class ServoWindow(QMainWindow):
 
     def set_scope_running(self, running: bool) -> None:
         self.scope_running = running
-        if running and self.scope_trigger_mode != "自动":
-            self.scope_trigger_remaining = 0
-            self.scope_trigger_ready = True
-            self.reset_scope_trigger_reference()
+        if running:
+            self.trigger_arm_check = False
+            self.scope_last_trigger = None
+            self.scope_trigger_remaining = -1 if self.scope_trigger_mode == "自动" else 0
         self.scope_action_buttons[0].setEnabled(not running)
         self.scope_action_buttons[1].setEnabled(running)
         if self.waveform_source is not None:
@@ -1449,10 +1840,40 @@ class ServoWindow(QMainWindow):
             label.setText("--")
         self.log("示波器显示缓存已清除。")
 
+    def export_scope_data(self) -> None:
+        """Export the current scope buffers to a CSV file.
+
+        Claimed file: header row lists channel names/units, then one row per
+        sample index with all four channels. Uses existing data only; does not
+        alter acquisition state.
+        """
+        series = self.scope.data
+        length = max((len(series[index]) for index in range(4)), default=0)
+        if length == 0:
+            self.log("没有可导出的波形数据。")
+            return
+        name = "servo-scope.csv"
+        path, _ = QFileDialog.getSaveFileName(self, "导出波形数据", name, "CSV (*.csv)")
+        if not path:
+            return
+        try:
+            with open(path, "w", encoding="utf-8", newline="") as stream:
+                writer = csv.writer(stream)
+                writer.writerow(["index"] + [f"{self.scope.channel_names[i]}[{self.scope.channel_units[i]}]" for i in range(4)])
+                for row_index in range(length):
+                    writer.writerow([row_index] + [series[i][row_index] for i in range(4)])
+            self.log(f"波形数据已导出到 {path}（{length} 个采样点）。")
+        except Exception as exc:
+            self.log(f"导出波形数据失败：{exc}")
+
     def set_scope_period(self, text: str) -> None:
-        interval = int(text.split()[0])
+        # Acquisition period is fixed at 100 ms; keep the handler for
+        # compatibility but never let it change the fixed interval.
+        interval = 100
         self.scope_timer.setInterval(interval)
-        self.log(f"示波器采样周期已设置为 {interval} ms。")
+        if self.waveform_source is None:
+            self.scope.set_sample_rate(1000.0 / max(interval, 1))
+        self.log(f"示波器接收缓存读取周期固定为 {interval} ms（不改变设备采样率）。")
 
     def set_scope_trigger(self, mode: str) -> None:
         self.scope_trigger_mode = mode
@@ -1463,76 +1884,57 @@ class ServoWindow(QMainWindow):
             self.scope_status.set_state("自动采集中" if mode == "自动" else f"等待{mode}触发", "run" if mode == "自动" else "warn")
         self.log(f"示波器触发方式切换为{mode}。")
 
+    def set_scope_trigger_source(self, index: int) -> None:
+        self.scope_trigger_source = index
+        self.reset_scope_trigger_reference()
+        self.log(f"示波器触发源切换为 CH{index + 1}。")
+
+    def set_scope_trigger_level(self, value: float) -> None:
+        self.scope_trigger_level_value = float(value)
+        self.reset_scope_trigger_reference()
+        self.log(f"示波器触发电平设置为 {value:.1f} %。")
+
     def reset_scope_trigger_reference(self, value=None) -> None:
         del value
         self.scope_last_trigger = None
         self.scope_trigger_ready = True
+        self.trigger_arm_check = False
+
+    def _trigger_matches(self, previous: float, current: float) -> bool:
+        """Decide whether the newest sample satisfies the selected trigger.
+
+        Auto returns True (free running). Edge modes look at the newest sample
+        crossing the trigger level on the selected channel. Single-shot keeps
+        returning True only while not yet consumed.
+        """
+        if self.scope_trigger_mode == "自动":
+            return True
+        if self.scope_trigger_mode == "单次":
+            return True
+        level = self.scope_trigger_level_value
+        if self.scope_trigger_mode == "上升沿":
+            return bool(previous <= level < current)
+        if self.scope_trigger_mode == "下降沿":
+            return bool(previous >= level > current)
+        return True
 
     def sample_scope(self) -> None:
-        self.scope_clock += self.scope_timer.interval() / 1000.0
-        if self.waveform_source is not None:
-            self.sample_from_transport()
-            return
-        mode = self.mode_combo.currentText()
-        if mode == "速度模式":
-            command_error = self.model.target - self.model.speed
-            error_scale = max(self.model.speed_limit, 1.0)
-        elif mode == "电流模式":
-            command_error = self.model.target - self.model.current
-            error_scale = 12.0
-        else:
-            command_error = self.model.target - self.model.position
-            error_scale = 360.0
-        single_turn_position = ((self.model.position + 180.0) % 360.0) - 180.0
-        sample = (
-            single_turn_position / 1.8,
-            clamp(self.model.speed / max(self.model.speed_limit, 1.0) * 100.0, -100.0, 100.0),
-            clamp(self.model.current / 12.0 * 100.0, -100.0, 100.0),
-            clamp(command_error / error_scale * 100.0, -100.0, 100.0),
-        )
-        trigger_value = sample[self.scope_source.currentIndex()]
-        if not self.scope_running:
-            self.scope_last_trigger = trigger_value
-            return
-
-        if self.scope_last_trigger is None:
-            self.scope_last_trigger = trigger_value
-            if self.scope_trigger_mode != "自动":
-                return
-        trigger_level = self.scope_trigger_level.value()
-        rising = self.scope_last_trigger < trigger_level <= trigger_value
-        falling = self.scope_last_trigger > trigger_level >= trigger_value
-        self.scope_last_trigger = trigger_value
-        triggered = (
-            self.scope_trigger_mode == "上升沿" and rising
-        ) or (self.scope_trigger_mode == "下降沿" and falling) or (
-            self.scope_trigger_mode == "单次" and (rising or falling)
-        )
-        if self.scope_trigger_mode != "自动" and self.scope_trigger_remaining == 0:
-            if not self.scope_trigger_ready:
-                opposite_edge = falling if self.scope_trigger_mode in ("上升沿", "单次") else rising
-                self.scope_trigger_ready = opposite_edge
-                return
-            if not triggered:
-                return
-            self.scope_trigger_ready = False
-            self.scope_trigger_remaining = 120
-            self.scope.clear()
-            self.scope_status.set_state("触发后采集中", "run")
-            self.log(f"示波器捕获到{self.scope_trigger_mode}触发。")
-
-        self.scope.add_sample(sample)
-        if self.scope_trigger_remaining > 0:
-            self.scope_trigger_remaining -= 1
-            if self.scope_trigger_remaining == 0:
-                if self.scope_trigger_mode == "单次":
-                    self.scope_running = False
-                    self.scope_action_buttons[0].setEnabled(True)
-                    self.scope_action_buttons[1].setEnabled(False)
-                    self.scope_status.set_state("单次采集完成", "ok")
-                    self.log("示波器单次采集完成。")
-                else:
-                    self.scope_status.set_state(f"等待{self.scope_trigger_mode}触发", "warn")
+        try:
+            self.scope_clock += self.scope_timer.interval() / 1000.0
+            if self.waveform_source is not None:
+                self.sample_from_transport()
+        except Exception as exc:
+            self.scope_faulted = True
+            self.scope_timer.stop()
+            write_crash_report("示波器定时采样异常", exc)
+            try:
+                self.detach_waveform_source(quiet=True)
+            except Exception as detach_exc:
+                write_crash_report("示波器异常后的数据源关闭失败", detach_exc)
+                self.waveform_source = None
+            self.waveform_status.set_state("示波器异常，采集已安全停止", "warn")
+            self.scope_status.set_state("采集异常，请查看 logs/servo_crash.log", "warn")
+            self.log(f"示波器异常已隔离，程序继续运行：{exc}")
 
     # ------------------------------------------------------------------
     # Real waveform sources (RS485 serial / built-in sine generator)
@@ -1575,12 +1977,6 @@ class ServoWindow(QMainWindow):
         if self.waveform_source is not None:
             self.detach_waveform_source(quiet=True)
         self.sync_serial_controls()
-        if name == "仿真模型":
-            self.waveform_status.set_state("数据源：仿真模型", "off")
-            self.waveform_stats_label.setText("尚未采集")
-            self.sync_scope_controls()
-            self.log("已切回仿真模型数据源。")
-            return
         self.sync_scope_controls()
         if name == "RS485 串口":
             self.waveform_status.set_state("等待打开串口", "warn")
@@ -1616,8 +2012,12 @@ class ServoWindow(QMainWindow):
 
     def attach_waveform_source(self, source, description: str) -> None:
         """Start streaming frames from ``source`` into the scope."""
+        self.scope_faulted = False
+        if not self.scope_timer.isActive():
+            self.scope_timer.start()
         self.waveform_source = source
         self.waveform_source_rate = getattr(source, "rate_hz", 1000) or 1000
+        self.scope.set_sample_rate(self.waveform_source_rate)
         self.waveform_idle_ticks = 0
         # About 2.5 firmware sine cycles on screen: one cycle alone leaves no
         # complete rising-edge pair for the frequency estimate to measure.
@@ -1631,7 +2031,7 @@ class ServoWindow(QMainWindow):
         self.scope.clear()
         self.reset_scope_trigger_reference()
         self.scope_running = True
-        self.scope_timer.setInterval(33)
+        self.scope_timer.setInterval(100)  # Fixed acquisition period: 100 ms
         self.waveform_status.set_state(f"采集中：{description}", "ok")
         self.sync_serial_controls()
         self.sync_scope_controls()
@@ -1649,20 +2049,27 @@ class ServoWindow(QMainWindow):
         self.waveform_idle_ticks = 0
         self.waveform_channel_signature = ()
         self.scope.set_capacity(ScopeChart.DEFAULT_CAPACITY)
-        if self.saved_channel_visibility:
-            self.apply_channel_visibility(tuple(self.saved_channel_visibility))
-            self.saved_channel_visibility = []
         self.scope.set_channel_names(
-            ("单圈位置", "速度反馈", "Q轴电流", "命令误差"),
-            ("%", "%", "%", "%"),
+            ("等待通道", "--", "--", "--"),
+            ("", "", "", ""),
         )
-        for check, text in zip(self.scope_channel_checks, ("CH1 单圈位置", "CH2 速度反馈", "CH3 Q轴电流", "CH4 命令误差")):
+        for check, text in zip(self.scope_channel_checks, ("CH1 等待数据", "CH2 --", "CH3 --", "CH4 --")):
             check.setText(text)
-        self.scope_timer.setInterval(50)
+        self.scope_statistics_channel.blockSignals(True)
+        self.scope_statistics_channel.clear()
+        self.scope_statistics_channel.addItem("等待通道数据")
+        self.scope_statistics_channel.setCurrentIndex(0)
+        self.scope_statistics_channel.blockSignals(False)
+        self.scope_statistics_channel.setEnabled(False)
+        self.apply_channel_visibility((True, False, False, False))
+        self.scope.clear()
+        self.scope_running = False
+        self.scope_timer.setInterval(100)  # Fixed acquisition period: 100 ms
+        self.scope.set_sample_rate(20.0)
         if not quiet:
-            self.waveform_status.set_state("数据源：仿真模型", "off")
+            self.waveform_status.set_state("等待打开 RS485 串口", "warn")
             self.waveform_stats_label.setText("尚未采集")
-            self.log("波形数据源已断开，恢复仿真模型显示。")
+            self.log("波形数据源已断开，等待新的 RS485 或内置正弦数据源。")
         self.sync_serial_controls()
         self.sync_scope_controls()
 
@@ -1676,29 +2083,26 @@ class ServoWindow(QMainWindow):
         self.scope.update()
 
     def sync_scope_controls(self) -> None:
-        """Trigger logic only applies to the simulated model."""
+        """Trigger controls apply to the live waveform source."""
         live = self.waveform_source is not None
         for widget in (self.scope_trigger, self.scope_source, self.scope_trigger_level):
-            widget.setEnabled(not live)
-        self.scope_action_buttons[0].setEnabled(not self.scope_running)
-        self.scope_action_buttons[1].setEnabled(self.scope_running)
+            widget.setEnabled(live)
+        ready = self.waveform_source is not None
+        self.scope_action_buttons[0].setEnabled(ready and not self.scope_running)
+        self.scope_action_buttons[1].setEnabled(ready and self.scope_running)
         self.scope_action_buttons[2].setEnabled(True)
+        self.scope_action_buttons[3].setEnabled(True)
         if live:
             self.scope_status.set_state(
                 "实时串口采集" if self.scope_running else "实时采集已暂停",
                 "run" if self.scope_running else "off",
             )
-        elif self.scope_running:
-            self.scope_status.set_state(
-                "自动采集中" if self.scope_trigger_mode == "自动"
-                else f"等待{self.scope_trigger_mode}触发",
-                "run" if self.scope_trigger_mode == "自动" else "warn",
-            )
         else:
-            self.scope_status.set_state("采集已停止", "off")
+            self.scope_status.set_state("等待数据源", "off")
 
     def sample_from_transport(self) -> None:
-        """Push every buffered frame into the scope and refresh statistics."""
+        """Push every buffered frame into the scope, gated by the trigger,
+        and refresh statistics."""
         source = self.waveform_source
         if source is None:
             return
@@ -1706,13 +2110,24 @@ class ServoWindow(QMainWindow):
         if frames:
             self.waveform_idle_ticks = 0
             if self.scope_running:
+                self.trigger_arm_check = getattr(self, "trigger_arm_check", False)
                 for frame in frames:
                     signature = (frame.mode, *frame.channel_ids)
                     if signature != self.waveform_channel_signature:
                         self.configure_waveform_channels(frame)
-                    self.scope.add_sample(to_scope_sample(frame))
-                self.update_scope_statistics()
-            self.update_waveform_stats(source)
+                    sample = to_scope_sample(frame)
+                    if not self._frame_passes_trigger(sample):
+                        continue
+                    self.scope_trigger_remaining += 1
+                    self.scope.add_sample(sample)
+                    if self.scope_trigger_mode == "单次":
+                        self.set_scope_running(False)
+                        self.log("单次触发已满足，采集停止。")
+                now = time.monotonic()
+                if now - getattr(self, "_last_scope_stats", 0) >= 0.2:
+                    self.update_scope_statistics()
+                    self.update_waveform_stats(source)
+                    self._last_scope_stats = now
         else:
             self.waveform_idle_ticks += 1
             # About one second without data: the link is silent.
@@ -1721,6 +2136,33 @@ class ServoWindow(QMainWindow):
                 self.log("串口链路约 1 秒没有收到有效帧，请检查 A/B 极性、共地与固件采样状态。")
         if self.waveform_idle_ticks % 10 == 0:
             self.update_waveform_stats(source)
+
+    def _frame_passes_trigger(self, sample: tuple[float, float, float, float]) -> bool:
+        """Apply the selected trigger to the newest frame sample.
+
+        Auto: pass everything. Edge modes: look at the selected channel
+        crossing the level between the previous and newest sample.
+        Single: pass only once until the reference resets.
+        """
+        if self.scope_trigger_mode == "自动":
+            return True
+        index = max(0, min(self.scope_trigger_source, 3))
+        current = sample[index]
+        previous = self.scope_last_trigger
+        self.scope_last_trigger = current
+        if previous is None:
+            return False
+        level = self.scope_trigger_level_value
+        if self.scope_trigger_mode == "上升沿":
+            return bool(previous <= level < current)
+        if self.scope_trigger_mode == "下降沿":
+            return bool(previous >= level > current)
+        if self.scope_trigger_mode == "单次":
+            if self.trigger_arm_check:
+                return False
+            self.trigger_arm_check = True
+            return True
+        return True
 
     def update_waveform_stats(self, source) -> None:
         stats = source.stats
@@ -1743,13 +2185,27 @@ class ServoWindow(QMainWindow):
             unit = f" [{channel.unit}]" if active and channel.unit else ""
             text = f"CH{index + 1} {channel.name}{unit}" if active else f"CH{index + 1} --"
             check.setText(text)
+        self.scope_statistics_channel.blockSignals(True)
+        self.scope_statistics_channel.clear()
+        for index, channel in enumerate(channels):
+            unit = f" [{channel.unit}]" if channel.unit else ""
+            self.scope_statistics_channel.addItem(f"CH{index + 1} {channel.name}{unit}")
+        self.scope_statistics_channel.setCurrentIndex(0)
+        self.scope_statistics_channel.blockSignals(False)
+        self.scope_statistics_channel.setEnabled(True)
         self.apply_channel_visibility(tuple(index < len(channels) for index in range(4)))
         self.waveform_status.set_state(f"采集中：{frame.mode_name} / {len(channels)} 通道", "ok")
         self.log(f"波形模式切换为{frame.mode_name}，通道 ID：{', '.join(map(str, frame.channel_ids))}。")
 
-    def update_scope_statistics(self) -> None:
-        """Peak/valley/RMS/frequency for the first channel in its own unit."""
-        values = list(self.scope.data[0])
+    def update_scope_statistics(self, value=None) -> None:
+        """Update statistics for the channel explicitly selected by the user."""
+        del value
+        channel_index = max(0, self.scope_statistics_channel.currentIndex())
+        self.scope.selected_channel = channel_index
+        self.scope.update()
+        if self.scope_popup is not None:
+            self.scope_popup.chart.update()
+        values = list(self.scope.data[channel_index])
         if not values:
             for label in self.scope_stats:
                 label.setText("--")
@@ -1760,15 +2216,30 @@ class ServoWindow(QMainWindow):
             else 1000.0 / max(self.scope_timer.interval(), 1)
         )
         statistics = (max(values), min(values), rms, estimate_frequency(values, rate))
-        unit = self.scope.channel_units[0]
+        unit = self.scope.channel_units[channel_index]
         for index, (label, value) in enumerate(zip(self.scope_stats, statistics)):
             suffix = " Hz" if index == 3 else (f" {unit}" if unit else "")
-            label.setText(f"{value:.1f}{suffix}")
+            number = f"{value:.1f}" if abs(value) < 100000 else f"{value:.3e}"
+            label.setText(f"{number}{suffix}")
+            label.setToolTip(f"{value:.6g}{suffix}")
+
+    def open_scope_popup(self) -> None:
+        if self.scope_popup is None:
+            self.scope_popup = ScopePopup(self.scope, self)
+        self.scope_popup.set_theme(self.theme_name)
+        if not self.scope_popup.refresh_timer.isActive():
+            self.scope_popup.refresh_timer.start()
+        self.scope_popup.show()
+        self.scope_popup.raise_()
+        self.scope_popup.activateWindow()
+        self.log("已打开实时波形独立视图。")
 
     def closeEvent(self, event) -> None:
         """Never leave the serial worker thread behind."""
         if self.waveform_source is not None:
             self.detach_waveform_source(quiet=True)
+        if self.scope_popup is not None:
+            self.scope_popup.close()
         super().closeEvent(event)
 
     def set_channel(self, index: int, visible: bool) -> None:
@@ -2003,6 +2474,7 @@ class ServoWindow(QMainWindow):
 
 
 def run() -> None:
+    install_crash_logging()
     app = QApplication(sys.argv)
     app.setStyle("Fusion")
     window = ServoWindow()

@@ -1,0 +1,49 @@
+20
+Status Bits
+The error bit, warning bit, and status bits are used to indicate the current operating status of the encoder. The functions of the error bit and warning bit are consistent across all interfaces. However, for different
+functional versions of the MPT product series, the error bit and warning bit may represent different
+information. The error bit and warning bit mainly indicate alarms and error conditions related to the single-turn absolute
+position and the battery-backed or flash multi-turn functions. Detailed alarm and error information is
+shown in the table below: LED On LED Flashing
+General Indication
+Battery Multi-turn
+Version
+Flash Multi-turn
+Version
+Warning
+Bit
+The encoder detects a
+possible mounting
+deviation, but the
+encoder is still operating
+normally. Battery voltage is
+below 2.9 V. -
+Error Bit
+The encoder detects an
+abnormal error condition. Battery voltage is
+below 2.7 V or the
+battery is
+disconnected.
+Mechanical rotation
+exceeded ±90° during
+power-off, resulting in
+abnormal multi-turn
+data. The multi-turn
+value is automatically
+cleared. Solution
+Check for mechanical
+structure changes or
+perform remounting and
+recalibration. Check the encoder
+battery voltage and
+wiring, or replace
+the encoder
+battery. Check the mechanical
+structure and power on
+the encoder again. The LED color changes according to the status of the error bit and warning bit. When the warning bit is
+asserted, the data remains valid and the LED indicator turns yellow. In this state, some parameters indicated
+by the status bits are approaching their limit values and can be checked through the status bits. When the
+error bit is asserted, the data becomes invalid and the LED indicator turns red. Detailed error information can
+be checked through the status bits. During normal operation, the LED indicator remains green.
+In the SSI, RS485, RS422, BUS, and PERIOD interfaces, one byte is used to represent status information.
+Status
